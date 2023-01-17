@@ -1,19 +1,158 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="UTF-8">
-        <title>{% block title %}Welcome!{% endblock %}</title>
-        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text></svg>">
-        {# Run `composer require symfony/webpack-encore-bundle` to start using Symfony UX #}
-        {% block stylesheets %}
-            {{ encore_entry_link_tags('app') }}
-        {% endblock %}
+	<head>
+		<meta charset="UTF-8">
+		<title>
+			{% block title %}Welcome!
+			{% endblock %}
+		</title>
+		<link
+		rel="icon" href="/img/logo_clear.svg">
+		{# Run `composer require symfony/webpack-encore-bundle` to start using Symfony UX #}
+		{% block stylesheets %}
+			{{ encore_entry_link_tags('app') }}
+		{% endblock %}
 
-        {% block javascripts %}
-            {{ encore_entry_script_tags('app') }}
-        {% endblock %}
-    </head>
-    <body>
-        {% block body %}{% endblock %}
-    </body>
+		{% block javascripts %}
+			{{ encore_entry_script_tags('app') }}
+		{% endblock %}
+	</head>
+	<body>
+		{% block header %}
+			<header>
+				<div class="logo_container">
+					<a href="{{path('app_index')}}">
+						<div class="logo">
+							<img src="/img/logo_clear.svg" alt="Le Quai Antique">
+						</div>
+					</a>
+					<div class="site_title">
+						Le Quai<br/>
+						Antique
+					</div>
+				</div>
+				<div class="top_menu">
+
+					<ul class="link_list">
+						<a href="{{path('app_dishes')}}">
+							<li class="link_item">La Carte</li>
+						</a>
+						<a href="{{path('app_menus')}}">
+							<li class="link_item">Les Menus</li>
+						</a>
+						<a href="#">
+							<li class="link_item">Mon Compte</li>
+						</a>
+					</ul>
+
+					<div class="burger">
+						<label for="show_menu">
+							<svg viewbox="0 0 32 32" fill="#ededed">
+								<rect x="0" y="4" rx="3" ry="3" width="32" height="3"/>
+								<rect x="0" y="14" rx="3" ry="3" width="32" height="3"/>
+								<rect x="0" y="24" rx="3" ry="3" width="32" height="3"/>
+							</svg>
+						</label>
+						<input type="checkbox" name="burger" id="show_menu" class="burgerInput">
+					</div>
+
+				</div>
+				<div class="button_container">
+					<a href="{{path('app_booking')}}">
+						<div class="booking_button">
+							<p>Réserver</p>
+						</div>
+					</a>
+				</div>
+			</header>
+		{% endblock %}
+		<main>
+			{% block body %}{% endblock %}
+		</main>
+
+		{% block footer %}
+			<footer>
+				<div class="schedule">
+					<p>Horaires d'ouverture</p>
+
+					<table>
+						<thead>
+							<tr>
+								<th></th>
+								<th>Midi</th>
+								<th>Soir</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>Lundi</td>
+								<td>Fermé</td>
+								<td>19h - 22h</td>
+							</tr>
+							<tr>
+								<td>Mardi</td>
+								<td>12h - 15h</td>
+								<td>19h - 22h</td>
+							</tr>
+							<tr>
+								<td>Mercredi</td>
+								<td>12h -15h</td>
+								<td>19h - 22h</td>
+							</tr>
+							<tr>
+								<td>Jeudi</td>
+								<td>12h - 15h</td>
+								<td>19h - 22h</td>
+							</tr>
+							<tr>
+								<td>Vendredi</td>
+								<td>12h - 15h</td>
+								<td>19h - 22h</td>
+							</tr>
+							<tr>
+								<td>Samedi</td>
+								<td>12h - 15h</td>
+								<td>19h - 22h</td>
+							</tr>
+							<tr>
+								<td>Dimanche</td>
+								<td>Fermé</td>
+								<td>Fermé</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<div class="site_map">
+					<div class="map">
+						<p>Plan du site</p>
+						<br/>
+						<p>
+							<a href="{{path('app_index')}}">Accueil</a>
+						</p>
+						<p>
+							<a href="{{path('app_dishes')}}">La Carte</a>
+						</p>
+						<p>
+							<a href="{{path('app_menus')}}">Les Menus</a>
+						</p>
+						<p>
+							<a href="#">Mon Compte</a>
+						</p>
+						<p>
+							<a href="{{path('app_booking')}}">Réserver</a>
+						</p>
+					</div>
+					<div class="cgu">
+						<a href="#">CGU</a>
+					</div>
+				</div>
+				<div class="address">
+					<p>Le Quai Antique</p>
+					<p>10 avenue de la Raclette</p>
+					<p>73000 Chambéry</p>
+					<p>Tél : 04 79 12 34 56</p>
+				</div>
+			</footer>
+		{% endblock %}
+	</body>
 </html>

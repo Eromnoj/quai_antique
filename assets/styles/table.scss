@@ -1,0 +1,159 @@
+
+.div_table {
+
+  table {
+    width: 810px;
+    margin-top: 35px;
+    border-collapse: collapse;
+    position: unset;
+    
+    td,
+    th,
+    tr {
+      position: unset;
+      padding: 5px;
+      width: 100px;
+      text-align: center;
+    }
+    
+    .day {
+      font-weight: bold;
+      text-align: left;
+    }
+    .end {
+      border-right: 1px solid variables.$rich-black-fogra-29;
+    }
+    .buttons {
+      width: 100px;
+      .buttons_div {
+        margin-top: 10px;
+        width: 100%;
+        display: flex;
+        justify-content: space-evenly;
+        align-items: center;
+      }
+    }
+    
+    .menu_name {
+      font-family: "Average Sans", sans-serif;
+      font-size: 20px;
+      text-align: center;
+      background-color: variables.$cultured;
+    }
+
+    
+
+  
+    .closed {
+      border-right: 1px solid variables.$rich-black-fogra-29;
+    }
+    
+    thead {
+      background-color: variables.$ocean-green;
+    }
+    
+    tbody tr:nth-child(odd) {
+      background-color: variables.$middle-blue-green;
+    }
+  }
+  
+}
+
+  @media screen and (max-width: 430px) {
+
+    .div_table {
+      width: 340px;
+      margin: auto;
+      overflow-x: scroll;
+    }
+  
+}
+
+@media screen and (min-width: 431px) and (max-width: 500px) {
+ 
+    .div_table {
+      width: 410px;
+      margin: auto;
+      overflow-x: scroll;
+    }
+  
+}
+
+@media screen and (min-width: 501px) and (max-width: 600px) {
+
+    .div_table {
+      width: 490px;
+      margin: auto;
+      overflow-x: scroll;
+    }
+  
+}
+
+@media screen and (min-width: 601px) and (max-width: 660px) {
+
+    .div_table {
+      width: 590px;
+      margin: auto;
+      overflow-x: scroll;
+    }
+  
+}
+
+@media screen and (min-width: 661px) and (max-width: 720px) {
+  
+    .div_table {
+      width: 650px;
+      margin: auto;
+      overflow-x: scroll;
+    }
+  
+}
+
+@media screen and (min-width: 721px) and (max-width: 820px) {
+
+    .div_table {
+      width: 710px;
+      margin: auto;
+      overflow-x: scroll;
+    }
+  
+}
+
+@media screen and (min-width: 821px) and (max-width: 874px) {
+
+    .div_table {
+      width: 810px;
+      margin: auto;
+      overflow-x: scroll;
+    }
+  
+}
+
+@media screen and (min-width: 875px) and (max-width: 920px) {
+
+    .div_table {
+      width: 550px;
+      margin: auto;
+      overflow-x: scroll;
+    }
+  
+}
+
+@media screen and (min-width: 921px) and (max-width: 980px) {
+
+    .div_table {
+      width: 600px;
+      margin: auto;
+      overflow-x: scroll;
+    }
+  
+}
+
+@media screen and (min-width: 981px) and (max-width: 1070px) {
+
+    .div_table {
+      width: 660px;
+      margin: auto;
+      overflow-x: scroll;
+    }
+}

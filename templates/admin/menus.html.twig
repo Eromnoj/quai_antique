@@ -1,0 +1,7 @@
+{% extends 'admin_base.html.twig' %}
+
+{% block title %}Gérer les menus{% endblock %}
+
+{% block content %}
+<div {{ react_component('AdminMenus', {'data': "l'autre test"} )}}></div>
+{% endblock %}

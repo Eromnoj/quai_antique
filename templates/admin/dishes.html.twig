@@ -1,0 +1,7 @@
+{% extends 'admin_base.html.twig' %}
+
+{% block title %}Gérer les plats{% endblock %}
+
+{% block content %}
+<div {{ react_component('AdminDishes', {'data': "l'autre test"} )}}></div>
+{% endblock %}

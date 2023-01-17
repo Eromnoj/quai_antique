@@ -1,0 +1,7 @@
+{% extends 'admin_base.html.twig' %}
+
+{% block title %}Infos Restaurant{% endblock %}
+
+{% block content %}
+<div {{ react_component('AdminRestaurant', {'data': "l'autre test"} )}}></div>
+{% endblock %}

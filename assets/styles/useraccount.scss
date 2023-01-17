@@ -1,0 +1,60 @@
+@use 'variables.scss';
+@import url('https://fonts.googleapis.com/css2?family=Average+Sans&family=Karma:wght@300;400;500;600;700&family=Titillium+Web:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,200;1,300;1,400;1,600;1,700&display=swap');
+
+.user_container {
+  width: 90%;
+  margin: auto;
+  margin-top: 40px;
+  margin-bottom: 140px;
+
+
+  .user_form {
+    max-width: 700px;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    .name_div,
+    .phone_div,
+    .number_div,
+    .allergen_div,
+    .email_div,
+    .password_div,
+    .password_verif_div {
+      display: flex;
+      flex-direction: column;
+      font-family: "Karma", serif;
+      font-size: 25px;
+      margin-bottom: 35px;
+
+      input {
+        height: 45px;
+        width: 100%;
+        border-radius: 10px;
+        border-width: 1px;
+        border-color: variables.$rich-black-fogra-29;
+        text-align: center;
+        font-size: 20px;
+      }
+
+      textarea {
+        height: 200px;
+        width: 100%;
+        border-radius: 10px;
+        border-width: 1px;
+        border-color: variables.$rich-black-fogra-29;
+        text-align: center;
+        font-size: 20px;
+        padding: 10px;
+      }
+    }
+
+    .submit_button {
+      @include variables.button(50px, 260px, variables.$green-crayola, 7px, 20px);
+      align-self: center;
+      
+    }
+  }
+  .margin_password {
+    margin-top: 75px;
+  }
+}

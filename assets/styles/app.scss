@@ -1,0 +1,247 @@
+@use 'variables';
+@import 'home.scss';
+@import 'dishes.scss';
+@import 'menus.scss';
+@import 'booking.scss';
+@import 'userbase.scss';
+@import 'useraccount.scss';
+@import 'adminbase.scss';
+@import 'adminrestaurant.scss';
+
+@import 'modal.scss';
+@import 'table.scss';
+
+@import url('https://fonts.googleapis.com/css2?family=Average+Sans&family=Karma:wght@300;400;500;600;700&family=Titillium+Web:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,200;1,300;1,400;1,600;1,700&display=swap');
+
+// CSS reset
+*,
+html,
+body {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+////////
+
+
+body {
+    background-color: variables.$cultured;
+    color: variables.$rich-black-fogra-29;
+    display: grid;
+    min-height: 100vh;
+    grid-template-rows: 100px 1fr 100%;
+    font-family: "Karma", serif;
+}
+
+
+header {
+    background-color: variables.$rich-black-fogra-29;
+    width: 100%;
+    height: 100px;
+    position: relative;
+    top: 0px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+
+    .logo_container {
+        display: flex;
+        align-items: center;
+        justify-self: start;
+        align-self: center;
+
+        .logo {
+            width: 80px;
+            height: 80px;
+            padding: 5px;
+            margin-top: -5px;
+        }
+
+        .site_title {
+            font-family: 'Titillium Web', sans-serif;
+            font-weight: bold;
+            font-size: 20px;
+            color: variables.$ocean-green;
+            margin-left: 10px;
+            text-decoration: none;
+        }
+    }
+
+    .top_menu {
+        justify-self: end;
+        align-self: center;
+        z-index: 40;
+        .burger {
+            width: 50px;
+            height: 50px;
+            position: absolute;
+            top: 25px;
+            right: 10px;
+
+            .burgerInput {
+                display: none;
+            }
+        }
+
+        .link_list {
+            display: none;
+            flex-direction: column;
+            list-style: none;
+            text-align: right;
+            position: absolute;
+            top: 100px;
+            right: 0px;
+            width: 100vw;
+            background-color: variables.$rich-black-fogra-29;
+
+            a {
+                font-family: 'Average Sans', sans-serif;
+                color: variables.$cultured;
+                font-size: 25px;
+                text-decoration: none;
+
+                .link_item {
+                    padding-right: 10px;
+                    margin-top: 40px;
+                    margin-bottom: 40px;
+                }
+
+                :hover {
+                    transition: filter .5s;
+                    filter: drop-shadow(0px 0px 1px variables.$middle-blue-green);
+                }
+            }
+        }
+    }
+
+    .button_container {
+        display: none;
+    }
+}
+
+footer {
+    width: 100%;
+    min-height: 380px;
+    max-height: 700px;
+    background: variables.$green-crayola;
+    color: variables.$rich-black-fogra-29;
+    font-family: 'Karma', serif;
+    font-size: 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: center;
+
+    .schedule {
+        height: 280px;
+        width: 340px;
+        display: flex;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
+        text-align: center;
+
+        table {
+            width: 90%;
+
+            thead,
+            tbody {
+                width: 100%;
+            }
+        }
+    }
+
+    .site_map {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-evenly;
+        align-items: center;
+        text-align: center;
+        height: 300px;
+        width: 90px;
+
+        a {
+            text-decoration: none;
+            color: variables.$rich-black-fogra-29;
+
+            &:hover {
+                text-decoration: underline;
+            }
+        }
+    }
+}
+
+
+
+@media screen and (min-width: 875px) {
+
+    body {
+        grid-template-rows: 100px 1fr 380px;
+    }
+
+    header {
+        grid-template-columns: repeat(3, 1fr);
+
+        .logo_container {
+    
+            .logo {
+                width: 90px;
+                height: 90px;
+            }
+    
+            .site_title {
+                font-size: 25px;
+            }
+        }
+
+        .top_menu {
+            justify-self: center;
+            align-self: center;
+
+            .burger {
+                display: none;
+            }
+
+            .link_list {
+                display: flex;
+                flex-direction: row;
+                text-align: center;
+
+                position: relative;
+                top: 0px;
+                right: 0px;
+                width: 100%;
+                max-height: 100%;
+
+                a {
+                    font-size: 20px;
+
+                    .link_item {
+                        margin-top: 0px;
+                        margin-bottom: 0px;
+                        margin-left: 40px;
+                        margin-right: 40px;
+                    }
+                }
+            }
+        }
+
+        .button_container {
+            display: block;
+            justify-self: end;
+            align-self: center;
+            a {
+                text-decoration: none;
+                .booking_button {
+                    @include variables.button(50px, 250px, variables.$green-crayola, 12px, 20px)
+                }
+            }
+        }
+    }
+
+    footer {
+        flex-direction: row;
+        justify-content: space-evenly;
+    }
+}

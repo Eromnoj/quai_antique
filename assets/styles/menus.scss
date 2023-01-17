@@ -1,0 +1,96 @@
+@use 'variables.scss';
+@import url('https://fonts.googleapis.com/css2?family=Average+Sans&family=Karma:wght@300;400;500;600;700&family=Titillium+Web:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,200;1,300;1,400;1,600;1,700&display=swap');
+
+.menus_container {
+  display: grid;
+  margin-bottom: 40px;
+
+  .page_title {
+    justify-self: center;
+    font-family: "Titillium web", sans-serif;
+    font-weight: bold;
+    color: variables.$green-crayola;
+    font-size: 50px;
+    margin-bottom: 50px;
+  }
+
+  .menus_items {
+    justify-self: center;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    max-width: 900px;
+
+    .item {
+      width: 340px;
+      min-height: 500px;
+      background: #FFFFFF;
+      box-shadow: 1px 3px 5px 1px rgba(29, 176, 122, 0.5);
+      margin-left: 0px;
+      margin-right: 0px;
+      margin-bottom: 100px;
+
+      display: flex;
+      flex-direction: column;
+      justify-content: space-evenly;
+      align-items: center;
+
+      .item_title {
+        font-family: "Average Sans", sans-serif;
+        font-size: 35px;
+      }
+
+        .item_formula{
+          min-height: 150px;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-evenly;
+          align-items: center;
+
+          .formula_title {
+            font-family: "Average Sans", sans-serif;
+            font-size: 25px;
+          }
+          .formula_description {
+            text-align: center;
+            font-family: "Karma", serif;
+            font-size: 16px;
+          }
+
+          .formula_price {
+            font-family: "Titillium Web", sans-serif;
+            font-size: 25px;
+            font-weight: bold;
+          }
+        }
+    }
+
+  }
+}
+
+@media screen and (min-width: 360px) {
+  .menus_container {
+
+    .menus_items {
+      .item {
+        margin-left: 10px;
+        margin-right: 10px;
+      }
+  }
+}
+}
+
+@media screen and (min-width: 875px) {
+  .menus_container {
+  
+    .page_title {
+      font-size: 80px;
+    }
+    .menus_items {
+      .item {
+        margin-left: 50px;
+        margin-right: 50px;
+      }
+  }
+}
+}

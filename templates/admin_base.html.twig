@@ -1,0 +1,23 @@
+{% extends 'base.html.twig' %}
+
+
+{% block body %}
+	<div class="admin_body">
+		{% block sidebar %}
+  <div class="sidebar">
+			
+      <ul class="sidebar_list">
+        <a href="{{path('app_admin_restaurant')}}"><li class="sidebar_item">Infos Restaurant</li></a>
+        <a href="{{path('app_admin_dishes')}}"><li class="sidebar_item">La Carte</li></a>
+        <a href="{{path('app_admin_menus')}}"><li class="sidebar_item">Les Menus</li></a>
+        <a href="{{path('app_admin_booking')}}"><li class="sidebar_item">Les Réservations</li></a>
+        <a href=""><li class="sidebar_item disconnect">Déconnexion</li></a>
+      </ul>
+  </div>
+		{% endblock %}
+    <div class="admin_content">
+    <h2 class="admin_title">Administration</h2>
+		{% block content %}{% endblock %}
+    </div>
+	</div>
+{% endblock %}

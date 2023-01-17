@@ -1,0 +1,88 @@
+@use 'variables.scss';
+@import url('https://fonts.googleapis.com/css2?family=Average+Sans&family=Karma:wght@300;400;500;600;700&family=Titillium+Web:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,200;1,300;1,400;1,600;1,700&display=swap');
+
+.dishes_container {
+  display: grid;
+  margin-bottom: 40px;
+
+  .page_title {
+    justify-self: center;
+    font-family: "Titillium web", sans-serif;
+    font-weight: bold;
+    color: variables.$green-crayola;
+    font-size: 50px;
+    margin-bottom: 50px;
+  }
+
+  .category_container {
+    justify-self: center;
+
+    .category_title {
+      text-align: center;
+      font-family: "Average Sans", sans-serif;
+      font-size: 40px;
+      text-decoration: underline;
+      margin-bottom: 30px;
+    }
+
+    .category_items {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 55px;
+
+      .item {
+        width: 300px;
+        min-height: 200px;
+        background: #FFFFFF;
+        box-shadow: 1px 3px 5px 1px rgba(29, 176, 122, 0.5);
+        margin-top: 35px;
+
+        display: flex;
+        flex-direction: column;
+        justify-content: space-evenly;
+        align-items: center;
+
+        .item_name {
+          font-family: "Average Sans", sans-serif;
+          font-size: 30px;
+        }
+
+        .item_description {
+          font-family: "Karma", serif;
+          font-size: 20px;
+        }
+
+        .item_price {
+          font-family: "Titillium web", sans-serif;
+          font-weight: bold;
+          font-size: 20px;
+
+        }
+      }
+    }
+  }
+}
+
+
+@media screen and (min-width: 875px){
+
+  .dishes_container {
+    .page_title {
+      font-size: 80px;
+      margin-bottom: 50px;
+    }
+    
+    .category_container {
+
+      .category_items {
+
+        .item {
+          margin-left: 33px;
+          margin-right: 33px;
+          margin-top: 35px;
+        }
+      }
+    }
+  }
+}

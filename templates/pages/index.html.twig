@@ -1,0 +1,27 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Le Quai Antique - Accueil
+{% endblock %}
+
+{% block body %}
+	<div class="landing">
+		<div class="intro">
+			<div class="title_intro">
+				<h1>Le Quai Antique</h1>
+				<h3>une expérience gastronomique<br/>sans artifice</h3>
+				<h4>par Arnaud Michant</h4>
+			</div>
+		</div>
+	</div>
+
+	<div class="home_content">
+		<div {{ react_component('Home', {'data': "l'autre test"} )}}></div>
+
+		<a href="{{path('app_booking')}}"><div class="booking_button">
+			<p>Réserver</p>
+		</div>
+		</a>
+	</div>
+
+
+{% endblock %}

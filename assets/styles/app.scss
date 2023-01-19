@@ -3,6 +3,9 @@
 @import 'dishes.scss';
 @import 'menus.scss';
 @import 'booking.scss';
+
+@import 'login.scss';
+@import 'reset.scss';
 @import 'userbase.scss';
 @import 'useraccount.scss';
 @import 'adminbase.scss';
@@ -231,6 +234,7 @@ footer {
             display: block;
             justify-self: end;
             align-self: center;
+            margin-right: 10px;
             a {
                 text-decoration: none;
                 .booking_button {

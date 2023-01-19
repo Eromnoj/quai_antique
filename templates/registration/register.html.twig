@@ -1,0 +1,44 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Register
+{% endblock %}
+
+{% block body %}
+	<div class="login_container">
+		<h2 class="login_title">Register</h2>
+
+		<div class="disclaimer">
+			<div>Déjà inscrit ?</div>
+			<div>
+				<a href="{{ path('app_login')}}">Connectez vous en cliquant ici</a>
+			</div>
+		</div>
+
+		
+			{{ form_start(registrationForm) }}
+			
+				{{ form_row(registrationForm.email, {
+                    label: 'Votre e-mail :'
+                }) }}
+			
+		
+				{{ form_row(registrationForm.plainPassword.first, {
+            label: 'Votre mot de passe :'
+        }) }}
+        {{ form_row(registrationForm.plainPassword.second, {
+            label: 'Confirmez le mot de passe :'
+        }) }}
+			
+				{{ form_row(registrationForm.agreeTerms, {
+                    label :"J'accepte les CGU",
+                }) }}
+                <div>
+                <a href="" class="cgu">Lire les CGU</a>
+                </div>
+			<div>
+				<button type="submit" class="submit_button">Register</button>
+			</div>
+			{{ form_end(registrationForm) }}
+		
+	</div>
+{% endblock %}

@@ -9,7 +9,6 @@ $gradient-top-right: linear-gradient(45deg, #edededff, #a7d8c6ff, #62c4a0ff, #1d
 
 
 @mixin button($height, $width, $bgcolor, $padding, $fontsize) {
-  margin-right: 10px;
   width: $width;
   height: $height;
   padding-top: $padding;

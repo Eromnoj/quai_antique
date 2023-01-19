@@ -1,0 +1,16 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Le Quai Antique - Email de renouvellement envoyé{% endblock %}
+
+{% block body %}
+<div class="reset_container">
+    <h2 class="reset_title">Renouvellement du mot de passe</h2>
+    <div>
+    <p>
+        Si un compte avec votre adresse existe, un e-mail avec lien permettant de renouveller votre mot de passe a été envoyé.
+        Le lien expirera dans {{ resetToken.expirationMessageKey|trans(resetToken.expirationMessageData, 'ResetPasswordBundle') }}.
+    </p>
+    <p>Si vous n'avez pas reçu d'e-mail, veuillez vérifier le dossier des spams, ou bien <a href="{{ path('app_forgot_password_request') }}">essayez de nouveau</a>.</p>
+    </div>
+</div>
+{% endblock %}

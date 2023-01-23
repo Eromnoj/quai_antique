@@ -65,7 +65,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     {
         $user = $this->findAll();
 
-        if (count($user) <=0){
+        if (count($user) <= 0){
             return true;
         } else {
             return false;

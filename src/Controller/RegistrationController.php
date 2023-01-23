@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Entity\Client;
+use App\Entity\Restaurant;
 use App\Entity\User;
 use App\Form\RegistrationFormType;
 use App\Repository\UserRepository;
@@ -29,9 +31,19 @@ class RegistrationController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             // encode the plain password
 
-            //Make sure the first suscriber is the Admin
+            //Make sure the first suscriber is the Admin if they are Admin, relation to the restaurant table, otherwise relation to the client DB
             if ($allUser->isUserFirstSuscriber()){
                 $user->setRoles(['ROLE_ADMIN']);
+                
+                $restaurant = new Restaurant();
+                $restaurant->setUserId($user);
+
+                $entityManager->persist($restaurant);
+            } else {
+                $client = new Client();
+                $client->setUserId($user);
+
+                $entityManager->persist($client);
             }
 
             $user->setPassword(

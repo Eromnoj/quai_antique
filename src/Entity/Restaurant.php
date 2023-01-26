@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\RestaurantRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: RestaurantRepository::class)]
 class Restaurant
@@ -11,24 +12,30 @@ class Restaurant
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['get_restaurant'])]
     private ?int $id = null;
 
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
     private ?User $user_id = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['get_restaurant'])]
     private ?string $address = null;
 
     #[ORM\Column(length: 5, nullable: true)]
+    #[Groups(['get_restaurant'])]
     private ?string $post_code = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['get_restaurant'])]
     private ?string $city = null;
 
     #[ORM\Column(length: 10, nullable: true)]
+    #[Groups(['get_restaurant'])]
     private ?string $phone = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['get_restaurant'])]
     private ?int $max_capacity = null;
 
     public function getId(): ?int

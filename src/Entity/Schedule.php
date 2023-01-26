@@ -3,7 +3,6 @@
 namespace App\Entity;
 
 use App\Repository\ScheduleRepository;
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ScheduleRepository::class)]
@@ -17,23 +16,23 @@ class Schedule
     #[ORM\Column(length: 255)]
     private ?string $day = null;
 
-    #[ORM\Column]
-    private ?bool $noon_open = null;
+    #[ORM\Column(length: 6)]
+    private ?string $noonStart = null;
 
-    #[ORM\Column(type: Types::TIME_MUTABLE)]
-    private ?\DateTimeInterface $noon_start = null;
-
-    #[ORM\Column(type: Types::TIME_MUTABLE)]
-    private ?\DateTimeInterface $noon_end = null;
+    #[ORM\Column(length: 6)]
+    private ?string $noonEnd = null;
 
     #[ORM\Column]
-    private ?bool $evening_open = null;
+    private ?bool $noonClosed = null;
 
-    #[ORM\Column(type: Types::TIME_MUTABLE)]
-    private ?\DateTimeInterface $evening_start = null;
+    #[ORM\Column(length: 6)]
+    private ?string $eveningStart = null;
 
-    #[ORM\Column(type: Types::TIME_MUTABLE)]
-    private ?\DateTimeInterface $evening_end = null;
+    #[ORM\Column(length: 6)]
+    private ?string $eveningEnd = null;
+
+    #[ORM\Column]
+    private ?bool $eveningClosed = null;
 
     public function getId(): ?int
     {
@@ -52,74 +51,74 @@ class Schedule
         return $this;
     }
 
-    public function isNoonOpen(): ?bool
+    public function getNoonStart(): ?string
     {
-        return $this->noon_open;
+        return $this->noonStart;
     }
 
-    public function setNoonOpen(bool $noon_open): self
+    public function setNoonStart(string $noonStart): self
     {
-        $this->noon_open = $noon_open;
+        $this->noonStart = $noonStart;
 
         return $this;
     }
 
-    public function getNoonStart(): ?\DateTimeInterface
+    public function getNoonEnd(): ?string
     {
-        return $this->noon_start;
+        return $this->noonEnd;
     }
 
-    public function setNoonStart(\DateTimeInterface $noon_start): self
+    public function setNoonEnd(string $noonEnd): self
     {
-        $this->noon_start = $noon_start;
+        $this->noonEnd = $noonEnd;
 
         return $this;
     }
 
-    public function getNoonEnd(): ?\DateTimeInterface
+    public function isNoonClosed(): ?bool
     {
-        return $this->noon_end;
+        return $this->noonClosed;
     }
 
-    public function setNoonEnd(\DateTimeInterface $noon_end): self
+    public function setNoonClosed(bool $noonClosed): self
     {
-        $this->noon_end = $noon_end;
+        $this->noonClosed = $noonClosed;
 
         return $this;
     }
 
-    public function isEveningOpen(): ?bool
+    public function getEveningStart(): ?string
     {
-        return $this->evening_open;
+        return $this->eveningStart;
     }
 
-    public function setEveningOpen(bool $evening_open): self
+    public function setEveningStart(string $eveningStart): self
     {
-        $this->evening_open = $evening_open;
+        $this->eveningStart = $eveningStart;
 
         return $this;
     }
 
-    public function getEveningStart(): ?\DateTimeInterface
+    public function getEveningEnd(): ?string
     {
-        return $this->evening_start;
+        return $this->eveningEnd;
     }
 
-    public function setEveningStart(\DateTimeInterface $evening_start): self
+    public function setEveningEnd(string $eveningEnd): self
     {
-        $this->evening_start = $evening_start;
+        $this->eveningEnd = $eveningEnd;
 
         return $this;
     }
 
-    public function getEveningEnd(): ?\DateTimeInterface
+    public function isEveningClosed(): ?bool
     {
-        return $this->evening_end;
+        return $this->eveningClosed;
     }
 
-    public function setEveningEnd(\DateTimeInterface $evening_end): self
+    public function setEveningClosed(bool $eveningClosed): self
     {
-        $this->evening_end = $evening_end;
+        $this->eveningClosed = $eveningClosed;
 
         return $this;
     }

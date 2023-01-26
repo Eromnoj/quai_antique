@@ -112,12 +112,12 @@ class AppFixtures extends Fixture
             $schedule[$i] = new Schedule();
 
             $schedule[$i]->setDay($days[$i]);
-            $i <= 4 ? $schedule[$i]->setNoonOpen(true) : $schedule[$i]->setNoonOpen(false);
-            $schedule[$i]->setNoonStart(new DateTime('12:00'));
-            $schedule[$i]->setNoonEnd(new DateTime('15:00'));
-            $i >= 4 && $i < 6 ? $schedule[$i]->setEveningOpen(true) : $schedule[$i]->setEveningOpen(false);
-            $schedule[$i]->setEveningStart(new DateTime('18:00'));
-            $schedule[$i]->setEveningEnd(new DateTime('22:00'));
+            $i <= 4 ? $schedule[$i]->setNoonClosed(false) : $schedule[$i]->setNoonClosed(true);
+            $schedule[$i]->setNoonStart('12:00');
+            $schedule[$i]->setNoonEnd('15:00');
+            $i >= 4 && $i < 6 ? $schedule[$i]->setEveningClosed(false) : $schedule[$i]->setEveningClosed(true);
+            $schedule[$i]->setEveningStart('18:00');
+            $schedule[$i]->setEveningEnd('22:00');
 
             $manager->persist($schedule[$i]);
         }
@@ -126,7 +126,7 @@ class AppFixtures extends Fixture
         // Gallery
         // 
         // 
-        $images = ['img/image_un.jpg', 'img/image_deux.jpg', 'img/image_trois.jpg'];
+        $images = ['image_un.jpg', 'image_deux.jpg', 'image_trois.jpg'];
 
         $gallery = array();
 

@@ -74,53 +74,7 @@
 			<footer>
 				<div class="schedule">
 					<p>Horaires d'ouverture</p>
-
-					<table>
-						<thead>
-							<tr>
-								<th></th>
-								<th>Midi</th>
-								<th>Soir</th>
-							</tr>
-						</thead>
-						<tbody>
-							<tr>
-								<td>Lundi</td>
-								<td>Fermé</td>
-								<td>19h - 22h</td>
-							</tr>
-							<tr>
-								<td>Mardi</td>
-								<td>12h - 15h</td>
-								<td>19h - 22h</td>
-							</tr>
-							<tr>
-								<td>Mercredi</td>
-								<td>12h -15h</td>
-								<td>19h - 22h</td>
-							</tr>
-							<tr>
-								<td>Jeudi</td>
-								<td>12h - 15h</td>
-								<td>19h - 22h</td>
-							</tr>
-							<tr>
-								<td>Vendredi</td>
-								<td>12h - 15h</td>
-								<td>19h - 22h</td>
-							</tr>
-							<tr>
-								<td>Samedi</td>
-								<td>12h - 15h</td>
-								<td>19h - 22h</td>
-							</tr>
-							<tr>
-								<td>Dimanche</td>
-								<td>Fermé</td>
-								<td>Fermé</td>
-							</tr>
-						</tbody>
-					</table>
+					<div {{ react_component('ScheduleBase')}}></div>
 				</div>
 				<div class="site_map">
 					<div class="map">
@@ -147,10 +101,7 @@
 					</div>
 				</div>
 				<div class="address">
-					<p>Le Quai Antique</p>
-					<p>10 avenue de la Raclette</p>
-					<p>73000 Chambéry</p>
-					<p>Tél : 04 79 12 34 56</p>
+					<div {{ react_component('AddressBase')}}></div>
 				</div>
 			</footer>
 		{% endblock %}

@@ -6,6 +6,7 @@ use App\Repository\CategoryRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: CategoryRepository::class)]
 class Category
@@ -13,15 +14,19 @@ class Category
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['get_category_with_dishes', 'get_category', 'get_dishes'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['get_category_with_dishes', 'get_category', 'get_dishes'])]
     private ?string $name = null;
 
     #[ORM\Column]
+    #[Groups(['get_category_with_dishes', 'get_category', 'get_dishes'])]
     private ?int $rank_display = null;
 
     #[ORM\OneToMany(mappedBy: 'category', targetEntity: Dish::class, orphanRemoval: true)]
+    #[Groups(['get_category_with_dishes'])]
     private Collection $dishes;
 
     public function __construct()

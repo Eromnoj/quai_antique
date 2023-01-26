@@ -33,7 +33,7 @@ body {
     color: variables.$rich-black-fogra-29;
     display: grid;
     min-height: 100vh;
-    grid-template-rows: 100px 1fr 100%;
+    grid-template-rows: 100px 1fr 700px;
     font-family: "Karma", serif;
 }
 
@@ -137,7 +137,7 @@ footer {
 
     .schedule {
         height: 280px;
-        width: 340px;
+        width: 350px;
         display: flex;
         display: flex;
         flex-direction: column;
@@ -146,11 +146,14 @@ footer {
         text-align: center;
 
         table {
-            width: 90%;
+            width: 95%;
 
             thead,
             tbody {
                 width: 100%;
+                td {
+                    width: 150px;
+                }
             }
         }
     }

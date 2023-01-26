@@ -1,10 +1,26 @@
 import React, { useState } from 'react'
 import ModalMenu from './ModalMenu'
 import ModalFormula from './ModalFormula'
+import axios from 'axios'
+import { useEffect } from 'react'
 
-const FormulasRows = ({ formula }) => {
+const FormulasRows = ({ formula, menuId }) => {
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [showModalFormula, setShowModalFormula] = useState(false)
+
+  const deleteFormula = async () => {
+    try {
+      const res = await axios.delete(`/api/delete/formulas/${formula.id}`)
+      const data = await res.data
+
+      console.log(data.message);
+      setTimeout(()=> {
+        window.location.reload(true)
+      },1000)
+    } catch (error) {
+      
+    }
+  }
   return (
     <tr>
       <td>{formula.name}</td>
@@ -15,7 +31,7 @@ const FormulasRows = ({ formula }) => {
         <div className='button_delete' onClick={() => { setConfirmDelete(prev => !prev) }}> <img src="../img/Trash.png" alt="delete" /></div>
       </div>
       {showModalFormula ?
-      <ModalFormula formula={formula} showEdit={() => {setShowModalFormula(prev => !prev) }} />
+      <ModalFormula formula={formula}  menuId={menuId} showEdit={() => {setShowModalFormula(prev => !prev) }} />
       :null}
       {confirmDelete ?
               <div className='confirm_delete_window'>
@@ -25,7 +41,7 @@ const FormulasRows = ({ formula }) => {
                     <button className='cancel_delete' onClick={() => setConfirmDelete(prev => !prev)}>Annuler</button>
                     <button className='delete' onClick={() => {
                       // Manage deletion
-                      setConfirmDelete(prev => !prev)
+                      deleteFormula()
                     }
                     }>Supprimer</button>
                   </div>
@@ -38,9 +54,9 @@ const FormulasRows = ({ formula }) => {
 
 const MenuTables = ({ menu }) => {
 
-  const showFormulas = menu.formulas.map((formula, i) => {
+  const showFormulas = menu.formulas.map(formula => {
     return (
-      <FormulasRows formula={formula} key={i} />
+      <FormulasRows formula={formula} key={formula.id}  menuId={menu.id} />
     )
   })
 
@@ -48,6 +64,19 @@ const MenuTables = ({ menu }) => {
   const [confirmDelete, setConfirmDelete] = useState(false)
 
   const [showModalFormula, setShowModalFormula] = useState(false)
+
+  const deleteMenu = async () => {
+    try {
+      const res = await axios.delete(`/api/delete/menus/${menu.id}`)
+      const data = await res.data
+      console.log(data.message);
+      setTimeout(() => {
+        window.location.reload(true)
+      },[])
+    } catch (error) {
+      
+    }
+  }
   return (
     <div className='div_table'>
     <table>
@@ -67,7 +96,7 @@ const MenuTables = ({ menu }) => {
               <div className='button_delete' onClick={() => { setConfirmDelete(prev => !prev) }}> <img src="../img/Trash.png" alt="delete" /></div>
             </div>
             {showModalMenu ?
-              <ModalMenu name={menu.name} showEdit={() => { setShowModalMenu(prev => !prev) }} />
+              <ModalMenu menu={menu} showEdit={() => { setShowModalMenu(prev => !prev) }} />
               : null}
             {confirmDelete ?
               <div className='confirm_delete_window'>
@@ -77,7 +106,7 @@ const MenuTables = ({ menu }) => {
                     <button className='cancel_delete' onClick={() => setConfirmDelete(prev => !prev)}>Annuler</button>
                     <button className='delete' onClick={() => {
                       // Manage deletion
-                      setConfirmDelete(prev => !prev)
+                      deleteMenu()
                     }
                     }>Supprimer</button>
                   </div>
@@ -90,7 +119,7 @@ const MenuTables = ({ menu }) => {
           <th colSpan={3}>
             <button className='add_formula_button' onClick={() => {setShowModalFormula(prev=> !prev) }}>Ajouter une formule</button>
             {showModalFormula ? 
-            <ModalFormula showEdit={() => {setShowModalFormula(prev=> !prev) }} />
+            <ModalFormula menuId={menu.id} showEdit={() => {setShowModalFormula(prev=> !prev) }} />
           :null}
           </th>
         </tr>
@@ -113,54 +142,29 @@ const MenuTables = ({ menu }) => {
 
 const AdminMenus = () => {
 
-  const menus = [
-    {
-      name: 'Un menu',
-      formulas: [
-        {
-          name: 'une formule',
-          description: 'une description',
-          price: '15'
-        },
-        {
-          name: 'une autre formule',
-          description: 'une description',
-          price: '25'
-        },
-        {
-          name: 'encore une formule',
-          description: 'une description',
-          price: '35'
-        }
-      ]
-    },
-    {
-      name: 'Un autre menu',
-      formulas: [
-        {
-          name: 'une formule encore',
-          description: 'une description',
-          price: '15'
-        },
-        {
-          name: 'une autre formule encore',
-          description: 'une description',
-          price: '25'
-        },
-        {
-          name: 'encore une formule...',
-          description: 'une description',
-          price: '3500'
-        }
-      ]
-    }
-  ]
+  const [menus, setMenus] = useState([])
 
+  const getMenus = async () => {
+    try {
+      const res = await axios.get('/api/menus')
+      const data = await res.data
+
+      console.log(data);
+      setMenus(data)
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  useEffect(()=> {
+    getMenus()
+  },[])
+ 
   const [showModalMenu, setShowModalMenu] = useState(false)
 
-  const showMenus = menus.map((menu, i) => {
+  const showMenus = menus.map(menu => {
     return (
-      <MenuTables menu={menu} key={i} />
+      <MenuTables menu={menu} key={menu.id} />
     )
   })
   return (

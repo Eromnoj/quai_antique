@@ -86,7 +86,7 @@
       }
     }
 
-    .allergen_div {
+    .allergies_div {
       margin-top: 45px;
       display: flex;
       flex-direction: column;
@@ -110,7 +110,7 @@
       align-items: center;
       margin-top: 45px;
       align-self: center;
-      .name_div,
+      .lastname_div,
       .email_div,
       .phone_div {
         display: flex;
@@ -181,7 +181,7 @@
         }
       }
 
-      .allergen_div {
+      .allergies_div {
         width: 70%;
       }
 
@@ -190,8 +190,8 @@
         flex-direction: row;
         flex-wrap: wrap;
         align-items: center;
-        justify-content: space-between;
-        .name_div,
+        justify-content: space-evenly;
+        .lastname_div,
         .email_div,
         .phone_div {
           display: flex;

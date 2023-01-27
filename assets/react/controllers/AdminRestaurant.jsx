@@ -2,6 +2,7 @@ import React, { useState, useEffect, useReducer } from 'react'
 import EditSchedule from './EditSchedule'
 import ModalImage from './ModalImage'
 import axios from 'axios'
+import moment from 'moment/moment'
 
 const TableRow = ({ day }) => {
 
@@ -17,8 +18,8 @@ const TableRow = ({ day }) => {
           </>
           :
           <>
-            <td>{day.noonStart}</td>
-            <td>{day.noonEnd }</td>
+            <td>{moment(day.noonStart).utcOffset(1).format('HH:mm')}</td>
+            <td>{moment(day.noonEnd).utcOffset(1).format('HH:mm')}</td>
           </>
       }
         <td className='closed'>{day.noonClosed ? 'x' : null }</td>
@@ -29,8 +30,8 @@ const TableRow = ({ day }) => {
           </>
           :
           <>
-            <td>{day.eveningStart }</td>
-            <td>{ day.eveningEnd }</td>
+            <td>{moment(day.eveningStart).utcOffset(1).format('HH:mm')}</td>
+            <td>{moment(day.eveningEnd).utcOffset(1).format('HH:mm')}</td>
           </>
       }
         <td className='closed'>{day.eveningClosed ? 'x' : null }</td>

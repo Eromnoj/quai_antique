@@ -1,97 +1,173 @@
-import React from 'react'
+import React, { useEffect, useReducer } from 'react'
+import moment from 'moment/moment'
+import axios from 'axios'
+import { useState } from 'react'
 
 const Booking = () => {
+
+
+  const initialState = {
+    lastname: '',
+    date: moment().format('YYYY-MM-DD') +'T00:00:00.000Z',
+    time: '',
+    allergies: '',
+    phone: '',
+    shift: 'midi',
+    number: 1,
+  }
+
+  const reducer = (state, action) => {
+    switch (action.type) {
+      case 'lastname':
+        return { ...state, lastname: action.value }
+      case 'date':
+        let date = moment(action.value + 'T00:00:00.000Z').utcOffset(0).toISOString()
+        return { ...state, date: date }
+      case 'time':
+        let time = moment('1970-01-01T' + action.value).utcOffset(0).toISOString()
+        return { ...state, time: time }
+      case 'allergies':
+        return { ...state, allergies: action.value }
+      case 'phone':
+        return { ...state, phone: action.value }
+      case 'shift':
+        return { ...state, shift: action.value }
+      case 'number':
+        return { ...state, number: Number(action.value) }
+      default:
+        return
+    }
+  }
+
+  const [state, dispatch] = useReducer(reducer, initialState)
+
+  const bookingSubmit = async () => {
+    '/api/add/booking'
+    try {
+      const res = await axios.put('/api/add/booking', state)
+      const data = await res.data
+
+      console.log(data);
+      setTimeout(() => {
+        window.location.reload(true)
+      }, 1000)
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  const [seatsLeft, setSeatsLeft] = useState(0)
+  const [isShiftClosed, setIsShiftClosed] = useState(false)
+
+  const [hourArray, setHourArray] = useState([])
+
+  const getAvailableSeatsAndSchedule = async () => {
+    try {
+      const res = await axios.get(`/api/booking/getavailable?date=${state.date}&shift=${state.shift}`)
+      const data = await res.data
+      setSeatsLeft(data.seatsLeft)
+      setIsShiftClosed(data.shiftClosed)
+
+      let tempArray = []
+      for (let i = moment(data.shiftStart).utcOffset(0); i <= moment(data.shiftEnd).utcOffset(0).subtract(1, 'h'); i = moment(i).add(15, 'm')) {
+        tempArray.push(moment(i).utcOffset(1).format('HH:mm'));
+      }
+      setHourArray(tempArray)
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  useEffect(() => {
+    getAvailableSeatsAndSchedule()
+  }, [state.date, state.shift])
+
+  const timeOptions = hourArray.map((hour, i) => {
+    return (
+      <div className='hours' key={i}>
+        <input type="radio" name="hour_to_choose" id={`time_${i}`} value={hour} onChange={(e) => dispatch({ type: 'time', value: e.target.value })} />
+        <label htmlFor={`time_${i}`}>{hour}</label>
+      </ div>
+    )
+  })
+
   return (
     <div className='booking_container'>
       <div className='booking_title'>
         <h2>Réserver une table</h2>
 
       </div>
-        <form className='form'>
-          <div className='booking_infos'>
-            <div className='date_div'>
-              <label htmlFor="date">Date :</label>
-              <input type="date" name="date" id="date" />
-            </div>
-            <div className='number_div'>
-              <label htmlFor="number">Couverts :</label>
-              <input type="number" name="number" id="number" />
-            </div>
-            <div className='shift_div'>
-              <label htmlFor="shift">Service :</label>
-              <select name="shift" id="shift">
-                <option value="noon">Midi</option>
-                <option value="evening">Soir</option>
-              </select>
-            </div>
+      <form className='form' onSubmit={(e)=> {
+        e.preventDefault()
+        bookingSubmit()
+      }}>
+        <div className='booking_infos'>
+          <div className='date_div'>
+            <label htmlFor="date">Date :</label>
+            <input type="date" name="date" id="date"
+              min={moment().format('YYYY-MM-DD')}
+              onChange={(e) => {
+                dispatch({ type: 'date', value: e.target.value })
+              }} required />
           </div>
-          <div className='available'>
-            <p>Place disponible : <span>23</span></p>
+          <div className='number_div'>
+            <label htmlFor="number">Couverts :</label>
+            <input type="number" name="number" id="number" onChange={(e) => dispatch({ type: 'number', value: e.target.value })} required />
           </div>
-          <div className='hour_choice'>
-            <div className='hours'>
-              <input type="radio" name="hour_to_choose" id="time_1" value="12:00" />
-              <label htmlFor="time_1">12:00</label>
-            </ div>
-            <div className='hours'>
-              <input type="radio" name="hour_to_choose" id="time_2" value="12:15" />
-              <label htmlFor="time_2">12:15</label>
-            </ div>
-            <div className='hours'>
-              <input type="radio" name="hour_to_choose" id="time_3" value="12:30" />
-              <label htmlFor="time_3">12:30</label>
-            </ div>
-            <div className='hours'>
-              <input type="radio" name="hour_to_choose" id="time_4" value="12:45" />
-              <label htmlFor="time_4">12:45</label>
-            </ div>
-            <div className='hours'>
-              <input type="radio" name="hour_to_choose" id="time_5" value="13:00" />
-              <label htmlFor="time_5">13:00</label>
-            </ div>
-            <div className='hours'>
-              <input type="radio" name="hour_to_choose" id="time_6" value="13:45" />
-              <label htmlFor="time_6">13:15</label>
-            </ div>
-            <div className='hours'>
-              <input type="radio" name="hour_to_choose" id="time_7" value="13:30" />
-              <label htmlFor="time_7">13:30</label>
-            </ div>
-            <div className='hours'>
-              <input type="radio" name="hour_to_choose" id="time_8" value="13:45" />
-              <label htmlFor="time_8">13:45</label>
-            </ div>
-            <div className='hours'>
-              <input type="radio" name="hour_to_choose" id="time_9" value="14:00" />
-              <label htmlFor="time_9">14:00</label>
-            </ div>
+          <div className='shift_div'>
+            <label htmlFor="shift">Service :</label>
+            <select name="shift" id="shift"
+              onChange={(e) => {
+                dispatch({ type: 'shift', value: e.target.value })
+
+              }} required>
+              <option value="midi">Midi</option>
+              <option value="soir">Soir</option>
+            </select>
           </div>
-          <div className='allergen_div'>
-            <label htmlFor="allergen">Veuillez signaler d'éventuelles allergies</label>
-            <textarea name="allergen" id="allergen"></textarea>
-          </div>
-          <div className='user_info'>
-            <div className='name_div'>
-              <label htmlFor="name">Votre nom :</label>
-              <input type="text" name="name" id="name" />
+        </div>
+
+        {seatsLeft === 0 || isShiftClosed ? 
+        
+        <div>
+          <p>Le restaurant est fermé, ou il n'y a plus de places disponibles</p>
+        </div>:
+          <>
+            <div className='available'>
+              {seatsLeft !== 0 ?
+                <p>Place disponible : <span>{seatsLeft}</span></p>
+                : null
+              }
             </div>
-            <div className='email_div'>
-              <label htmlFor="email">Votre email :</label>
-              <input type="email" name="email" id="email" />
+            <div className='hour_choice'>
+              {timeOptions}
             </div>
-            <div className='phone_div'>
-              <label htmlFor="phone">Votre téléphone :</label>
-              <input type="tel" name="phone" id="phone" />
-            </div>
-          </div>
-          <div className='disclaimer'>
-            <p>Le restaurant est susceptible de vous appeler pour confirmer la réservation</p>
+          </>
+        }
+
+        <div className='allergies_div'>
+          <label htmlFor="allergies">Veuillez signaler d'éventuelles allergies</label>
+          <textarea name="allergies" id="allergies" onChange={(e) => dispatch({ type: 'allergies', value: e.target.value })}></textarea>
+        </div>
+        <div className='user_info'>
+          <div className='lastname_div'>
+            <label htmlFor="lastname">Votre nom :</label>
+            <input type="text" name="lastname" id="lastname" onChange={(e) => dispatch({ type: 'lastname', value: e.target.value })} required />
           </div>
 
-          <button type="submit" className='submit_button'>Confirmer la réservation</button>
+          <div className='phone_div'>
+            <label htmlFor="phone">Votre téléphone :</label>
+            <input type="tel" name="phone" id="phone" onChange={(e) => dispatch({ type: 'phone', value: e.target.value })} required />
+          </div>
+        </div>
+        <div className='disclaimer'>
+          <p>Le restaurant est susceptible de vous appeler pour confirmer la réservation</p>
+        </div>
+
+        <button type="submit" className='submit_button' disabled={seatsLeft === 0 || isShiftClosed ? true : false}>Confirmer la réservation</button>
 
 
-        </form>
+      </form>
     </div>
   )
 }

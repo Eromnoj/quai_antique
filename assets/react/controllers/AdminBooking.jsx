@@ -1,17 +1,33 @@
 import React, { useState } from 'react'
 import ModalBooking from './ModalBooking'
-
+import axios from 'axios'
+import { useEffect } from 'react'
+import moment from 'moment/moment'
 
 const BookingRows = ({booking}) => {
 
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [showModalBooking, setShowModalBooking] = useState(false)
+
+  const deleteBooking = async () => {
+    try {
+      const res = await axios.delete(`/api/delete/booking/${booking.id}`)
+      const data = await res.data
+
+      console.log(data);
+      setTimeout(()=> {
+        window.location.reload(true)
+      },1000)
+    } catch (error) {
+      console.log(error);
+    }
+  }
   return (
     <tr>
-      <td>{booking.name}</td>
-      <td>{booking.date}</td>
-      <td>{booking.time}</td>
-      <td className='end'>{booking.allergens}</td>
+      <td>{booking.lastname}</td>
+      <td>{moment(booking.date).format('DD/MM/YYYY')}</td>
+      <td>{moment(booking.time).utcOffset(1).format('HH:mm')}</td>
+      <td className='end'>{booking.allergies}</td>
       <td className='buttons'><div className='buttons_div'>
         <div className='button_edit' onClick={() => { setShowModalBooking(prev => !prev) }} > <img src="../img/Edit-alt.png" alt="edit" /> </div>
         <div className='button_delete' onClick={() => { setConfirmDelete(prev => !prev) }}> <img src="../img/Trash.png" alt="delete" /></div>
@@ -22,12 +38,12 @@ const BookingRows = ({booking}) => {
       {confirmDelete ?
               <div className='confirm_delete_window'>
                 <div className='confirm_delete_container'>
-                  <p>Voulez-vous vraiment supprimer la reservation de : {booking.name} ?</p>
+                  <p>Voulez-vous vraiment supprimer la reservation de : {booking.lastname} ?</p>
                   <div className='delete_buttons'>
                     <button className='cancel_delete' onClick={() => setConfirmDelete(prev => !prev)}>Annuler</button>
                     <button className='delete' onClick={() => {
                       // Manage deletion
-                      setConfirmDelete(prev => !prev)
+                      deleteBooking()
                     }
                     }>Supprimer</button>
                   </div>
@@ -40,36 +56,26 @@ const BookingRows = ({booking}) => {
 
 const AdminBooking = () => {
 
-  const bookings = [
-    {
-      name: 'Igor Bogdanov',
-      date: '18/02/23',
-      time: '12:00',
-      allergens: 'lupîn'
-    },
-    {
-      name: 'Louis Philippe',
-      date: '19/02/23',
-      time: '12:30',
-      allergens: ''
-    },
-    {
-      name: 'Louise Michele',
-      date: '18/02/23',
-      time: '19:00',
-      allergens: 'fruits à coque'
-    },
-    {
-      name: 'Donald Trump',
-      date: '20/02/23',
-      time: '13:00',
-      allergens: 'poisson, crustacé, gluten'
-    },
-  ]
+  const [bookings, setBookings] = useState([])
 
-  const showBookings = bookings.map((booking, i)=> {
+  const getBookings = async () => {
+    try {
+      const res = await axios.get('/api/booking')
+      const data = await res.data
+      console.log(data);
+      setBookings(data)
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  useEffect(() => {
+    getBookings()
+  },[])
+  
+  const showBookings = bookings.map(booking=> {
     return (
-      <BookingRows booking={booking} key={i} />
+      <BookingRows booking={booking} key={booking.id} />
     )
   })
 

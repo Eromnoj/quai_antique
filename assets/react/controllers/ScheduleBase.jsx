@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import axios from 'axios'
+import moment from 'moment/moment'
 
 const ScheduleBase = () => {
   const [schedule, setSchedule] = useState([])
@@ -23,8 +24,8 @@ const ScheduleBase = () => {
     return (
       <tr key={day.id}>
         <td>{day.day}</td>
-        {day.noonClosed ? <td>Fermé</td> : <td>{day.noonStart} {day.noonEnd}</td>}
-        {day.eveningClosed ? <td>Fermé</td> : <td>{day.eveningStart} {day.eveningEnd}</td>}
+        {day.noonClosed ? <td>Fermé</td> : <td>{moment(day.noonStart).utcOffset(1).format('HH:mm')} {moment(day.noonEnd).utcOffset(1).format('HH:mm')}</td>}
+        {day.eveningClosed ? <td>Fermé</td> : <td>{moment(day.eveningStart).utcOffset(1).format('HH:mm')} {moment(day.eveningEnd).utcOffset(1).format('HH:mm')}</td>}
       </tr>
     )
   })

@@ -13,6 +13,7 @@ use App\Entity\Restaurant;
 use App\Entity\Schedule;
 use App\Entity\User;
 use DateTime;
+use DateTimeZone;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -113,11 +114,11 @@ class AppFixtures extends Fixture
 
             $schedule[$i]->setDay($days[$i]);
             $i <= 4 ? $schedule[$i]->setNoonClosed(false) : $schedule[$i]->setNoonClosed(true);
-            $schedule[$i]->setNoonStart('12:00');
-            $schedule[$i]->setNoonEnd('15:00');
+            $schedule[$i]->setNoonStart(new DateTime('11:00'));
+            $schedule[$i]->setNoonEnd(new DateTime('14:00'));
             $i >= 4 && $i < 6 ? $schedule[$i]->setEveningClosed(false) : $schedule[$i]->setEveningClosed(true);
-            $schedule[$i]->setEveningStart('18:00');
-            $schedule[$i]->setEveningEnd('22:00');
+            $schedule[$i]->setEveningStart(new DateTime('17:00'));
+            $schedule[$i]->setEveningEnd(new DateTime('22:00'));
 
             $manager->persist($schedule[$i]);
         }

@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Schedule;
+use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -39,28 +40,76 @@ class ScheduleRepository extends ServiceEntityRepository
         }
     }
 
-//    /**
-//     * @return Schedule[] Returns an array of Schedule objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('s')
-//            ->andWhere('s.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('s.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+    public function getScheduleByDate($date, $shift): array
+    {
+        $daysEnToFr = [
+            'Monday' => 'Lundi',
+            'Tuesday' => 'Mardi',
+            'Wednesday' => 'Mercredi',
+            'Thursday' => 'Jeudi',
+            'Friday' => 'Vendredi',
+            'Saturday' => 'Samedi',
+            'Sunday' => 'Dimanche',
+    ];
 
-//    public function findOneBySomeField($value): ?Schedule
-//    {
-//        return $this->createQueryBuilder('s')
-//            ->andWhere('s.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+        $dayFromDate = date_format(new DateTime($date), 'l');  
+
+        $dayFr = $daysEnToFr[$dayFromDate];
+
+        $response = array();
+
+        if($shift === 'midi'){
+            $qb = $this->createQueryBuilder('s')
+            ->select('s.noonStart')
+            ->addSelect('s.noonEnd')
+            ->addSelect('s.noonClosed')
+            ->andWhere('s.day = :val')
+            ->setParameter('val', $dayFr)
+            ->getQuery()
+            ->getResult();
+
+            $response['start'] = $qb[0]['noonStart'];
+            $response['end'] = $qb[0]['noonEnd'];
+            $response['closed'] = $qb[0]['noonClosed'];
+        } else if($shift === 'soir'){
+            $qb = $this->createQueryBuilder('s')
+            ->select('s.eveningStart')
+            ->addSelect('s.eveningEnd')
+            ->addSelect('s.eveningClosed')
+            ->andWhere('s.day = :val')
+            ->setParameter('val', $dayFr)
+            ->getQuery()
+            ->getResult();
+
+            $response['start'] = $qb[0]['eveningStart'];
+            $response['end'] = $qb[0]['eveningEnd'];
+            $response['closed'] = $qb[0]['eveningClosed'];
+        }
+        return $response;
+    }
+
+    //    /**
+    //     * @return Schedule[] Returns an array of Schedule objects
+    //     */
+    //    public function findByExampleField($value): array
+    //    {
+    //        return $this->createQueryBuilder('s')
+    //            ->andWhere('s.exampleField = :val')
+    //            ->setParameter('val', $value)
+    //            ->orderBy('s.id', 'ASC')
+    //            ->setMaxResults(10)
+    //            ->getQuery()
+    //            ->getResult()
+    //        ;
+    //    }
+
+    //    public function findOneBySomeField($value): ?Schedule
+    //    {
+    //        return $this->createQueryBuilder('s')
+    //            ->andWhere('s.exampleField = :val')
+    //            ->setParameter('val', $value)
+    //            ->getQuery()
+    //            ->getOneOrNullResult()
+    //        ;
+    //    }
 }

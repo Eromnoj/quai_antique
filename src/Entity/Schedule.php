@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\ScheduleRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\DBAL\Types\Types;
 
 #[ORM\Entity(repositoryClass: ScheduleRepository::class)]
 class Schedule
@@ -16,20 +17,20 @@ class Schedule
     #[ORM\Column(length: 255)]
     private ?string $day = null;
 
-    #[ORM\Column(length: 6)]
-    private ?string $noonStart = null;
+    #[ORM\Column(type: Types::TIME_MUTABLE)]
+    private ?\DateTimeInterface $noonStart = null;
 
-    #[ORM\Column(length: 6)]
-    private ?string $noonEnd = null;
+    #[ORM\Column(type: Types::TIME_MUTABLE)]
+    private ?\DateTimeInterface $noonEnd = null;
 
     #[ORM\Column]
     private ?bool $noonClosed = null;
 
-    #[ORM\Column(length: 6)]
-    private ?string $eveningStart = null;
+    #[ORM\Column(type: Types::TIME_MUTABLE)]
+    private ?\DateTimeInterface $eveningStart = null;
 
-    #[ORM\Column(length: 6)]
-    private ?string $eveningEnd = null;
+    #[ORM\Column(type: Types::TIME_MUTABLE)]
+    private ?\DateTimeInterface $eveningEnd = null;
 
     #[ORM\Column]
     private ?bool $eveningClosed = null;
@@ -51,24 +52,24 @@ class Schedule
         return $this;
     }
 
-    public function getNoonStart(): ?string
+    public function getNoonStart(): ?\DateTimeInterface
     {
         return $this->noonStart;
     }
 
-    public function setNoonStart(string $noonStart): self
+    public function setNoonStart(\DateTimeInterface $noonStart): self
     {
         $this->noonStart = $noonStart;
 
         return $this;
     }
 
-    public function getNoonEnd(): ?string
+    public function getNoonEnd(): ?\DateTimeInterface
     {
         return $this->noonEnd;
     }
 
-    public function setNoonEnd(string $noonEnd): self
+    public function setNoonEnd(\DateTimeInterface $noonEnd): self
     {
         $this->noonEnd = $noonEnd;
 
@@ -87,24 +88,24 @@ class Schedule
         return $this;
     }
 
-    public function getEveningStart(): ?string
+    public function getEveningStart(): ?\DateTimeInterface
     {
         return $this->eveningStart;
     }
 
-    public function setEveningStart(string $eveningStart): self
+    public function setEveningStart(\DateTimeInterface $eveningStart): self
     {
         $this->eveningStart = $eveningStart;
 
         return $this;
     }
 
-    public function getEveningEnd(): ?string
+    public function getEveningEnd(): ?\DateTimeInterface
     {
         return $this->eveningEnd;
     }
 
-    public function setEveningEnd(string $eveningEnd): self
+    public function setEveningEnd(\DateTimeInterface $eveningEnd): self
     {
         $this->eveningEnd = $eveningEnd;
 

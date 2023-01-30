@@ -3,6 +3,9 @@
 {% block title %}Mon Compte{% endblock %}
 
 {% block content %}
+	{% if app.user %}
+		{% set userId = app.user.id %}
+	{% endif %}
 
-<div {{ react_component('UserAccount', {'data': "l'autre test"} )}}></div>
+<div {{ react_component('UserAccount', {userId} )}}></div>
 {% endblock %}

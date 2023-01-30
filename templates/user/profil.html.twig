@@ -3,6 +3,21 @@
 {% block title %}Mon Profil{% endblock %}
 
 {% block content %}
+	{% if app.user %}
+		{% set userId = app.user.client.id %}
+		{% set userLastname = app.user.client.lastname %}
+		{% set userFirstname = app.user.client.firstname %}
+		{% set userAllergies = app.user.client.allergies %}
+		{% set userPhone = app.user.client.phone %}
+		{% set userNumber = app.user.client.number %}
+	{% else %}
+		{% set userId = null %}
+		{% set userLastname = null %}
+		{% set userFirstname = null %}
+		{% set userAllergies = null %}
+		{% set userPhone = null %}
+		{% set userNumber = null %}
+	{% endif %}
 
-<div {{ react_component('UserProfil', {'data': "l'autre test"} )}}></div>
+<div {{ react_component('UserProfil', {userId, userLastname, userFirstname, userAllergies, userPhone, userNumber} )}}></div>
 {% endblock %}

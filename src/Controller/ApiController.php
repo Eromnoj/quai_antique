@@ -4,12 +4,14 @@ namespace App\Controller;
 
 use App\Entity\Booking;
 use App\Entity\Category;
+use App\Entity\Client;
 use App\Entity\Dish;
 use App\Entity\Formula;
 use App\Entity\Gallery;
 use App\Entity\Menu;
 use App\Entity\Restaurant;
 use App\Entity\Schedule;
+use App\Entity\User;
 use App\Repository\BookingRepository;
 use App\Repository\CategoryRepository;
 use App\Repository\DishRepository;
@@ -17,15 +19,16 @@ use App\Repository\GalleryRepository;
 use App\Repository\MenuRepository;
 use App\Repository\RestaurantRepository;
 use App\Repository\ScheduleRepository;
-use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Serializer\Context\Normalizer\ObjectNormalizerContextBuilder;
@@ -320,7 +323,6 @@ class ApiController extends AbstractController
         $em->flush();
 
         return new JsonResponse($request->getContent(), Response::HTTP_OK, [], true);
-
     }
 
     // Schedule
@@ -841,6 +843,8 @@ class ApiController extends AbstractController
         return new JsonResponse($imagesJson, Response::HTTP_OK, [], true);
     }
 
+
+    // Route to get the remaining available seats and the schedule depending on the day
     #[Route('/booking/getavailable', name: 'app_booking_available', methods: ['GET'])]
     public function get_booking_available(
         BookingRepository $bookingRepository,
@@ -853,10 +857,10 @@ class ApiController extends AbstractController
         $date = $request->query->get('date');
         $shift = $request->query->get('shift');
 
-        $day = $scheduleRepository->getScheduleByDate($date, $shift);        
-    
+        $day = $scheduleRepository->getScheduleByDate($date, $shift);
+
         $maxCapacity = $restaurantRepository->getMaxCapacity();
-        
+
         $seatsTaken = $bookingRepository->getAvailable($date, $shift)[0]['seats'] === null ? 0 : intval($bookingRepository->getAvailable($date, $shift)[0]['seats']);
 
         $seatsLeft = $maxCapacity - $seatsTaken;
@@ -865,10 +869,195 @@ class ApiController extends AbstractController
             'shiftStart' => $day['start'],
             'shiftEnd' => $day['end'],
             'shiftClosed' => $day['closed']
-        
+
         ];
 
         $responseJson = $serializer->serialize($response, 'json', []);
         return new JsonResponse($responseJson, Response::HTTP_OK, [], true);
+    }
+
+    // Client Account and Profil
+    ///////////////////////////
+    #[Route('/get/client/{id}', name: 'app_get_client', methods: ['GET'])]
+    #[IsGranted('ROLE_USER', message: 'Vous n\'avez pas les droits suffisants pour effectuer cette action')]
+    public function get_client(
+        User $user,
+        SerializerInterface $serializer
+    ): JsonResponse {
+        $email = $user->getEmail();
+
+        $response = [
+            'email' => $email
+        ];
+
+        $responseJson = $serializer->serialize($response, 'json', []);
+
+        return new JsonResponse($responseJson, Response::HTTP_OK, [], true);
+    }
+
+    #[Route('/update/client/{id}', name: 'app_update_client', methods: ['PUT'])]
+    #[IsGranted('ROLE_USER', message: 'Vous n\'avez pas les droits suffisants pour effectuer cette action')]
+    public function update_client(
+        User $user,
+        Request $request,
+        EntityManagerInterface $em,
+        UserPasswordHasherInterface $userPasswordHasher,
+        SerializerInterface $serializer,
+        Security $security
+    ): JsonResponse {
+
+        $currentUser = $security->getUser();
+        $requestArray = $request->toArray();
+        $email = $requestArray['email'];
+        $newPassword = $requestArray['password'];
+        $verifPwd = $requestArray['verifPwd'];
+
+        // Verify if the current user is trying to make update on his account
+        if ($currentUser !== $user) {
+            $content = [
+                'message' => 'Vous ne pouvez effectuer de modification uniquement sur votre compte'
+            ];
+            $response = $serializer->serialize($content, 'json', []);
+            $responseJson = $serializer->serialize($response, 'json', []);
+
+            return new JsonResponse($responseJson, Response::HTTP_FORBIDDEN, [], true);
+        }
+
+        // If the current password is Okay
+        if ($userPasswordHasher->isPasswordValid($user, $verifPwd)) {
+
+            if ($email) {
+                $user->setEmail($email);
+            }
+
+            if ($newPassword) {
+                $user->setPassword(
+                    $userPasswordHasher->hashPassword(
+                        $user,
+                        $newPassword
+                    )
+                );
+            }
+
+            $em->persist($user);
+            $em->flush();
+
+            $content = [
+                'message' => "Changements effectués"
+
+            ];
+            $response = $serializer->serialize($content, 'json', []);
+            $responseJson = $serializer->serialize($response, 'json', []);
+
+            return new JsonResponse($responseJson, Response::HTTP_OK, [], true);
+        } else {
+            $content = [
+                'message' => 'Veuillez entrer votre ancien mot de passe pour valider les changements'
+
+            ];
+            $response = $serializer->serialize($content, 'json', []);
+            $responseJson = $serializer->serialize($response, 'json', []);
+
+            return new JsonResponse($responseJson, Response::HTTP_FORBIDDEN, [], true);
+        }
+    }
+
+    #[Route('/delete/client/{id}', name: 'app_delete_client', methods: ['DELETE'])]
+    #[IsGranted('ROLE_USER', message: 'Vous n\'avez pas les droits suffisants pour effectuer cette action')]
+    public function delete_client(
+        User $user,
+        Request $request,
+        UserPasswordHasherInterface $userPasswordHasher,
+        EntityManagerInterface $em,
+        SerializerInterface $serializer,
+        Security $security
+    ): JsonResponse {
+
+        
+        $requestArray = $request->toArray();
+        $password = $requestArray['password'];
+        $currentUser = $security->getUser();
+
+        // Verify if the current user is trying to delete his own account
+        if ($currentUser !== $user) {
+            $content = [
+                'message' => 'Vous ne pouvez effectuer de modification uniquement sur votre compte'
+            ];
+            $response = $serializer->serialize($content, 'json', []);
+            $responseJson = $serializer->serialize($response, 'json', []);
+
+            return new JsonResponse($responseJson, Response::HTTP_FORBIDDEN, [], true);
+        }
+
+        if ($userPasswordHasher->isPasswordValid($user, $password)) {
+
+            $em->remove($user);
+            $em->flush();
+
+            $content = [
+                'message' => "Client supprimé"
+
+            ];
+            $response = $serializer->serialize($content, 'json', []);
+            $responseJson = $serializer->serialize($response, 'json', []);
+
+            return new JsonResponse($responseJson, Response::HTTP_OK, [], true);
+        } else {
+            $content = [
+                'message' => 'Veuillez entrer votre ancien mot de passe pour valider la suppression'
+
+            ];
+            $response = $serializer->serialize($content, 'json', []);
+            $responseJson = $serializer->serialize($response, 'json', []);
+
+            return new JsonResponse($responseJson, Response::HTTP_FORBIDDEN, [], true);
+        }
+    }
+
+    #[Route('/update/profil/{id}', name:'app_update_profil', methods: ['PUT'])]
+    #[IsGranted('ROLE_USER', message: 'Vous n\'avez pas les droits suffisants pour effectuer cette action')]
+    public function update_profil (
+        Client $client,
+        Request $request,
+        SerializerInterface $serializer,
+        EntityManagerInterface $em,
+        Security $security
+    ) : JsonResponse {
+
+        $updateClient =$serializer->deserialize(
+            $request->getContent(),
+            Client::class,
+            'json'
+        );
+
+        $user = $client->getUserId();
+        $currentUser = $security->getUser();
+
+        if ($currentUser !== $user) {
+            $content = [
+                'message' => 'Vous ne pouvez effectuer de modification uniquement sur votre compte'
+            ];
+            $response = $serializer->serialize($content, 'json', []);
+            $responseJson = $serializer->serialize($response, 'json', []);
+
+            return new JsonResponse($responseJson, Response::HTTP_FORBIDDEN, [], true);
+        }
+        
+        $client->setLastname($updateClient->getLastname());
+        $client->setFirstname($updateClient->getFirstname());
+        $client->setAllergies($updateClient->getAllergies());
+        $client->setPhone($updateClient->getPhone());
+        $client->setNumber($updateClient->getNumber());
+
+        $em->persist($client);
+        $em->flush();
+
+        $content = [
+            "message" => "Changement sauvegardé. Veuillez patienter pendant le chargement de la page"
+        ];
+
+        $contentJson = $serializer->serialize($content, 'json', []);
+
+        return new JsonResponse($contentJson, Response::HTTP_OK, [], true);
     }
 }

@@ -3,23 +3,25 @@ import moment from 'moment/moment'
 import axios from 'axios'
 import { useState } from 'react'
 
-const Booking = () => {
-
+const Booking = ({ userLastname, userFirstname, userAllergies, userPhone, userNumber}) => {
 
   const initialState = {
-    lastname: '',
-    date: moment().format('YYYY-MM-DD') +'T00:00:00.000Z',
+    lastname: userLastname ? userLastname : '',
+    firstname: userFirstname ? userFirstname : '',
+    date: moment().format('YYYY-MM-DD') + 'T00:00:00.000Z',
     time: '',
-    allergies: '',
-    phone: '',
+    allergies: userAllergies ? userAllergies : '',
+    phone: userPhone ? userPhone : '',
     shift: 'midi',
-    number: 1,
+    number: userNumber ? userNumber : 1,
   }
 
   const reducer = (state, action) => {
     switch (action.type) {
       case 'lastname':
         return { ...state, lastname: action.value }
+      case 'firstname':
+        return { ...state, firstname: action.value }
       case 'date':
         let date = moment(action.value + 'T00:00:00.000Z').utcOffset(0).toISOString()
         return { ...state, date: date }
@@ -39,6 +41,7 @@ const Booking = () => {
     }
   }
 
+
   const [state, dispatch] = useReducer(reducer, initialState)
 
   const bookingSubmit = async () => {
@@ -47,7 +50,6 @@ const Booking = () => {
       const res = await axios.put('/api/add/booking', state)
       const data = await res.data
 
-      console.log(data);
       setTimeout(() => {
         window.location.reload(true)
       }, 1000)
@@ -82,6 +84,7 @@ const Booking = () => {
     getAvailableSeatsAndSchedule()
   }, [state.date, state.shift])
 
+
   const timeOptions = hourArray.map((hour, i) => {
     return (
       <div className='hours' key={i}>
@@ -97,7 +100,7 @@ const Booking = () => {
         <h2>Réserver une table</h2>
 
       </div>
-      <form className='form' onSubmit={(e)=> {
+      <form className='form' onSubmit={(e) => {
         e.preventDefault()
         bookingSubmit()
       }}>
@@ -112,7 +115,7 @@ const Booking = () => {
           </div>
           <div className='number_div'>
             <label htmlFor="number">Couverts :</label>
-            <input type="number" name="number" id="number" onChange={(e) => dispatch({ type: 'number', value: e.target.value })} required />
+            <input type="number" name="number" id="number" value={state.number} onChange={(e) => dispatch({ type: 'number', value: e.target.value })} required />
           </div>
           <div className='shift_div'>
             <label htmlFor="shift">Service :</label>
@@ -127,11 +130,11 @@ const Booking = () => {
           </div>
         </div>
 
-        {seatsLeft === 0 || isShiftClosed ? 
-        
-        <div>
-          <p>Le restaurant est fermé, ou il n'y a plus de places disponibles</p>
-        </div>:
+        {seatsLeft === 0 || isShiftClosed ?
+
+          <div>
+            <p>Le restaurant est fermé, ou il n'y a plus de places disponibles</p>
+          </div> :
           <>
             <div className='available'>
               {seatsLeft !== 0 ?
@@ -147,17 +150,20 @@ const Booking = () => {
 
         <div className='allergies_div'>
           <label htmlFor="allergies">Veuillez signaler d'éventuelles allergies</label>
-          <textarea name="allergies" id="allergies" onChange={(e) => dispatch({ type: 'allergies', value: e.target.value })}></textarea>
+          <textarea name="allergies" id="allergies" value={state.allergies} onChange={(e) => dispatch({ type: 'allergies', value: e.target.value })}></textarea>
         </div>
         <div className='user_info'>
           <div className='lastname_div'>
             <label htmlFor="lastname">Votre nom :</label>
-            <input type="text" name="lastname" id="lastname" onChange={(e) => dispatch({ type: 'lastname', value: e.target.value })} required />
+            <input type="text" name="lastname" id="lastname" value={state.lastname} onChange={(e) => dispatch({ type: 'lastname', value: e.target.value })} required />
           </div>
-
+          <div className='firstname_div'>
+            <label htmlFor="firstname">Votre prénom :</label>
+            <input type="text" name="firstname" id="firstname" value={state.firstname} onChange={(e) => dispatch({ type: 'firstname', value: e.target.value })} required />
+          </div>
           <div className='phone_div'>
             <label htmlFor="phone">Votre téléphone :</label>
-            <input type="tel" name="phone" id="phone" onChange={(e) => dispatch({ type: 'phone', value: e.target.value })} required />
+            <input type="tel" name="phone" id="phone" value={state.phone} onChange={(e) => dispatch({ type: 'phone', value: e.target.value })} required />
           </div>
         </div>
         <div className='disclaimer'>

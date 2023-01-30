@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\ClientRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: ClientRepository::class)]
 class Client
@@ -12,21 +13,27 @@ class Client
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['client_info'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['client_info'])]
     private ?string $lastname = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['client_info'])]
     private ?string $firstname = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['client_info'])]
     private ?string $allergies = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['client_info'])]
     private ?string $phone = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['client_info'])]
     private ?int $number = null;
 
     #[ORM\OneToOne(inversedBy: 'client', cascade: ['persist', 'remove'])]

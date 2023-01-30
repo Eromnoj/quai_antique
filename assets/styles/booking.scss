@@ -111,6 +111,7 @@
       margin-top: 45px;
       align-self: center;
       .lastname_div,
+      .firstname_div,
       .email_div,
       .phone_div {
         display: flex;
@@ -192,6 +193,7 @@
         align-items: center;
         justify-content: space-evenly;
         .lastname_div,
+        .firstname_div,
         .email_div,
         .phone_div {
           display: flex;

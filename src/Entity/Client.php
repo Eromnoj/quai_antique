@@ -6,6 +6,7 @@ use App\Repository\ClientRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ClientRepository::class)]
 class Client
@@ -30,6 +31,7 @@ class Client
 
     #[ORM\Column(nullable: true)]
     #[Groups(['client_info'])]
+    #[Assert\Regex('/^(?:(?:\+|00)33|0)\s*[1-9](?:[\s.-]*\d{2}){4}$/', message: "Veuillez indiquer un numéro de téléphone valide")]
     private ?string $phone = null;
 
     #[ORM\Column(nullable: true)]

@@ -100,7 +100,7 @@ class ApiController extends AbstractController
         if ($this->isCsrfTokenValid('image', $submittedToken)) {
             $updateImage = $request->files->get('image');
             $description = $request->get('description');
-            $message = [];
+
             // Check if file is an image with a max size 2Mo
             $violations = $validator->validate(
                 $updateImage,
@@ -108,18 +108,15 @@ class ApiController extends AbstractController
                     'maxSize' => '2000K',
                     'mimeTypes' => [
                         'image/*'
-                    ]
+                    ],
+                    'maxSizeMessage' => 'Le fichier doit faire moins de 2Mo',
+                    'mimeTypesMessage' => 'Le fichier doit être une image'
                 ])
             );
 
             if ($violations->count() > 0) {
-                $message = [
-                    'message' => 'Le fichier doit être une image de moins de 2Mo'
-                ];
 
-                $messageJson = $serializer->serialize($message, 'json', []);
-
-                return new JsonResponse($messageJson, Response::HTTP_BAD_REQUEST, [], true);
+                return new JsonResponse($serializer->serialize($violations, 'json', []), Response::HTTP_BAD_REQUEST, [], true);
             }
 
             if ($updateImage) {
@@ -150,9 +147,11 @@ class ApiController extends AbstractController
                     return new JsonResponse($messageJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
                 }
             }
+            $image->setDescription($description);
 
-            if ($description) {
-                $image->setDescription($description);
+            $errors = $validator->validate($image);
+            if ($errors->count() > 0) {
+                return new JsonResponse($serializer->serialize($errors, 'json'), JsonResponse::HTTP_BAD_REQUEST, [], true);
             }
 
             $em->persist($image);
@@ -163,7 +162,11 @@ class ApiController extends AbstractController
             $imagesJson = $serializer->serialize($content, 'json', []);
             return new JsonResponse($imagesJson, Response::HTTP_OK, [], true);
         } else {
-            throw new Error("Token invalide", Response::HTTP_FORBIDDEN);
+            $content = [
+                'message' => 'Une erreur est survenue'
+            ];
+            $imagesJson = $serializer->serialize($content, 'json', []);
+            return new JsonResponse($imagesJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
         }
     }
 
@@ -205,7 +208,11 @@ class ApiController extends AbstractController
             $imagesJson = $serializer->serialize($content, 'json', []);
             return new JsonResponse($imagesJson, Response::HTTP_OK, [], true);
         } else {
-            throw new Error("Token invalide", Response::HTTP_FORBIDDEN);
+            $content = [
+                'message' => 'Une erreur est survenue'
+            ];
+            $imagesJson = $serializer->serialize($content, 'json', []);
+            return new JsonResponse($imagesJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
         }
     }
 
@@ -233,18 +240,15 @@ class ApiController extends AbstractController
                     'maxSize' => '2000K',
                     'mimeTypes' => [
                         'image/*'
-                    ]
+                    ],
+                    'maxSizeMessage' => 'Le fichier doit faire moins de 2Mo',
+                    'mimeTypesMessage' => 'Le fichier doit être une image'
                 ])
             );
 
             if ($violations->count() > 0) {
-                $message = [
-                    'message' => 'Le fichier doit être une image de moins de 2Mo'
-                ];
 
-                $messageJson = $serializer->serialize($message, 'json', []);
-
-                return new JsonResponse($messageJson, Response::HTTP_BAD_REQUEST, [], true);
+                return new JsonResponse($serializer->serialize($violations, 'json', []), Response::HTTP_BAD_REQUEST, [], true);
             }
 
             if ($updateImage) {
@@ -269,26 +273,13 @@ class ApiController extends AbstractController
 
                     return new JsonResponse($messageJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
                 }
-            } else {
-                $message = [
-                    'message' => 'Vous devez ajouter une image'
-                ];
-
-                $messageJson = $serializer->serialize($message, 'json', []);
-
-                return new JsonResponse($messageJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
             }
 
-            if ($description) {
-                $image->setDescription($description);
-            } else {
-                $message = [
-                    'message' => 'Vous devez ajouter une description'
-                ];
+            $image->setDescription($description);
 
-                $messageJson = $serializer->serialize($message, 'json', []);
-
-                return new JsonResponse($messageJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
+            $errors = $validator->validate($image);
+            if ($errors->count() > 0) {
+                return new JsonResponse($serializer->serialize($errors, 'json'), JsonResponse::HTTP_BAD_REQUEST, [], true);
             }
 
             $em->persist($image);
@@ -299,7 +290,11 @@ class ApiController extends AbstractController
             $imagesJson = $serializer->serialize($content, 'json', []);
             return new JsonResponse($imagesJson, Response::HTTP_OK, [], true);
         } else {
-            throw new Error("Token invalide", Response::HTTP_FORBIDDEN);
+            $content = [
+                'message' => 'Une erreur est survenue'
+            ];
+            $imagesJson = $serializer->serialize($content, 'json', []);
+            return new JsonResponse($imagesJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
         }
     }
 
@@ -324,7 +319,8 @@ class ApiController extends AbstractController
         Restaurant $restaurant,
         SerializerInterface $serializer,
         Request $request,
-        EntityManagerInterface $em
+        EntityManagerInterface $em,
+        ValidatorInterface $validator
     ): JsonResponse {
 
         $requestArray = $request->toArray();
@@ -344,13 +340,20 @@ class ApiController extends AbstractController
             $restaurant->setPostCode($updateRestaurant->getPostCode());
             $restaurant->setMaxCapacity($updateRestaurant->getMaxCapacity());
 
-            // TODO : intégrer les validations du formulaire, avec réponse pour les erreurs
+            $errors = $validator->validate($restaurant);
+            if ($errors->count() > 0) {
+                return new JsonResponse($serializer->serialize($errors, 'json'), JsonResponse::HTTP_BAD_REQUEST, [], true);
+            }
             $em->persist($restaurant);
             $em->flush();
 
             return new JsonResponse($request->getContent(), Response::HTTP_OK, [], true);
         } else {
-            throw new Error("Token invalide", Response::HTTP_FORBIDDEN);
+            $content = [
+                'message' => 'Une erreur est survenue'
+            ];
+            $imagesJson = $serializer->serialize($content, 'json', []);
+            return new JsonResponse($imagesJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
         }
     }
 
@@ -404,7 +407,11 @@ class ApiController extends AbstractController
 
             return new JsonResponse($contentJson, Response::HTTP_OK, [], true);
         } else {
-            throw new Error("Token invalide", Response::HTTP_FORBIDDEN);
+            $content = [
+                'message' => 'Une erreur est survenue'
+            ];
+            $imagesJson = $serializer->serialize($content, 'json', []);
+            return new JsonResponse($imagesJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
         }
     }
 
@@ -431,7 +438,8 @@ class ApiController extends AbstractController
         Category $category,
         Request $request,
         SerializerInterface $serializer,
-        EntityManagerInterface $em
+        EntityManagerInterface $em,
+        ValidatorInterface $validator
     ): JsonResponse {
 
         $requestArray = $request->toArray();
@@ -449,6 +457,13 @@ class ApiController extends AbstractController
 
             $category->setName($updateCategory->getName());
             $category->setRankDisplay($updateCategory->getRankDisplay());
+
+            $errors = $validator->validate($category);
+
+            if ($errors->count() > 0) {
+                return new JsonResponse($serializer->serialize($errors, 'json'), JsonResponse::HTTP_BAD_REQUEST, [], true);
+            }
+
             $em->persist($category);
             $em->flush();
             $content = [
@@ -459,7 +474,11 @@ class ApiController extends AbstractController
 
             return new JsonResponse($contentJson, Response::HTTP_OK, [], true);
         } else {
-            throw new Error("Token invalide", Response::HTTP_FORBIDDEN);
+            $content = [
+                'message' => 'Une erreur est survenue'
+            ];
+            $imagesJson = $serializer->serialize($content, 'json', []);
+            return new JsonResponse($imagesJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
         }
     }
 
@@ -484,7 +503,11 @@ class ApiController extends AbstractController
             $imagesJson = $serializer->serialize($content, 'json', []);
             return new JsonResponse($imagesJson, Response::HTTP_OK, [], true);
         } else {
-            throw new Error("Token invalide", Response::HTTP_FORBIDDEN);
+            $content = [
+                'message' => 'Une erreur est survenue'
+            ];
+            $imagesJson = $serializer->serialize($content, 'json', []);
+            return new JsonResponse($imagesJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
         }
     }
 
@@ -493,7 +516,8 @@ class ApiController extends AbstractController
     public function add_categories(
         Request $request,
         SerializerInterface $serializer,
-        EntityManagerInterface $em
+        EntityManagerInterface $em,
+        ValidatorInterface $validator
     ): JsonResponse {
 
         $requestArray = $request->toArray();
@@ -510,6 +534,13 @@ class ApiController extends AbstractController
             $category = new Category();
             $category->setName($updateCategory->getName());
             $category->setRankDisplay($updateCategory->getRankDisplay());
+
+            $errors = $validator->validate($category);
+
+            if ($errors->count() > 0) {
+                return new JsonResponse($serializer->serialize($errors, 'json'), JsonResponse::HTTP_BAD_REQUEST, [], true);
+            }
+
             $em->persist($category);
             $em->flush();
             $content = [
@@ -520,7 +551,11 @@ class ApiController extends AbstractController
 
             return new JsonResponse($contentJson, Response::HTTP_OK, [], true);
         } else {
-            throw new Error("Token invalide", Response::HTTP_FORBIDDEN);
+            $content = [
+                'message' => 'Une erreur est survenue'
+            ];
+            $imagesJson = $serializer->serialize($content, 'json', []);
+            return new JsonResponse($imagesJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
         }
     }
 
@@ -546,7 +581,8 @@ class ApiController extends AbstractController
         CategoryRepository $categoryRepository,
         Request $request,
         SerializerInterface $serializer,
-        EntityManagerInterface $em
+        EntityManagerInterface $em,
+        ValidatorInterface $validator
     ): JsonResponse {
         $requestArray = $request->toArray();
 
@@ -568,6 +604,12 @@ class ApiController extends AbstractController
             $idCategory = $content['category'];
 
             $dish->setCategory($categoryRepository->find($idCategory));
+
+            $errors = $validator->validate($dish);
+
+            if ($errors->count() > 0) {
+                return new JsonResponse($serializer->serialize($errors, 'json'), JsonResponse::HTTP_BAD_REQUEST, [], true);
+            }
             $em->persist($dish);
             $em->flush();
 
@@ -579,7 +621,11 @@ class ApiController extends AbstractController
 
             return new JsonResponse($contentJson, Response::HTTP_OK, [], true);
         } else {
-            throw new Error("Token invalide", Response::HTTP_FORBIDDEN);
+            $content = [
+                'message' => 'Une erreur est survenue'
+            ];
+            $imagesJson = $serializer->serialize($content, 'json', []);
+            return new JsonResponse($imagesJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
         }
     }
 
@@ -589,7 +635,8 @@ class ApiController extends AbstractController
         CategoryRepository $categoryRepository,
         Request $request,
         SerializerInterface $serializer,
-        EntityManagerInterface $em
+        EntityManagerInterface $em,
+        ValidatorInterface $validator
     ): JsonResponse {
         $requestArray = $request->toArray();
 
@@ -613,6 +660,12 @@ class ApiController extends AbstractController
             $idCategory = $content['category'];
 
             $dish->setCategory($categoryRepository->find($idCategory));
+
+            $errors = $validator->validate($dish);
+
+            if ($errors->count() > 0) {
+                return new JsonResponse($serializer->serialize($errors, 'json'), JsonResponse::HTTP_BAD_REQUEST, [], true);
+            }
             $em->persist($dish);
             $em->flush();
 
@@ -624,7 +677,11 @@ class ApiController extends AbstractController
 
             return new JsonResponse($contentJson, Response::HTTP_OK, [], true);
         } else {
-            throw new Error("Token invalide", Response::HTTP_FORBIDDEN);
+            $content = [
+                'message' => 'Une erreur est survenue'
+            ];
+            $imagesJson = $serializer->serialize($content, 'json', []);
+            return new JsonResponse($imagesJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
         }
     }
 
@@ -649,7 +706,11 @@ class ApiController extends AbstractController
             $imagesJson = $serializer->serialize($content, 'json', []);
             return new JsonResponse($imagesJson, Response::HTTP_OK, [], true);
         } else {
-            throw new Error("Token invalide", Response::HTTP_FORBIDDEN);
+            $content = [
+                'message' => 'Une erreur est survenue'
+            ];
+            $imagesJson = $serializer->serialize($content, 'json', []);
+            return new JsonResponse($imagesJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
         }
     }
 
@@ -677,7 +738,8 @@ class ApiController extends AbstractController
         Menu $menu,
         Request $request,
         SerializerInterface $serializer,
-        EntityManagerInterface $em
+        EntityManagerInterface $em,
+        ValidatorInterface $validator
     ): JsonResponse {
 
         $requestArray = $request->toArray();
@@ -693,6 +755,12 @@ class ApiController extends AbstractController
 
 
             $menu->setName($updateMenu->getName());
+
+            $errors = $validator->validate($menu);
+
+            if ($errors->count() > 0) {
+                return new JsonResponse($serializer->serialize($errors, 'json'), JsonResponse::HTTP_BAD_REQUEST, [], true);
+            }
             $em->persist($menu);
             $em->flush();
             $content = [
@@ -703,7 +771,11 @@ class ApiController extends AbstractController
 
             return new JsonResponse($contentJson, Response::HTTP_OK, [], true);
         } else {
-            throw new Error("Token invalide", Response::HTTP_FORBIDDEN);
+            $content = [
+                'message' => 'Une erreur est survenue'
+            ];
+            $imagesJson = $serializer->serialize($content, 'json', []);
+            return new JsonResponse($imagesJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
         }
     }
 
@@ -728,7 +800,11 @@ class ApiController extends AbstractController
             $imagesJson = $serializer->serialize($content, 'json', []);
             return new JsonResponse($imagesJson, Response::HTTP_OK, [], true);
         } else {
-            throw new Error("Token invalide", Response::HTTP_FORBIDDEN);
+            $content = [
+                'message' => 'Une erreur est survenue'
+            ];
+            $imagesJson = $serializer->serialize($content, 'json', []);
+            return new JsonResponse($imagesJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
         }
     }
 
@@ -737,7 +813,8 @@ class ApiController extends AbstractController
     public function add_menus(
         Request $request,
         SerializerInterface $serializer,
-        EntityManagerInterface $em
+        EntityManagerInterface $em,
+        ValidatorInterface $validator
     ): JsonResponse {
         $requestArray = $request->toArray();
 
@@ -752,6 +829,12 @@ class ApiController extends AbstractController
 
             $menu = new Menu();
             $menu->setName($updateMenu->getName());
+
+            $errors = $validator->validate($menu);
+
+            if ($errors->count() > 0) {
+                return new JsonResponse($serializer->serialize($errors, 'json'), JsonResponse::HTTP_BAD_REQUEST, [], true);
+            }
             $em->persist($menu);
             $em->flush();
             $content = [
@@ -762,7 +845,11 @@ class ApiController extends AbstractController
 
             return new JsonResponse($contentJson, Response::HTTP_OK, [], true);
         } else {
-            throw new Error("Token invalide", Response::HTTP_FORBIDDEN);
+            $content = [
+                'message' => 'Une erreur est survenue'
+            ];
+            $imagesJson = $serializer->serialize($content, 'json', []);
+            return new JsonResponse($imagesJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
         }
     }
 
@@ -773,7 +860,8 @@ class ApiController extends AbstractController
         Formula $formula,
         Request $request,
         SerializerInterface $serializer,
-        EntityManagerInterface $em
+        EntityManagerInterface $em,
+        ValidatorInterface $validator
     ): JsonResponse {
         $requestArray = $request->toArray();
 
@@ -790,6 +878,11 @@ class ApiController extends AbstractController
             $formula->setDescription($updateFormula->getDescription());
             $formula->setPrice($updateFormula->getPrice());
 
+            $errors = $validator->validate($formula);
+
+            if ($errors->count() > 0) {
+                return new JsonResponse($serializer->serialize($errors, 'json'), JsonResponse::HTTP_BAD_REQUEST, [], true);
+            }
             $em->persist($formula);
             $em->flush();
 
@@ -801,7 +894,11 @@ class ApiController extends AbstractController
 
             return new JsonResponse($contentJson, Response::HTTP_OK, [], true);
         } else {
-            throw new Error("Token invalide", Response::HTTP_FORBIDDEN);
+            $content = [
+                'message' => 'Une erreur est survenue'
+            ];
+            $imagesJson = $serializer->serialize($content, 'json', []);
+            return new JsonResponse($imagesJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
         }
     }
 
@@ -811,7 +908,8 @@ class ApiController extends AbstractController
         MenuRepository $menuRepository,
         Request $request,
         SerializerInterface $serializer,
-        EntityManagerInterface $em
+        EntityManagerInterface $em,
+        ValidatorInterface $validator
     ): JsonResponse {
         $requestArray = $request->toArray();
 
@@ -835,6 +933,12 @@ class ApiController extends AbstractController
             $idMenu = $requestArray['menuId'];
 
             $formula->setMenu($menuRepository->find($idMenu));
+
+            $errors = $validator->validate($formula);
+
+            if ($errors->count() > 0) {
+                return new JsonResponse($serializer->serialize($errors, 'json'), JsonResponse::HTTP_BAD_REQUEST, [], true);
+            }
             $em->persist($formula);
             $em->flush();
 
@@ -846,7 +950,11 @@ class ApiController extends AbstractController
 
             return new JsonResponse($contentJson, Response::HTTP_OK, [], true);
         } else {
-            throw new Error("Token invalide", Response::HTTP_FORBIDDEN);
+            $content = [
+                'message' => 'Une erreur est survenue'
+            ];
+            $imagesJson = $serializer->serialize($content, 'json', []);
+            return new JsonResponse($imagesJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
         }
     }
 
@@ -871,7 +979,11 @@ class ApiController extends AbstractController
             $imagesJson = $serializer->serialize($content, 'json', []);
             return new JsonResponse($imagesJson, Response::HTTP_OK, [], true);
         } else {
-            throw new Error("Token invalide", Response::HTTP_FORBIDDEN);
+            $content = [
+                'message' => 'Une erreur est survenue'
+            ];
+            $imagesJson = $serializer->serialize($content, 'json', []);
+            return new JsonResponse($imagesJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
         }
     }
 
@@ -896,7 +1008,8 @@ class ApiController extends AbstractController
         Booking $booking,
         Request $request,
         SerializerInterface $serializer,
-        EntityManagerInterface $em
+        EntityManagerInterface $em,
+        ValidatorInterface $validator
     ): JsonResponse {
         $requestArray = $request->toArray();
 
@@ -917,6 +1030,11 @@ class ApiController extends AbstractController
             $booking->setTime($updateBooking->getTime());
             $booking->setNumber($updateBooking->getNumber());
 
+            $errors = $validator->validate($booking);
+
+            if ($errors->count() > 0) {
+                return new JsonResponse($serializer->serialize($errors, 'json'), JsonResponse::HTTP_BAD_REQUEST, [], true);
+            }
             $em->persist($booking);
             $em->flush();
 
@@ -928,7 +1046,11 @@ class ApiController extends AbstractController
 
             return new JsonResponse($contentJson, Response::HTTP_OK, [], true);
         } else {
-            throw new Error("Token invalide", Response::HTTP_FORBIDDEN);
+            $content = [
+                'message' => 'Une erreur est survenue'
+            ];
+            $imagesJson = $serializer->serialize($content, 'json', []);
+            return new JsonResponse($imagesJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
         }
     }
 
@@ -936,7 +1058,8 @@ class ApiController extends AbstractController
     public function add_booking(
         Request $request,
         SerializerInterface $serializer,
-        EntityManagerInterface $em
+        EntityManagerInterface $em,
+        ValidatorInterface $validator
     ): JsonResponse {
         $requestArray = $request->toArray();
 
@@ -958,6 +1081,11 @@ class ApiController extends AbstractController
             $booking->setTime($updateBooking->getTime());
             $booking->setNumber($updateBooking->getNumber());
 
+            $errors = $validator->validate($booking);
+
+            if ($errors->count() > 0) {
+                return new JsonResponse($serializer->serialize($errors, 'json'), JsonResponse::HTTP_BAD_REQUEST, [], true);
+            }
             $em->persist($booking);
             $em->flush();
 
@@ -969,7 +1097,11 @@ class ApiController extends AbstractController
 
             return new JsonResponse($contentJson, Response::HTTP_OK, [], true);
         } else {
-            throw new Error("Token invalide", Response::HTTP_FORBIDDEN);
+            $content = [
+                'message' => 'Une erreur est survenue'
+            ];
+            $imagesJson = $serializer->serialize($content, 'json', []);
+            return new JsonResponse($imagesJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
         }
     }
 
@@ -994,7 +1126,11 @@ class ApiController extends AbstractController
             $imagesJson = $serializer->serialize($content, 'json', []);
             return new JsonResponse($imagesJson, Response::HTTP_OK, [], true);
         } else {
-            throw new Error("Token invalide", Response::HTTP_FORBIDDEN);
+            $content = [
+                'message' => 'Une erreur est survenue'
+            ];
+            $imagesJson = $serializer->serialize($content, 'json', []);
+            return new JsonResponse($imagesJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
         }
     }
 
@@ -1059,7 +1195,8 @@ class ApiController extends AbstractController
         EntityManagerInterface $em,
         UserPasswordHasherInterface $userPasswordHasher,
         SerializerInterface $serializer,
-        Security $security
+        Security $security,
+        ValidatorInterface $validator
     ): JsonResponse {
         $requestArray = $request->toArray();
 
@@ -1098,6 +1235,12 @@ class ApiController extends AbstractController
                     );
                 }
 
+                $errors = $validator->validate($user);
+
+                if ($errors->count() > 0) {
+                    return new JsonResponse($serializer->serialize($errors, 'json'), JsonResponse::HTTP_BAD_REQUEST, [], true);
+                }
+
                 $em->persist($user);
                 $em->flush();
 
@@ -1118,7 +1261,11 @@ class ApiController extends AbstractController
                 return new JsonResponse($responseJson, Response::HTTP_FORBIDDEN, [], true);
             }
         } else {
-            throw new Error("Token invalide", Response::HTTP_FORBIDDEN);
+            $content = [
+                'message' => 'Une erreur est survenue'
+            ];
+            $imagesJson = $serializer->serialize($content, 'json', []);
+            return new JsonResponse($imagesJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
         }
     }
 
@@ -1141,7 +1288,7 @@ class ApiController extends AbstractController
         $submittedToken = $requestArray['token'];
 
         if ($this->isCsrfTokenValid('profil', $submittedToken)) {
-            
+
             if ($isAdmin) {
                 $content = [
                     'message' => 'Le compte administrateur ne peut pas être supprimé'
@@ -1163,7 +1310,7 @@ class ApiController extends AbstractController
             if ($userPasswordHasher->isPasswordValid($user, $password)) {
                 $em->remove($user);
                 $em->flush();
-                
+
                 $security->logout(false);
                 $content = [
                     'message' => "Client supprimé"
@@ -1182,7 +1329,11 @@ class ApiController extends AbstractController
                 return new JsonResponse($responseJson, Response::HTTP_FORBIDDEN, [], true);
             }
         } else {
-            throw new Error("Token invalide", Response::HTTP_FORBIDDEN);
+            $content = [
+                'message' => 'Une erreur est survenue'
+            ];
+            $imagesJson = $serializer->serialize($content, 'json', []);
+            return new JsonResponse($imagesJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
         }
     }
 
@@ -1193,7 +1344,8 @@ class ApiController extends AbstractController
         Request $request,
         SerializerInterface $serializer,
         EntityManagerInterface $em,
-        Security $security
+        Security $security,
+        ValidatorInterface $validator
     ): JsonResponse {
         $requestArray = $request->toArray();
 
@@ -1224,6 +1376,11 @@ class ApiController extends AbstractController
             $client->setPhone($updateClient->getPhone());
             $client->setNumber($updateClient->getNumber());
 
+            $errors = $validator->validate($client);
+
+            if ($errors->count() > 0) {
+                return new JsonResponse($serializer->serialize($errors, 'json'), JsonResponse::HTTP_BAD_REQUEST, [], true);
+            }
             $em->persist($client);
             $em->flush();
 
@@ -1235,7 +1392,11 @@ class ApiController extends AbstractController
 
             return new JsonResponse($contentJson, Response::HTTP_OK, [], true);
         } else {
-            throw new Error("Token invalide", Response::HTTP_FORBIDDEN);
+            $content = [
+                'message' => 'Une erreur est survenue'
+            ];
+            $imagesJson = $serializer->serialize($content, 'json', []);
+            return new JsonResponse($imagesJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
         }
     }
 }

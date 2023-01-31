@@ -34,14 +34,16 @@ class Restaurant
     #[Assert\NotBlank(message:"Vous devez indiquer la ville du restaurant")]
     private ?string $city = null;
 
-    #[ORM\Column(length: 10, nullable: true)]
+    #[ORM\Column(length: 255, nullable: true)]
     #[Groups(['get_restaurant'])]
     #[Assert\NotBlank(message:"Vous devez indiquer un numéro de téléphone")]
+    #[Assert\Regex('/^(?:(?:\+|00)33|0)\s*[1-9](?:[\s.-]*\d{2}){4}$/', message: "Veuillez indiquer un numéro de téléphone valide")]
     private ?string $phone = null;
 
     #[ORM\Column(nullable: true)]
     #[Groups(['get_restaurant'])]
     #[Assert\NotBlank(message:"Veuillez indiquer la capacité maximale pour un service")]
+    #[Assert\GreaterThan(value:0, message: "veuillez indiquer un nombre supérieur à {{ value }}")]
     private ?int $max_capacity = null;
 
     public function getId(): ?int

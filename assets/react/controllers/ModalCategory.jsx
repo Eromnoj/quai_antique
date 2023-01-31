@@ -2,12 +2,13 @@ import React from 'react'
 import { useReducer } from 'react'
 import axios from 'axios'
 
-const ModalCategory = ({ cat, showEdit }) => {
-
+const ModalCategory = ({ cat, showEdit, token }) => {
+  console.log(token);
   const initialCategory = {
     id: cat ? cat.id : 0,
     name: cat ? cat.name : '',
     rank_display: cat ? cat.rank_display : '',
+    token: token
   }
 
   const categoryReducer = (state, action) => {
@@ -38,7 +39,6 @@ const ModalCategory = ({ cat, showEdit }) => {
       console.log(error);
     }
   }
-  console.log(category);
   return (
     <div className='modal_window'>
       <div className='modal_container'>

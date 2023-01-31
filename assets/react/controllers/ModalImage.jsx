@@ -2,10 +2,10 @@ import React, { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import axios from 'axios'
 
-const ModalImage = ({ image, showEdit }) => {
+const ModalImage = ({ image, showEdit, token }) => {
 
   const {register, handleSubmit} = useForm()
-
+  console.log(token);
   const [showMessage, setShowMessage] = useState('false')
   const [message, setMessage] = useState('')
 
@@ -13,6 +13,7 @@ const ModalImage = ({ image, showEdit }) => {
     const formData = new FormData()
     formData.append('image', data.image[0])
     formData.append('description', data.description)
+    formData.append('token', token)
     const url = image ? `/api/update/image/${image.id}` : `/api/add/image`
     try {
       const res = await axios.post(url, formData, {
@@ -21,7 +22,7 @@ const ModalImage = ({ image, showEdit }) => {
         },
       })
       const data = await res.data
-
+      console.log(data);
       setMessage(data.message);
       setShowMessage(true)
       setTimeout(()=> {
@@ -29,6 +30,7 @@ const ModalImage = ({ image, showEdit }) => {
       },
       3000)
     } catch (error) {
+      console.log(error);
       setShowMessage(true)
       setMessage(error.response.data.message);
     }

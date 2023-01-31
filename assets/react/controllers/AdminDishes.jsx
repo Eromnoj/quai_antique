@@ -4,14 +4,18 @@ import ModalDish from './ModalDish'
 import axios from 'axios'
 import { useEffect } from 'react'
 
-const CategoryRows = ({ category }) => {
+const CategoryRows = ({ category, token }) => {
 
   const [showModalCategory, setShowModalCategory] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
 
-  const deleteCategory = async () => {
+  const deleteCategory = async (token) => {
     try {
-      const res = await axios.delete(`/api/delete/categories/${category.id}`)
+      const res = await axios.delete(`/api/delete/categories/${category.id}`, {
+        data: {
+          token
+        }
+      })
       const data = await res.data
 
       console.log(data);
@@ -32,7 +36,7 @@ const CategoryRows = ({ category }) => {
           <div className='button_delete' onClick={() => setConfirmDelete(prev => !prev)}> <img src="../img/Trash.png" alt="delete" /></div>
         </div>
         {showModalCategory ?
-        <ModalCategory cat={category} showEdit={() => {setShowModalCategory(prev=> !prev)}} />
+        <ModalCategory cat={category} showEdit={() => {setShowModalCategory(prev=> !prev)}} token={token} />
         :null}
         {confirmDelete ? 
       <div className='confirm_delete_window'>
@@ -42,7 +46,7 @@ const CategoryRows = ({ category }) => {
             <button className='cancel_delete' onClick={()=> setConfirmDelete(prev => !prev)}>Annuler</button>
             <button className='delete' onClick={()=> {
               // Manage deletion
-              deleteCategory()}
+              deleteCategory(token)}
               }>Supprimer</button>
           </div>
         </div>
@@ -52,14 +56,18 @@ const CategoryRows = ({ category }) => {
   )
 }
 
-const DishesRows = ({ dish, categories }) => {
+const DishesRows = ({ dish, categories, token }) => {
 
   const [showModalDish, setShowModalDish] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
 
-  const deleteDish = async () => {
+  const deleteDish = async (token) => {
     try {
-      const res = await axios.delete(`/api/delete/dishes/${dish.id}`)
+      const res = await axios.delete(`/api/delete/dishes/${dish.id}`, {
+        data: {
+          token
+        }
+      })
       const data = await res.data
 
       console.log(data);
@@ -83,7 +91,7 @@ const DishesRows = ({ dish, categories }) => {
           <div className='button_delete' onClick={() => setConfirmDelete(prev => !prev)}> <img src="../img/Trash.png" alt="delete" /></div>
         </div>
         {showModalDish? 
-        <ModalDish dish={dish} categories={categories} showEdit={() => {setShowModalDish(prev=>!prev)}} />
+        <ModalDish dish={dish} categories={categories} showEdit={() => {setShowModalDish(prev=>!prev)}} token={token} />
         :null}
         {confirmDelete ? 
       <div className='confirm_delete_window'>
@@ -93,7 +101,7 @@ const DishesRows = ({ dish, categories }) => {
             <button className='cancel_delete' onClick={()=> setConfirmDelete(prev => !prev)}>Annuler</button>
             <button className='delete' onClick={()=> {
               // Manage deletion
-              deleteDish()}
+              deleteDish(token)}
               }>Supprimer</button>
           </div>
         </div>
@@ -103,7 +111,7 @@ const DishesRows = ({ dish, categories }) => {
   )
 }
 
-const AdminDishes = () => {
+const AdminDishes = ({CategoryCSRFToken, DishesCSRFToken }) => {
 
   const [categories, setCategories] = useState([])
 
@@ -142,13 +150,13 @@ const AdminDishes = () => {
 
   const showCategories = categories.map( category => {
     return (
-      <CategoryRows category={category} key={category.id} />
+      <CategoryRows category={category} key={category.id} token={CategoryCSRFToken}/>
     )
   })
 
   const showDishes = dishes.map(dish => {
     return (
-      <DishesRows dish={dish} categories={categories} key={dish.id} />
+      <DishesRows dish={dish} categories={categories} key={dish.id} token={DishesCSRFToken} />
     )
   })
 
@@ -179,7 +187,7 @@ const AdminDishes = () => {
         <button className='submit_button' onClick={() => {setShowModalCategory(prev => !prev) }}>Ajouter une catégorie</button>
 
         {showModalCategory ? 
-        <ModalCategory showEdit={() => setShowModalCategory(prev => !prev)} />
+        <ModalCategory showEdit={() => setShowModalCategory(prev => !prev)} token={CategoryCSRFToken} />
         :null}
       </section>
 
@@ -207,7 +215,7 @@ const AdminDishes = () => {
         <button className='submit_button' onClick={() => setShowModalDish(prev => !prev)}>Ajouter un plat</button>
 
         {showModalDish ? 
-        <ModalDish  categories={categories} showEdit={() => setShowModalDish(prev => !prev)} />
+        <ModalDish  categories={categories} showEdit={() => setShowModalDish(prev => !prev)} token={DishesCSRFToken} />
         :null}
       </section>
 

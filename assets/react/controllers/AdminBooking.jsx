@@ -4,14 +4,18 @@ import axios from 'axios'
 import { useEffect } from 'react'
 import moment from 'moment/moment'
 
-const BookingRows = ({booking}) => {
+const BookingRows = ({booking, token}) => {
 
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [showModalBooking, setShowModalBooking] = useState(false)
 
-  const deleteBooking = async () => {
+  const deleteBooking = async (token) => {
     try {
-      const res = await axios.delete(`/api/delete/booking/${booking.id}`)
+      const res = await axios.delete(`/api/delete/booking/${booking.id}`, {
+        data: {
+          token: token
+        }
+      })
       const data = await res.data
 
       console.log(data);
@@ -33,7 +37,7 @@ const BookingRows = ({booking}) => {
         <div className='button_delete' onClick={() => { setConfirmDelete(prev => !prev) }}> <img src="../img/Trash.png" alt="delete" /></div>
       </div>
       {showModalBooking ?
-      <ModalBooking booking={booking} showEdit={() => {setShowModalBooking(prev => !prev)}} />
+      <ModalBooking booking={booking} showEdit={() => {setShowModalBooking(prev => !prev)}} token={token} />
     :null}
       {confirmDelete ?
               <div className='confirm_delete_window'>
@@ -43,7 +47,7 @@ const BookingRows = ({booking}) => {
                     <button className='cancel_delete' onClick={() => setConfirmDelete(prev => !prev)}>Annuler</button>
                     <button className='delete' onClick={() => {
                       // Manage deletion
-                      deleteBooking()
+                      deleteBooking(token)
                     }
                     }>Supprimer</button>
                   </div>
@@ -54,7 +58,7 @@ const BookingRows = ({booking}) => {
   )
 }
 
-const AdminBooking = () => {
+const AdminBooking = ({BookingCSRFToken}) => {
 
   const [bookings, setBookings] = useState([])
 
@@ -62,7 +66,6 @@ const AdminBooking = () => {
     try {
       const res = await axios.get('/api/booking')
       const data = await res.data
-      console.log(data);
       setBookings(data)
     } catch (error) {
       console.log(error);
@@ -75,7 +78,7 @@ const AdminBooking = () => {
   
   const showBookings = bookings.map(booking=> {
     return (
-      <BookingRows booking={booking} key={booking.id} />
+      <BookingRows booking={booking} key={booking.id} token={BookingCSRFToken} />
     )
   })
 
@@ -105,7 +108,7 @@ const AdminBooking = () => {
 
         <button className='submit_button' onClick={() => { setShowAddBooking(prev => !prev)}}>Ajouter une réservation</button>
         {showAddBooking ?
-        <ModalBooking showEdit={() => setShowAddBooking(prev => !prev)} />
+        <ModalBooking showEdit={() => setShowAddBooking(prev => !prev)} token={BookingCSRFToken} />
       :null}
       </section>
 

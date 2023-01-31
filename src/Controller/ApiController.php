@@ -20,6 +20,7 @@ use App\Repository\MenuRepository;
 use App\Repository\RestaurantRepository;
 use App\Repository\ScheduleRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Error;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -35,6 +36,7 @@ use Symfony\Component\Serializer\Context\Normalizer\ObjectNormalizerContextBuild
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+
 
 #[Route('/api')]
 class ApiController extends AbstractController
@@ -93,105 +95,118 @@ class ApiController extends AbstractController
         ValidatorInterface $validator
     ): JsonResponse {
 
+        $submittedToken = $request->request->get('token');
 
-        $updateImage = $request->files->get('image');
-        $description = $request->get('description');
-        $message = [];
-        // Check if file is an image with a max size 2Mo
-        $violations = $validator->validate(
-            $updateImage,
-            new File([
-                'maxSize' => '2000K',
-                'mimeTypes' => [
-                    'image/*'
-                ]
-            ])
-        );
+        if ($this->isCsrfTokenValid('image', $submittedToken)) {
+            $updateImage = $request->files->get('image');
+            $description = $request->get('description');
+            $message = [];
+            // Check if file is an image with a max size 2Mo
+            $violations = $validator->validate(
+                $updateImage,
+                new File([
+                    'maxSize' => '2000K',
+                    'mimeTypes' => [
+                        'image/*'
+                    ]
+                ])
+            );
 
-        if ($violations->count() > 0) {
-            $message = [
-                'message' => 'Le fichier doit être une image de moins de 2Mo'
-            ];
-
-            $messageJson = $serializer->serialize($message, 'json', []);
-
-            return new JsonResponse($messageJson, Response::HTTP_BAD_REQUEST, [], true);
-        }
-
-        if ($updateImage) {
-
-            $originalFilename = pathinfo($updateImage->getClientOriginalName(), PATHINFO_FILENAME);
-            $safeFilename = $slugger->slug($originalFilename);
-            $newFilename = $safeFilename . '-' . uniqid() . '.' . $updateImage->guessExtension();
-            try {
-                $updateImage->move(
-                    $this->getParameter('image_directory'),
-                    $newFilename
-                );
-
-                $filesystem = new Filesystem();
-
-                $oldImage = $image->getUrl();
-                $filesystem->remove([$this->getParameter('image_directory') . '/' . $oldImage]);
-
-                $image->setUrl($newFilename);
-            } catch (FileException $e) {
-                // ... handle exception if something happens during file upload
+            if ($violations->count() > 0) {
                 $message = [
-                    'message' => 'Un problème est servenu lors du chargement de l\'image, veuillez recommencer'
+                    'message' => 'Le fichier doit être une image de moins de 2Mo'
                 ];
 
                 $messageJson = $serializer->serialize($message, 'json', []);
 
-                return new JsonResponse($messageJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
+                return new JsonResponse($messageJson, Response::HTTP_BAD_REQUEST, [], true);
             }
-        }
 
-        if ($description) {
-            $image->setDescription($description);
-        }
+            if ($updateImage) {
 
-        $em->persist($image);
-        $em->flush();
-        $content = [
-            'message' => 'Changement sauvegardé. Veuillez patienter pendant le rechargement de la page'
-        ];
-        $imagesJson = $serializer->serialize($content, 'json', []);
-        return new JsonResponse($imagesJson, Response::HTTP_OK, [], true);
+                $originalFilename = pathinfo($updateImage->getClientOriginalName(), PATHINFO_FILENAME);
+                $safeFilename = $slugger->slug($originalFilename);
+                $newFilename = $safeFilename . '-' . uniqid() . '.' . $updateImage->guessExtension();
+                try {
+                    $updateImage->move(
+                        $this->getParameter('image_directory'),
+                        $newFilename
+                    );
+
+                    $filesystem = new Filesystem();
+
+                    $oldImage = $image->getUrl();
+                    $filesystem->remove([$this->getParameter('image_directory') . '/' . $oldImage]);
+
+                    $image->setUrl($newFilename);
+                } catch (FileException $e) {
+                    // ... handle exception if something happens during file upload
+                    $message = [
+                        'message' => 'Un problème est servenu lors du chargement de l\'image, veuillez recommencer'
+                    ];
+
+                    $messageJson = $serializer->serialize($message, 'json', []);
+
+                    return new JsonResponse($messageJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
+                }
+            }
+
+            if ($description) {
+                $image->setDescription($description);
+            }
+
+            $em->persist($image);
+            $em->flush();
+            $content = [
+                'message' => 'Changement sauvegardé. Veuillez patienter pendant le rechargement de la page'
+            ];
+            $imagesJson = $serializer->serialize($content, 'json', []);
+            return new JsonResponse($imagesJson, Response::HTTP_OK, [], true);
+        } else {
+            throw new Error("Token invalide", Response::HTTP_FORBIDDEN);
+        }
     }
 
     #[Route('/delete/image/{id}', name: 'app_delete_image', methods: ['DELETE'])]
     #[IsGranted('ROLE_ADMIN', message: 'Vous n\'avez pas les droits suffisants pour effectuer cette action')]
     public function delete_image(
         Gallery $image,
+        Request $request,
         SerializerInterface $serializer,
         EntityManagerInterface $em,
     ): JsonResponse {
+        $requestArray = $request->toArray();
 
-        $imageUrl = $image->getUrl();
-        try {
-            $filesystem = new Filesystem();
+        $submittedToken = $requestArray['token'];
 
-            $filesystem->remove([$this->getParameter('image_directory') . '/' . $imageUrl]);
-        } catch (FileException $e) {
-            // ... handle exception if something happens during file upload
-            $message = [
-                'message' => 'Un problème est servenu lors de la suppression de l\'image, veuillez recommencer'
+        if ($this->isCsrfTokenValid('image', $submittedToken)) {
+            $imageUrl = $image->getUrl();
+            try {
+                $filesystem = new Filesystem();
+
+                $filesystem->remove([$this->getParameter('image_directory') . '/' . $imageUrl]);
+            } catch (FileException $e) {
+                // ... handle exception if something happens during file upload
+                $message = [
+                    'message' => 'Un problème est servenu lors de la suppression de l\'image, veuillez recommencer'
+                ];
+
+                $messageJson = $serializer->serialize($message, 'json', []);
+
+                return new JsonResponse($messageJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
+            }
+
+
+            $em->remove($image);
+            $em->flush();
+            $content = [
+                'message' => 'Image supprimée. Veuillez patienter pendant le rechargement de la page'
             ];
-
-            $messageJson = $serializer->serialize($message, 'json', []);
-
-            return new JsonResponse($messageJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
+            $imagesJson = $serializer->serialize($content, 'json', []);
+            return new JsonResponse($imagesJson, Response::HTTP_OK, [], true);
+        } else {
+            throw new Error("Token invalide", Response::HTTP_FORBIDDEN);
         }
-
-
-        $em->remove($image);
-        $em->flush();
-        $content = [
-            'message' => 'Image supprimée. Veuillez patienter pendant le rechargement de la page'
-        ];
-        $imagesJson = $serializer->serialize($content, 'json', []);
-        return new JsonResponse($imagesJson, Response::HTTP_OK, [], true);
     }
 
     #[Route('/add/image', name: 'app_add_image', methods: ['POST'])]
@@ -204,82 +219,88 @@ class ApiController extends AbstractController
         ValidatorInterface $validator
     ): JsonResponse {
 
-        $image = new Gallery();
+        $submittedToken = $request->request->get('token');
 
-        $updateImage = $request->files->get('image');
-        $description = $request->get('description');
-        // Check if file is an image with a max size 2Mo
-        $violations = $validator->validate(
-            $updateImage,
-            new File([
-                'maxSize' => '2000K',
-                'mimeTypes' => [
-                    'image/*'
-                ]
-            ])
-        );
+        if ($this->isCsrfTokenValid('image', $submittedToken)) {
+            $image = new Gallery();
 
-        if ($violations->count() > 0) {
-            $message = [
-                'message' => 'Le fichier doit être une image de moins de 2Mo'
-            ];
+            $updateImage = $request->files->get('image');
+            $description = $request->get('description');
+            // Check if file is an image with a max size 2Mo
+            $violations = $validator->validate(
+                $updateImage,
+                new File([
+                    'maxSize' => '2000K',
+                    'mimeTypes' => [
+                        'image/*'
+                    ]
+                ])
+            );
 
-            $messageJson = $serializer->serialize($message, 'json', []);
-
-            return new JsonResponse($messageJson, Response::HTTP_BAD_REQUEST, [], true);
-        }
-
-        if ($updateImage) {
-
-            $originalFilename = pathinfo($updateImage->getClientOriginalName(), PATHINFO_FILENAME);
-            $safeFilename = $slugger->slug($originalFilename);
-            $newFilename = $safeFilename . '-' . uniqid() . '.' . $updateImage->guessExtension();
-            try {
-                $updateImage->move(
-                    $this->getParameter('image_directory'),
-                    $newFilename
-                );
-
-                $image->setUrl($newFilename);
-            } catch (FileException $e) {
-                // ... handle exception if something happens during file upload
+            if ($violations->count() > 0) {
                 $message = [
-                    'message' => 'Un problème est servenu lors du chargement de l\'image, veuillez recommencer'
+                    'message' => 'Le fichier doit être une image de moins de 2Mo'
+                ];
+
+                $messageJson = $serializer->serialize($message, 'json', []);
+
+                return new JsonResponse($messageJson, Response::HTTP_BAD_REQUEST, [], true);
+            }
+
+            if ($updateImage) {
+
+                $originalFilename = pathinfo($updateImage->getClientOriginalName(), PATHINFO_FILENAME);
+                $safeFilename = $slugger->slug($originalFilename);
+                $newFilename = $safeFilename . '-' . uniqid() . '.' . $updateImage->guessExtension();
+                try {
+                    $updateImage->move(
+                        $this->getParameter('image_directory'),
+                        $newFilename
+                    );
+
+                    $image->setUrl($newFilename);
+                } catch (FileException $e) {
+                    // ... handle exception if something happens during file upload
+                    $message = [
+                        'message' => 'Un problème est servenu lors du chargement de l\'image, veuillez recommencer'
+                    ];
+
+                    $messageJson = $serializer->serialize($message, 'json', []);
+
+                    return new JsonResponse($messageJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
+                }
+            } else {
+                $message = [
+                    'message' => 'Vous devez ajouter une image'
                 ];
 
                 $messageJson = $serializer->serialize($message, 'json', []);
 
                 return new JsonResponse($messageJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
             }
-        } else {
-            $message = [
-                'message' => 'Vous devez ajouter une image'
+
+            if ($description) {
+                $image->setDescription($description);
+            } else {
+                $message = [
+                    'message' => 'Vous devez ajouter une description'
+                ];
+
+                $messageJson = $serializer->serialize($message, 'json', []);
+
+                return new JsonResponse($messageJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
+            }
+
+            $em->persist($image);
+            $em->flush();
+            $content = [
+                'message' => 'Changement sauvegardé. Veuillez patienter pendant le rechargement de la page'
             ];
-
-            $messageJson = $serializer->serialize($message, 'json', []);
-
-            return new JsonResponse($messageJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
-        }
-
-        if ($description) {
-            $image->setDescription($description);
+            $imagesJson = $serializer->serialize($content, 'json', []);
+            return new JsonResponse($imagesJson, Response::HTTP_OK, [], true);
         } else {
-            $message = [
-                'message' => 'Vous devez ajouter une description'
-            ];
-
-            $messageJson = $serializer->serialize($message, 'json', []);
-
-            return new JsonResponse($messageJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
+            throw new Error("Token invalide", Response::HTTP_FORBIDDEN);
         }
-
-        $em->persist($image);
-        $em->flush();
-        $content = [
-            'message' => 'Changement sauvegardé. Veuillez patienter pendant le rechargement de la page'
-        ];
-        $imagesJson = $serializer->serialize($content, 'json', []);
-        return new JsonResponse($imagesJson, Response::HTTP_OK, [], true);
     }
 
     // Restaurant Info
@@ -306,23 +327,31 @@ class ApiController extends AbstractController
         EntityManagerInterface $em
     ): JsonResponse {
 
-        $updateRestaurant = $serializer->deserialize(
-            $request->getContent(),
-            Restaurant::class,
-            'json'
-        );
+        $requestArray = $request->toArray();
 
-        $restaurant->setAddress($updateRestaurant->getAddress());
-        $restaurant->setCity($updateRestaurant->getCity());
-        $restaurant->setPhone($updateRestaurant->getPhone());
-        $restaurant->setPostCode($updateRestaurant->getPostCode());
-        $restaurant->setMaxCapacity($updateRestaurant->getMaxCapacity());
+        $submittedToken = $requestArray['token'];
 
-        // TODO : intégrer les validations du formulaire, avec réponse pour les erreurs
-        $em->persist($restaurant);
-        $em->flush();
+        if ($this->isCsrfTokenValid('restaurant', $submittedToken)) {
 
-        return new JsonResponse($request->getContent(), Response::HTTP_OK, [], true);
+            $updateRestaurant = $serializer->deserialize(
+                $request->getContent(),
+                Restaurant::class,
+                'json'
+            );
+            $restaurant->setAddress($updateRestaurant->getAddress());
+            $restaurant->setCity($updateRestaurant->getCity());
+            $restaurant->setPhone($updateRestaurant->getPhone());
+            $restaurant->setPostCode($updateRestaurant->getPostCode());
+            $restaurant->setMaxCapacity($updateRestaurant->getMaxCapacity());
+
+            // TODO : intégrer les validations du formulaire, avec réponse pour les erreurs
+            $em->persist($restaurant);
+            $em->flush();
+
+            return new JsonResponse($request->getContent(), Response::HTTP_OK, [], true);
+        } else {
+            throw new Error("Token invalide", Response::HTTP_FORBIDDEN);
+        }
     }
 
     // Schedule
@@ -347,28 +376,36 @@ class ApiController extends AbstractController
         EntityManagerInterface $em
     ): JsonResponse {
 
-        $updateSchedule = $serializer->deserialize(
-            $request->getContent(),
-            Schedule::class,
-            'json'
-        );
+        $requestArray = $request->toArray();
 
-        $schedule->setNoonStart($updateSchedule->getNoonStart());
-        $schedule->setNoonEnd($updateSchedule->getNoonEnd());
-        $schedule->setNoonClosed($updateSchedule->isNoonClosed());
-        $schedule->setEveningStart($updateSchedule->getEveningStart());
-        $schedule->setEveningEnd($updateSchedule->getEveningEnd());
-        $schedule->setEveningClosed($updateSchedule->isEveningClosed());
+        $submittedToken = $requestArray['token'];
 
-        $em->persist($schedule);
-        $em->flush();
-        $content = [
-            "message" => "Changement sauvegardé. Veuillez patienter pendant le chargement de la page"
-        ];
+        if ($this->isCsrfTokenValid('schedule', $submittedToken)) {
 
-        $contentJson = $serializer->serialize($content, 'json', []);
+            $updateSchedule = $serializer->deserialize(
+                $request->getContent(),
+                Schedule::class,
+                'json'
+            );
+            $schedule->setNoonStart($updateSchedule->getNoonStart());
+            $schedule->setNoonEnd($updateSchedule->getNoonEnd());
+            $schedule->setNoonClosed($updateSchedule->isNoonClosed());
+            $schedule->setEveningStart($updateSchedule->getEveningStart());
+            $schedule->setEveningEnd($updateSchedule->getEveningEnd());
+            $schedule->setEveningClosed($updateSchedule->isEveningClosed());
 
-        return new JsonResponse($contentJson, Response::HTTP_OK, [], true);
+            $em->persist($schedule);
+            $em->flush();
+            $content = [
+                "message" => "Changement sauvegardé. Veuillez patienter pendant le chargement de la page"
+            ];
+
+            $contentJson = $serializer->serialize($content, 'json', []);
+
+            return new JsonResponse($contentJson, Response::HTTP_OK, [], true);
+        } else {
+            throw new Error("Token invalide", Response::HTTP_FORBIDDEN);
+        }
     }
 
     // Category and dishes
@@ -396,41 +433,59 @@ class ApiController extends AbstractController
         SerializerInterface $serializer,
         EntityManagerInterface $em
     ): JsonResponse {
-        $updateCategory = $serializer->deserialize(
-            $request->getContent(),
-            Category::class,
-            'json'
-        );
+
+        $requestArray = $request->toArray();
+
+        $submittedToken = $requestArray['token'];
+
+        if ($this->isCsrfTokenValid('category', $submittedToken)) {
+
+            $updateCategory = $serializer->deserialize(
+                $request->getContent(),
+                Category::class,
+                'json'
+            );
 
 
-        $category->setName($updateCategory->getName());
-        $category->setRankDisplay($updateCategory->getRankDisplay());
-        $em->persist($category);
-        $em->flush();
-        $content = [
-            "message" => "Changement sauvegardé. Veuillez patienter pendant le chargement de la page"
-        ];
+            $category->setName($updateCategory->getName());
+            $category->setRankDisplay($updateCategory->getRankDisplay());
+            $em->persist($category);
+            $em->flush();
+            $content = [
+                "message" => "Changement sauvegardé. Veuillez patienter pendant le chargement de la page"
+            ];
 
-        $contentJson = $serializer->serialize($content, 'json', []);
+            $contentJson = $serializer->serialize($content, 'json', []);
 
-        return new JsonResponse($contentJson, Response::HTTP_OK, [], true);
+            return new JsonResponse($contentJson, Response::HTTP_OK, [], true);
+        } else {
+            throw new Error("Token invalide", Response::HTTP_FORBIDDEN);
+        }
     }
 
     #[Route('/delete/categories/{id}', name: 'app_delete_categories', methods: ['DELETE'])]
     #[IsGranted('ROLE_ADMIN', message: 'Vous n\'avez pas les droits suffisants pour effectuer cette action')]
     public function delete_categories(
         Category $category,
+        Request $request,
         EntityManagerInterface $em,
         SerializerInterface $serializer
     ): JsonResponse {
+        $requestArray = $request->toArray();
 
-        $em->remove($category);
-        $em->flush();
-        $content = [
-            'message' => 'Catégorie supprimée. Veuillez patienter pendant le rechargement de la page'
-        ];
-        $imagesJson = $serializer->serialize($content, 'json', []);
-        return new JsonResponse($imagesJson, Response::HTTP_OK, [], true);
+        $submittedToken = $requestArray['token'];
+
+        if ($this->isCsrfTokenValid('category', $submittedToken)) {
+            $em->remove($category);
+            $em->flush();
+            $content = [
+                'message' => 'Catégorie supprimée. Veuillez patienter pendant le rechargement de la page'
+            ];
+            $imagesJson = $serializer->serialize($content, 'json', []);
+            return new JsonResponse($imagesJson, Response::HTTP_OK, [], true);
+        } else {
+            throw new Error("Token invalide", Response::HTTP_FORBIDDEN);
+        }
     }
 
     #[Route('/add/categories', name: 'app_add_categories', methods: ['POST'])]
@@ -440,24 +495,33 @@ class ApiController extends AbstractController
         SerializerInterface $serializer,
         EntityManagerInterface $em
     ): JsonResponse {
-        $updateCategory = $serializer->deserialize(
-            $request->getContent(),
-            Category::class,
-            'json'
-        );
 
-        $category = new Category();
-        $category->setName($updateCategory->getName());
-        $category->setRankDisplay($updateCategory->getRankDisplay());
-        $em->persist($category);
-        $em->flush();
-        $content = [
-            "message" => "Catégorie ajoutée. Veuillez patienter pendant le chargement de la page"
-        ];
+        $requestArray = $request->toArray();
 
-        $contentJson = $serializer->serialize($content, 'json', []);
+        $submittedToken = $requestArray['token'];
 
-        return new JsonResponse($contentJson, Response::HTTP_OK, [], true);
+        if ($this->isCsrfTokenValid('category', $submittedToken)) {
+            $updateCategory = $serializer->deserialize(
+                $request->getContent(),
+                Category::class,
+                'json'
+            );
+
+            $category = new Category();
+            $category->setName($updateCategory->getName());
+            $category->setRankDisplay($updateCategory->getRankDisplay());
+            $em->persist($category);
+            $em->flush();
+            $content = [
+                "message" => "Catégorie ajoutée. Veuillez patienter pendant le chargement de la page"
+            ];
+
+            $contentJson = $serializer->serialize($content, 'json', []);
+
+            return new JsonResponse($contentJson, Response::HTTP_OK, [], true);
+        } else {
+            throw new Error("Token invalide", Response::HTTP_FORBIDDEN);
+        }
     }
 
     #[Route('/dishes', name: 'app_get_dishes', methods: ['GET'])]
@@ -484,32 +548,39 @@ class ApiController extends AbstractController
         SerializerInterface $serializer,
         EntityManagerInterface $em
     ): JsonResponse {
+        $requestArray = $request->toArray();
 
-        $updateDish = $serializer->deserialize(
-            $request->getContent(),
-            Dish::class,
-            'json'
-        );
+        $submittedToken = $requestArray['token'];
 
-        $dish->setName($updateDish->getName());
-        $dish->setDescription($updateDish->getDescription());
-        $dish->setPrice($updateDish->getPrice());
+        if ($this->isCsrfTokenValid('dishes', $submittedToken)) {
+            $updateDish = $serializer->deserialize(
+                $request->getContent(),
+                Dish::class,
+                'json'
+            );
+
+            $dish->setName($updateDish->getName());
+            $dish->setDescription($updateDish->getDescription());
+            $dish->setPrice($updateDish->getPrice());
 
 
-        $content = $request->toArray();
-        $idCategory = $content['category'];
+            $content = $request->toArray();
+            $idCategory = $content['category'];
 
-        $dish->setCategory($categoryRepository->find($idCategory));
-        $em->persist($dish);
-        $em->flush();
+            $dish->setCategory($categoryRepository->find($idCategory));
+            $em->persist($dish);
+            $em->flush();
 
-        $content = [
-            "message" => "Changement sauvegardé. Veuillez patienter pendant le chargement de la page"
-        ];
+            $content = [
+                "message" => "Changement sauvegardé. Veuillez patienter pendant le chargement de la page"
+            ];
 
-        $contentJson = $serializer->serialize($content, 'json', []);
+            $contentJson = $serializer->serialize($content, 'json', []);
 
-        return new JsonResponse($contentJson, Response::HTTP_OK, [], true);
+            return new JsonResponse($contentJson, Response::HTTP_OK, [], true);
+        } else {
+            throw new Error("Token invalide", Response::HTTP_FORBIDDEN);
+        }
     }
 
     #[Route('/add/dishes', name: 'app_add_dishes', methods: ['POST'])]
@@ -520,51 +591,66 @@ class ApiController extends AbstractController
         SerializerInterface $serializer,
         EntityManagerInterface $em
     ): JsonResponse {
+        $requestArray = $request->toArray();
 
-        $updateDish = $serializer->deserialize(
-            $request->getContent(),
-            Dish::class,
-            'json'
-        );
+        $submittedToken = $requestArray['token'];
 
-        $dish = new Dish();
+        if ($this->isCsrfTokenValid('dishes', $submittedToken)) {
+            $updateDish = $serializer->deserialize(
+                $request->getContent(),
+                Dish::class,
+                'json'
+            );
 
-        $dish->setName($updateDish->getName());
-        $dish->setDescription($updateDish->getDescription());
-        $dish->setPrice($updateDish->getPrice());
+            $dish = new Dish();
+
+            $dish->setName($updateDish->getName());
+            $dish->setDescription($updateDish->getDescription());
+            $dish->setPrice($updateDish->getPrice());
 
 
-        $content = $request->toArray();
-        $idCategory = $content['category'];
+            $content = $request->toArray();
+            $idCategory = $content['category'];
 
-        $dish->setCategory($categoryRepository->find($idCategory));
-        $em->persist($dish);
-        $em->flush();
+            $dish->setCategory($categoryRepository->find($idCategory));
+            $em->persist($dish);
+            $em->flush();
 
-        $content = [
-            "message" => "Changement sauvegardé. Veuillez patienter pendant le chargement de la page"
-        ];
+            $content = [
+                "message" => "Changement sauvegardé. Veuillez patienter pendant le chargement de la page"
+            ];
 
-        $contentJson = $serializer->serialize($content, 'json', []);
+            $contentJson = $serializer->serialize($content, 'json', []);
 
-        return new JsonResponse($contentJson, Response::HTTP_OK, [], true);
+            return new JsonResponse($contentJson, Response::HTTP_OK, [], true);
+        } else {
+            throw new Error("Token invalide", Response::HTTP_FORBIDDEN);
+        }
     }
 
     #[Route('/delete/dishes/{id}', name: 'app_delete_dishes', methods: ['DELETE'])]
     #[IsGranted('ROLE_ADMIN', message: 'Vous n\'avez pas les droits suffisants pour effectuer cette action')]
     public function delete_dishes(
         Dish $dish,
+        Request $request,
         EntityManagerInterface $em,
         SerializerInterface $serializer
     ): JsonResponse {
+        $requestArray = $request->toArray();
 
-        $em->remove($dish);
-        $em->flush();
-        $content = [
-            'message' => 'Catégorie supprimée. Veuillez patienter pendant le rechargement de la page'
-        ];
-        $imagesJson = $serializer->serialize($content, 'json', []);
-        return new JsonResponse($imagesJson, Response::HTTP_OK, [], true);
+        $submittedToken = $requestArray['token'];
+
+        if ($this->isCsrfTokenValid('dishes', $submittedToken)) {
+            $em->remove($dish);
+            $em->flush();
+            $content = [
+                'message' => 'Catégorie supprimée. Veuillez patienter pendant le rechargement de la page'
+            ];
+            $imagesJson = $serializer->serialize($content, 'json', []);
+            return new JsonResponse($imagesJson, Response::HTTP_OK, [], true);
+        } else {
+            throw new Error("Token invalide", Response::HTTP_FORBIDDEN);
+        }
     }
 
 
@@ -593,40 +679,57 @@ class ApiController extends AbstractController
         SerializerInterface $serializer,
         EntityManagerInterface $em
     ): JsonResponse {
-        $updateMenu = $serializer->deserialize(
-            $request->getContent(),
-            Category::class,
-            'json'
-        );
+
+        $requestArray = $request->toArray();
+
+        $submittedToken = $requestArray['token'];
+
+        if ($this->isCsrfTokenValid('menus', $submittedToken)) {
+            $updateMenu = $serializer->deserialize(
+                $request->getContent(),
+                Category::class,
+                'json'
+            );
 
 
-        $menu->setName($updateMenu->getName());
-        $em->persist($menu);
-        $em->flush();
-        $content = [
-            "message" => "Changement sauvegardé. Veuillez patienter pendant le chargement de la page"
-        ];
+            $menu->setName($updateMenu->getName());
+            $em->persist($menu);
+            $em->flush();
+            $content = [
+                "message" => "Changement sauvegardé. Veuillez patienter pendant le chargement de la page"
+            ];
 
-        $contentJson = $serializer->serialize($content, 'json', []);
+            $contentJson = $serializer->serialize($content, 'json', []);
 
-        return new JsonResponse($contentJson, Response::HTTP_OK, [], true);
+            return new JsonResponse($contentJson, Response::HTTP_OK, [], true);
+        } else {
+            throw new Error("Token invalide", Response::HTTP_FORBIDDEN);
+        }
     }
 
     #[Route('/delete/menus/{id}', name: 'app_delete_menus', methods: ['DELETE'])]
     #[IsGranted('ROLE_ADMIN', message: 'Vous n\'avez pas les droits suffisants pour effectuer cette action')]
     public function delete_menus(
         Menu $menu,
+        Request $request,
         EntityManagerInterface $em,
         SerializerInterface $serializer
     ): JsonResponse {
+        $requestArray = $request->toArray();
 
-        $em->remove($menu);
-        $em->flush();
-        $content = [
-            'message' => 'Catégorie supprimée. Veuillez patienter pendant le rechargement de la page'
-        ];
-        $imagesJson = $serializer->serialize($content, 'json', []);
-        return new JsonResponse($imagesJson, Response::HTTP_OK, [], true);
+        $submittedToken = $requestArray['token'];
+
+        if ($this->isCsrfTokenValid('menus', $submittedToken)) {
+            $em->remove($menu);
+            $em->flush();
+            $content = [
+                'message' => 'Catégorie supprimée. Veuillez patienter pendant le rechargement de la page'
+            ];
+            $imagesJson = $serializer->serialize($content, 'json', []);
+            return new JsonResponse($imagesJson, Response::HTTP_OK, [], true);
+        } else {
+            throw new Error("Token invalide", Response::HTTP_FORBIDDEN);
+        }
     }
 
     #[Route('/add/menus', name: 'app_add_menus', methods: ['POST'])]
@@ -636,23 +739,31 @@ class ApiController extends AbstractController
         SerializerInterface $serializer,
         EntityManagerInterface $em
     ): JsonResponse {
-        $updateMenu = $serializer->deserialize(
-            $request->getContent(),
-            Menu::class,
-            'json'
-        );
+        $requestArray = $request->toArray();
 
-        $menu = new Menu();
-        $menu->setName($updateMenu->getName());
-        $em->persist($menu);
-        $em->flush();
-        $content = [
-            "message" => "Catégorie ajoutée. Veuillez patienter pendant le chargement de la page"
-        ];
+        $submittedToken = $requestArray['token'];
 
-        $contentJson = $serializer->serialize($content, 'json', []);
+        if ($this->isCsrfTokenValid('menus', $submittedToken)) {
+            $updateMenu = $serializer->deserialize(
+                $request->getContent(),
+                Menu::class,
+                'json'
+            );
 
-        return new JsonResponse($contentJson, Response::HTTP_OK, [], true);
+            $menu = new Menu();
+            $menu->setName($updateMenu->getName());
+            $em->persist($menu);
+            $em->flush();
+            $content = [
+                "message" => "Catégorie ajoutée. Veuillez patienter pendant le chargement de la page"
+            ];
+
+            $contentJson = $serializer->serialize($content, 'json', []);
+
+            return new JsonResponse($contentJson, Response::HTTP_OK, [], true);
+        } else {
+            throw new Error("Token invalide", Response::HTTP_FORBIDDEN);
+        }
     }
 
 
@@ -664,27 +775,34 @@ class ApiController extends AbstractController
         SerializerInterface $serializer,
         EntityManagerInterface $em
     ): JsonResponse {
+        $requestArray = $request->toArray();
 
-        $updateFormula = $serializer->deserialize(
-            $request->getContent(),
-            Formula::class,
-            'json'
-        );
+        $submittedToken = $requestArray['token'];
 
-        $formula->setName($updateFormula->getName());
-        $formula->setDescription($updateFormula->getDescription());
-        $formula->setPrice($updateFormula->getPrice());
+        if ($this->isCsrfTokenValid('formulas', $submittedToken)) {
+            $updateFormula = $serializer->deserialize(
+                $request->getContent(),
+                Formula::class,
+                'json'
+            );
 
-        $em->persist($formula);
-        $em->flush();
+            $formula->setName($updateFormula->getName());
+            $formula->setDescription($updateFormula->getDescription());
+            $formula->setPrice($updateFormula->getPrice());
 
-        $content = [
-            "message" => "Changement sauvegardé. Veuillez patienter pendant le chargement de la page"
-        ];
+            $em->persist($formula);
+            $em->flush();
 
-        $contentJson = $serializer->serialize($content, 'json', []);
+            $content = [
+                "message" => "Changement sauvegardé. Veuillez patienter pendant le chargement de la page"
+            ];
 
-        return new JsonResponse($contentJson, Response::HTTP_OK, [], true);
+            $contentJson = $serializer->serialize($content, 'json', []);
+
+            return new JsonResponse($contentJson, Response::HTTP_OK, [], true);
+        } else {
+            throw new Error("Token invalide", Response::HTTP_FORBIDDEN);
+        }
     }
 
     #[Route('/add/formulas', name: 'app_add_formulas', methods: ['POST'])]
@@ -695,51 +813,66 @@ class ApiController extends AbstractController
         SerializerInterface $serializer,
         EntityManagerInterface $em
     ): JsonResponse {
-
-        $updateFormula = $serializer->deserialize(
-            $request->getContent(),
-            Formula::class,
-            'json'
-        );
-
-        $formula = new Formula();
-
-        $formula->setName($updateFormula->getName());
-        $formula->setDescription($updateFormula->getDescription());
-        $formula->setPrice($updateFormula->getPrice());
-
-
         $requestArray = $request->toArray();
-        $idMenu = $requestArray['menuId'];
 
-        $formula->setMenu($menuRepository->find($idMenu));
-        $em->persist($formula);
-        $em->flush();
+        $submittedToken = $requestArray['token'];
 
-        $content = [
-            "message" => "Changement sauvegardé. Veuillez patienter pendant le chargement de la page"
-        ];
+        if ($this->isCsrfTokenValid('formulas', $submittedToken)) {
+            $updateFormula = $serializer->deserialize(
+                $request->getContent(),
+                Formula::class,
+                'json'
+            );
 
-        $contentJson = $serializer->serialize($content, 'json', []);
+            $formula = new Formula();
 
-        return new JsonResponse($contentJson, Response::HTTP_OK, [], true);
+            $formula->setName($updateFormula->getName());
+            $formula->setDescription($updateFormula->getDescription());
+            $formula->setPrice($updateFormula->getPrice());
+
+
+            $requestArray = $request->toArray();
+            $idMenu = $requestArray['menuId'];
+
+            $formula->setMenu($menuRepository->find($idMenu));
+            $em->persist($formula);
+            $em->flush();
+
+            $content = [
+                "message" => "Changement sauvegardé. Veuillez patienter pendant le chargement de la page"
+            ];
+
+            $contentJson = $serializer->serialize($content, 'json', []);
+
+            return new JsonResponse($contentJson, Response::HTTP_OK, [], true);
+        } else {
+            throw new Error("Token invalide", Response::HTTP_FORBIDDEN);
+        }
     }
 
     #[Route('/delete/formulas/{id}', name: 'app_delete_formulas', methods: ['DELETE'])]
     #[IsGranted('ROLE_ADMIN', message: 'Vous n\'avez pas les droits suffisants pour effectuer cette action')]
     public function delete_formulas(
         Formula $formula,
+        Request $request,
         EntityManagerInterface $em,
         SerializerInterface $serializer
     ): JsonResponse {
+        $requestArray = $request->toArray();
 
-        $em->remove($formula);
-        $em->flush();
-        $content = [
-            'message' => 'Catégorie supprimée. Veuillez patienter pendant le rechargement de la page'
-        ];
-        $imagesJson = $serializer->serialize($content, 'json', []);
-        return new JsonResponse($imagesJson, Response::HTTP_OK, [], true);
+        $submittedToken = $requestArray['token'];
+
+        if ($this->isCsrfTokenValid('formulas', $submittedToken)) {
+            $em->remove($formula);
+            $em->flush();
+            $content = [
+                'message' => 'Catégorie supprimée. Veuillez patienter pendant le rechargement de la page'
+            ];
+            $imagesJson = $serializer->serialize($content, 'json', []);
+            return new JsonResponse($imagesJson, Response::HTTP_OK, [], true);
+        } else {
+            throw new Error("Token invalide", Response::HTTP_FORBIDDEN);
+        }
     }
 
     // Booking
@@ -765,31 +898,38 @@ class ApiController extends AbstractController
         SerializerInterface $serializer,
         EntityManagerInterface $em
     ): JsonResponse {
+        $requestArray = $request->toArray();
 
-        $updateBooking = $serializer->deserialize(
-            $request->getContent(),
-            Booking::class,
-            'json'
-        );
+        $submittedToken = $requestArray['token'];
 
-        $booking->setLastName($updateBooking->getLastName());
-        $booking->setAllergies($updateBooking->getAllergies());
-        $booking->setPhone($updateBooking->getPhone());
-        $booking->setShift($updateBooking->getShift());
-        $booking->setDate($updateBooking->getDate());
-        $booking->setTime($updateBooking->getTime());
-        $booking->setNumber($updateBooking->getNumber());
+        if ($this->isCsrfTokenValid('booking', $submittedToken)) {
+            $updateBooking = $serializer->deserialize(
+                $request->getContent(),
+                Booking::class,
+                'json'
+            );
 
-        $em->persist($booking);
-        $em->flush();
+            $booking->setLastName($updateBooking->getLastName());
+            $booking->setAllergies($updateBooking->getAllergies());
+            $booking->setPhone($updateBooking->getPhone());
+            $booking->setShift($updateBooking->getShift());
+            $booking->setDate($updateBooking->getDate());
+            $booking->setTime($updateBooking->getTime());
+            $booking->setNumber($updateBooking->getNumber());
 
-        $content = [
-            "message" => "Changement sauvegardé. Veuillez patienter pendant le chargement de la page"
-        ];
+            $em->persist($booking);
+            $em->flush();
 
-        $contentJson = $serializer->serialize($content, 'json', []);
+            $content = [
+                "message" => "Changement sauvegardé. Veuillez patienter pendant le chargement de la page"
+            ];
 
-        return new JsonResponse($contentJson, Response::HTTP_OK, [], true);
+            $contentJson = $serializer->serialize($content, 'json', []);
+
+            return new JsonResponse($contentJson, Response::HTTP_OK, [], true);
+        } else {
+            throw new Error("Token invalide", Response::HTTP_FORBIDDEN);
+        }
     }
 
     #[Route('/add/booking', name: 'app_add_booking', methods: ['PUT'])]
@@ -798,49 +938,64 @@ class ApiController extends AbstractController
         SerializerInterface $serializer,
         EntityManagerInterface $em
     ): JsonResponse {
+        $requestArray = $request->toArray();
 
-        $updateBooking = $serializer->deserialize(
-            $request->getContent(),
-            Booking::class,
-            'json'
-        );
+        $submittedToken = $requestArray['token'];
 
-        $booking = new Booking();
-        $booking->setLastName($updateBooking->getLastName());
-        $booking->setAllergies($updateBooking->getAllergies());
-        $booking->setPhone($updateBooking->getPhone());
-        $booking->setShift($updateBooking->getShift());
-        $booking->setDate($updateBooking->getDate());
-        $booking->setTime($updateBooking->getTime());
-        $booking->setNumber($updateBooking->getNumber());
+        if ($this->isCsrfTokenValid('booking', $submittedToken)) {
+            $updateBooking = $serializer->deserialize(
+                $request->getContent(),
+                Booking::class,
+                'json'
+            );
 
-        $em->persist($booking);
-        $em->flush();
+            $booking = new Booking();
+            $booking->setLastName($updateBooking->getLastName());
+            $booking->setAllergies($updateBooking->getAllergies());
+            $booking->setPhone($updateBooking->getPhone());
+            $booking->setShift($updateBooking->getShift());
+            $booking->setDate($updateBooking->getDate());
+            $booking->setTime($updateBooking->getTime());
+            $booking->setNumber($updateBooking->getNumber());
 
-        $content = [
-            "message" => "Changement sauvegardé. Veuillez patienter pendant le chargement de la page"
-        ];
+            $em->persist($booking);
+            $em->flush();
 
-        $contentJson = $serializer->serialize($content, 'json', []);
+            $content = [
+                "message" => "Changement sauvegardé. Veuillez patienter pendant le chargement de la page"
+            ];
 
-        return new JsonResponse($contentJson, Response::HTTP_OK, [], true);
+            $contentJson = $serializer->serialize($content, 'json', []);
+
+            return new JsonResponse($contentJson, Response::HTTP_OK, [], true);
+        } else {
+            throw new Error("Token invalide", Response::HTTP_FORBIDDEN);
+        }
     }
 
     #[Route('/delete/booking/{id}', name: 'app_delete_booking', methods: ['DELETE'])]
     #[IsGranted('ROLE_ADMIN', message: 'Vous n\'avez pas les droits suffisants pour effectuer cette action')]
     public function delete_booking(
         Booking $booking,
+        Request $request,
         EntityManagerInterface $em,
         SerializerInterface $serializer
     ): JsonResponse {
+        $requestArray = $request->toArray();
 
-        $em->remove($booking);
-        $em->flush();
-        $content = [
-            'message' => 'Réservation supprimée. Veuillez patienter pendant le rechargement de la page'
-        ];
-        $imagesJson = $serializer->serialize($content, 'json', []);
-        return new JsonResponse($imagesJson, Response::HTTP_OK, [], true);
+        $submittedToken = $requestArray['token'];
+
+        if ($this->isCsrfTokenValid('booking', $submittedToken)) {
+            $em->remove($booking);
+            $em->flush();
+            $content = [
+                'message' => 'Réservation supprimée. Veuillez patienter pendant le rechargement de la page'
+            ];
+            $imagesJson = $serializer->serialize($content, 'json', []);
+            return new JsonResponse($imagesJson, Response::HTTP_OK, [], true);
+        } else {
+            throw new Error("Token invalide", Response::HTTP_FORBIDDEN);
+        }
     }
 
 
@@ -884,6 +1039,7 @@ class ApiController extends AbstractController
         User $user,
         SerializerInterface $serializer
     ): JsonResponse {
+
         $email = $user->getEmail();
 
         $response = [
@@ -905,60 +1061,64 @@ class ApiController extends AbstractController
         SerializerInterface $serializer,
         Security $security
     ): JsonResponse {
-
-        $currentUser = $security->getUser();
         $requestArray = $request->toArray();
-        $email = $requestArray['email'];
-        $newPassword = $requestArray['password'];
-        $verifPwd = $requestArray['verifPwd'];
 
-        // Verify if the current user is trying to make update on his account
-        if ($currentUser !== $user) {
-            $content = [
-                'message' => 'Vous ne pouvez effectuer de modification uniquement sur votre compte'
-            ];
-            $response = $serializer->serialize($content, 'json', []);
-            $responseJson = $serializer->serialize($response, 'json', []);
+        $submittedToken = $requestArray['token'];
 
-            return new JsonResponse($responseJson, Response::HTTP_FORBIDDEN, [], true);
-        }
+        if ($this->isCsrfTokenValid('profil', $submittedToken)) {
+            $currentUser = $security->getUser();
+            $requestArray = $request->toArray();
+            $email = $requestArray['email'];
+            $newPassword = $requestArray['password'];
+            $verifPwd = $requestArray['verifPwd'];
 
-        // If the current password is Okay
-        if ($userPasswordHasher->isPasswordValid($user, $verifPwd)) {
+            // Verify if the current user is trying to make update on his account
+            if ($currentUser !== $user) {
+                $content = [
+                    'message' => 'Vous ne pouvez effectuer de modification uniquement sur votre compte'
+                ];
+                $responseJson = $serializer->serialize($content, 'json', []);
 
-            if ($email) {
-                $user->setEmail($email);
+                return new JsonResponse($responseJson, Response::HTTP_FORBIDDEN, [], true);
             }
 
-            if ($newPassword) {
-                $user->setPassword(
-                    $userPasswordHasher->hashPassword(
-                        $user,
-                        $newPassword
-                    )
-                );
+            // If the current password is Okay
+            if ($userPasswordHasher->isPasswordValid($user, $verifPwd)) {
+
+                if ($email) {
+                    $user->setEmail($email);
+                }
+
+                if ($newPassword) {
+                    $user->setPassword(
+                        $userPasswordHasher->hashPassword(
+                            $user,
+                            $newPassword
+                        )
+                    );
+                }
+
+                $em->persist($user);
+                $em->flush();
+
+                $content = [
+                    'message' => "Changements effectués"
+
+                ];
+                $responseJson = $serializer->serialize($content, 'json', []);
+
+                return new JsonResponse($responseJson, Response::HTTP_OK, [], true);
+            } else {
+                $content = [
+                    'message' => 'Veuillez entrer votre ancien mot de passe pour valider les changements'
+
+                ];
+                $responseJson = $serializer->serialize($content, 'json', []);
+
+                return new JsonResponse($responseJson, Response::HTTP_FORBIDDEN, [], true);
             }
-
-            $em->persist($user);
-            $em->flush();
-
-            $content = [
-                'message' => "Changements effectués"
-
-            ];
-            $response = $serializer->serialize($content, 'json', []);
-            $responseJson = $serializer->serialize($response, 'json', []);
-
-            return new JsonResponse($responseJson, Response::HTTP_OK, [], true);
         } else {
-            $content = [
-                'message' => 'Veuillez entrer votre ancien mot de passe pour valider les changements'
-
-            ];
-            $response = $serializer->serialize($content, 'json', []);
-            $responseJson = $serializer->serialize($response, 'json', []);
-
-            return new JsonResponse($responseJson, Response::HTTP_FORBIDDEN, [], true);
+            throw new Error("Token invalide", Response::HTTP_FORBIDDEN);
         }
     }
 
@@ -973,91 +1133,109 @@ class ApiController extends AbstractController
         Security $security
     ): JsonResponse {
 
-        
+
         $requestArray = $request->toArray();
         $password = $requestArray['password'];
         $currentUser = $security->getUser();
+        $isAdmin = in_array('ROLE_ADMIN', $user->getRoles());
+        $submittedToken = $requestArray['token'];
 
-        // Verify if the current user is trying to delete his own account
-        if ($currentUser !== $user) {
-            $content = [
-                'message' => 'Vous ne pouvez effectuer de modification uniquement sur votre compte'
-            ];
-            $response = $serializer->serialize($content, 'json', []);
-            $responseJson = $serializer->serialize($response, 'json', []);
+        if ($this->isCsrfTokenValid('profil', $submittedToken)) {
+            
+            if ($isAdmin) {
+                $content = [
+                    'message' => 'Le compte administrateur ne peut pas être supprimé'
+                ];
+                $responseJson = $serializer->serialize($content, 'json', []);
 
-            return new JsonResponse($responseJson, Response::HTTP_FORBIDDEN, [], true);
-        }
+                return new JsonResponse($responseJson, Response::HTTP_FORBIDDEN, [], true);
+            }
+            // Verify if the current user is trying to delete his own account
+            if ($currentUser !== $user) {
+                $content = [
+                    'message' => 'Vous ne pouvez effectuer de modification uniquement sur votre compte'
+                ];
+                $responseJson = $serializer->serialize($content, 'json', []);
 
-        if ($userPasswordHasher->isPasswordValid($user, $password)) {
+                return new JsonResponse($responseJson, Response::HTTP_FORBIDDEN, [], true);
+            }
 
-            $em->remove($user);
-            $em->flush();
+            if ($userPasswordHasher->isPasswordValid($user, $password)) {
+                $em->remove($user);
+                $em->flush();
+                
+                $security->logout(false);
+                $content = [
+                    'message' => "Client supprimé"
 
-            $content = [
-                'message' => "Client supprimé"
+                ];
+                $responseJson = $serializer->serialize($content, 'json', []);
 
-            ];
-            $response = $serializer->serialize($content, 'json', []);
-            $responseJson = $serializer->serialize($response, 'json', []);
+                return new JsonResponse($responseJson, Response::HTTP_OK, [], true);
+            } else {
+                $content = [
+                    'message' => 'Veuillez entrer votre ancien mot de passe pour valider la suppression'
 
-            return new JsonResponse($responseJson, Response::HTTP_OK, [], true);
+                ];
+                $responseJson = $serializer->serialize($content, 'json', []);
+
+                return new JsonResponse($responseJson, Response::HTTP_FORBIDDEN, [], true);
+            }
         } else {
-            $content = [
-                'message' => 'Veuillez entrer votre ancien mot de passe pour valider la suppression'
-
-            ];
-            $response = $serializer->serialize($content, 'json', []);
-            $responseJson = $serializer->serialize($response, 'json', []);
-
-            return new JsonResponse($responseJson, Response::HTTP_FORBIDDEN, [], true);
+            throw new Error("Token invalide", Response::HTTP_FORBIDDEN);
         }
     }
 
-    #[Route('/update/profil/{id}', name:'app_update_profil', methods: ['PUT'])]
+    #[Route('/update/profil/{id}', name: 'app_update_profil', methods: ['PUT'])]
     #[IsGranted('ROLE_USER', message: 'Vous n\'avez pas les droits suffisants pour effectuer cette action')]
-    public function update_profil (
+    public function update_profil(
         Client $client,
         Request $request,
         SerializerInterface $serializer,
         EntityManagerInterface $em,
         Security $security
-    ) : JsonResponse {
+    ): JsonResponse {
+        $requestArray = $request->toArray();
 
-        $updateClient =$serializer->deserialize(
-            $request->getContent(),
-            Client::class,
-            'json'
-        );
+        $submittedToken = $requestArray['token'];
 
-        $user = $client->getUserId();
-        $currentUser = $security->getUser();
+        if ($this->isCsrfTokenValid('profil', $submittedToken)) {
+            $updateClient = $serializer->deserialize(
+                $request->getContent(),
+                Client::class,
+                'json'
+            );
 
-        if ($currentUser !== $user) {
+            $user = $client->getUserId();
+            $currentUser = $security->getUser();
+
+            if ($currentUser !== $user) {
+                $content = [
+                    'message' => 'Vous ne pouvez effectuer de modification uniquement sur votre compte'
+                ];
+                $responseJson = $serializer->serialize($content, 'json', []);
+
+                return new JsonResponse($responseJson, Response::HTTP_FORBIDDEN, [], true);
+            }
+
+            $client->setLastname($updateClient->getLastname());
+            $client->setFirstname($updateClient->getFirstname());
+            $client->setAllergies($updateClient->getAllergies());
+            $client->setPhone($updateClient->getPhone());
+            $client->setNumber($updateClient->getNumber());
+
+            $em->persist($client);
+            $em->flush();
+
             $content = [
-                'message' => 'Vous ne pouvez effectuer de modification uniquement sur votre compte'
+                "message" => "Changement sauvegardé. Veuillez patienter pendant le chargement de la page"
             ];
-            $response = $serializer->serialize($content, 'json', []);
-            $responseJson = $serializer->serialize($response, 'json', []);
 
-            return new JsonResponse($responseJson, Response::HTTP_FORBIDDEN, [], true);
+            $contentJson = $serializer->serialize($content, 'json', []);
+
+            return new JsonResponse($contentJson, Response::HTTP_OK, [], true);
+        } else {
+            throw new Error("Token invalide", Response::HTTP_FORBIDDEN);
         }
-        
-        $client->setLastname($updateClient->getLastname());
-        $client->setFirstname($updateClient->getFirstname());
-        $client->setAllergies($updateClient->getAllergies());
-        $client->setPhone($updateClient->getPhone());
-        $client->setNumber($updateClient->getNumber());
-
-        $em->persist($client);
-        $em->flush();
-
-        $content = [
-            "message" => "Changement sauvegardé. Veuillez patienter pendant le chargement de la page"
-        ];
-
-        $contentJson = $serializer->serialize($content, 'json', []);
-
-        return new JsonResponse($contentJson, Response::HTTP_OK, [], true);
     }
 }

@@ -1,13 +1,14 @@
 import React, { useReducer} from 'react'
 import axios from 'axios'
 
-const ModalFormula = ({menuId, formula, showEdit}) => {
+const ModalFormula = ({menuId, formula, showEdit, token}) => {
 
   const initialState = {
     name: formula ? formula.name : '',
     description: formula ? formula.description : '',
     price: formula ? formula.price : '',
-    menuId: menuId
+    menuId: menuId,
+    token: token
   }
 
   const reducer = (state, action) => {

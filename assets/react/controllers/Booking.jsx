@@ -3,7 +3,7 @@ import moment from 'moment/moment'
 import axios from 'axios'
 import { useState } from 'react'
 
-const Booking = ({ userLastname, userFirstname, userAllergies, userPhone, userNumber}) => {
+const Booking = ({ userLastname, userFirstname, userAllergies, userPhone, userNumber, BookingCSRFToken}) => {
 
   const initialState = {
     lastname: userLastname ? userLastname : '',
@@ -14,6 +14,7 @@ const Booking = ({ userLastname, userFirstname, userAllergies, userPhone, userNu
     phone: userPhone ? userPhone : '',
     shift: 'midi',
     number: userNumber ? userNumber : 1,
+    token: BookingCSRFToken
   }
 
   const reducer = (state, action) => {

@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useReducer } from 'react'
 import moment from 'moment/moment'
 
-const EditSchedule = ({ day, setEdit }) => {
+const EditSchedule = ({ day, setEdit, token }) => {
 
   const [showMessage, setShowMessage] = useState(false)
   const [message, setMessage] = useState('')
@@ -17,6 +17,7 @@ const EditSchedule = ({ day, setEdit }) => {
     eveningStart: day.eveningStart,
     eveningEnd: day.eveningEnd,
     evening_closed: day.eveningClosed,
+    token: token
   }
 
   const scheduleReducer = (state, action) => {
@@ -56,7 +57,7 @@ const EditSchedule = ({ day, setEdit }) => {
         window.location.reload(true)
       },3000)
     } catch (error) {
-      console.log(error);
+      console.log(error.response.data.detail);
     }
   }
   return (

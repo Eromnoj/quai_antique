@@ -1,13 +1,14 @@
 import axios from 'axios'
 import React, { useReducer } from 'react'
 
-const ModalDish = ({ dish, categories, showEdit }) => {
+const ModalDish = ({ dish, categories, showEdit, token }) => {
 
   const initialState = {
     name: dish ? dish.name : '',
     category: dish ? dish.category.id : 0,
     description: dish ? dish.description : '',
-    price: dish ? dish.price : ''
+    price: dish ? dish.price : '',
+    token: token
   }
 
   function reducer(state, action) {
@@ -43,7 +44,6 @@ const ModalDish = ({ dish, categories, showEdit }) => {
     }
   }
   
-  console.log(dishState);
   return (
     <div className='modal_window'>
       <div className='modal_container'>

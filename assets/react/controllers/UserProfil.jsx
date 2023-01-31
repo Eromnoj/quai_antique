@@ -2,7 +2,7 @@ import axios from 'axios';
 import React from 'react'
 import { useReducer } from 'react';
 
-const UserProfil = ({userId, userLastname, userFirstname, userAllergies, userPhone, userNumber}) => {
+const UserProfil = ({userId, userLastname, userFirstname, userAllergies, userPhone, userNumber, ProfilCSRFToken}) => {
 
 
   const initialUser = {
@@ -11,6 +11,7 @@ const UserProfil = ({userId, userLastname, userFirstname, userAllergies, userPho
     allergies: userAllergies ? userAllergies : '',
     phone: userPhone ? userPhone : '',
     number: userNumber ? userNumber : 1,
+    token: ProfilCSRFToken
   }
 
   const userReducer = (state, action) => {
@@ -32,7 +33,6 @@ const UserProfil = ({userId, userLastname, userFirstname, userAllergies, userPho
 
   const [userProfil, dispatch] = useReducer(userReducer, initialUser)
 
-  console.log(userProfil);
   const submitUserInfo = async () => {
     try {
       const res = await axios.put(`/api/update/profil/${userId}`, userProfil)

@@ -2,6 +2,10 @@
 
 {% block title %}Infos Restaurant{% endblock %}
 
+{% set RestaurantCSRFToken = csrf_token('restaurant') %}
+{% set ScheduleCSRFToken = csrf_token('schedule') %}
+{% set ImageCSRFToken = csrf_token('image') %}
+
 {% block content %}
-<div {{ react_component('AdminRestaurant', {'data': "l'autre test"} )}}></div>
+<div {{ react_component('AdminRestaurant', {RestaurantCSRFToken, ScheduleCSRFToken, ImageCSRFToken } )}}></div>
 {% endblock %}

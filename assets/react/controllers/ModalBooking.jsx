@@ -2,7 +2,7 @@ import React, { useReducer } from 'react'
 import moment from 'moment/moment'
 import axios from 'axios'
 
-const ModalBooking = ({ booking, showEdit }) => {
+const ModalBooking = ({ booking, showEdit, token }) => {
 
   const initialState = {
     lastname: booking ? booking.lastname : '',
@@ -12,6 +12,7 @@ const ModalBooking = ({ booking, showEdit }) => {
     phone: booking ? booking.phone : '',
     shift: booking ? booking.shift : '',
     number: booking ? booking.number : 1,
+    token: token
   }
 
   const reducer = (state, action) => {

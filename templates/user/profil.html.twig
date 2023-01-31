@@ -1,9 +1,10 @@
 {% extends 'user_base.html.twig' %}
 
-{% block title %}Mon Profil{% endblock %}
+{% block title %}Mon Profil
+{% endblock %}
 
 {% block content %}
-	{% if app.user %}
+	{% if app.user.client %}
 		{% set userId = app.user.client.id %}
 		{% set userLastname = app.user.client.lastname %}
 		{% set userFirstname = app.user.client.firstname %}
@@ -18,6 +19,7 @@
 		{% set userPhone = null %}
 		{% set userNumber = null %}
 	{% endif %}
+	{% set ProfilCSRFToken = csrf_token('profil') %}
 
-<div {{ react_component('UserProfil', {userId, userLastname, userFirstname, userAllergies, userPhone, userNumber} )}}></div>
+	<div {{ react_component('UserProfil', {userId, userLastname, userFirstname, userAllergies, userPhone, userNumber,ProfilCSRFToken } )}}></div>
 {% endblock %}

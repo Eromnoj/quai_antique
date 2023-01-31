@@ -3,5 +3,7 @@
 {% block title %}Gérer les réservations{% endblock %}
 
 {% block content %}
-<div {{ react_component('AdminBooking', {'data': "l'autre test"} )}}></div>
+{% set BookingCSRFToken = csrf_token('booking') %}
+
+<div {{ react_component('AdminBooking', {BookingCSRFToken} )}}></div>
 {% endblock %}

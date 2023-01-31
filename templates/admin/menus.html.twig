@@ -1,7 +1,10 @@
 {% extends 'admin_base.html.twig' %}
 
-{% block title %}Gérer les menus{% endblock %}
+{% block title %}Gérer les menus
+{% endblock %}
 
 {% block content %}
-<div {{ react_component('AdminMenus', {'data': "l'autre test"} )}}></div>
+	{% set MenuCSRFToken = csrf_token('menus') %}
+	{% set FormulaCSRFToken = csrf_token('formulas') %}
+	<div {{ react_component('AdminMenus', {MenuCSRFToken, FormulaCSRFToken } )}}></div>
 {% endblock %}

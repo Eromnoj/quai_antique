@@ -4,16 +4,16 @@ import { useState } from 'react'
 import { useEffect } from 'react'
 import { useReducer } from 'react'
 
-const UserAccount = ({userId}) => {
+const UserAccount = ({userId, ProfilCSRFToken}) => {
 
   const [deletePassword, setDeletePassword] = useState('')
   const initialUser = {
     email: '',
     password: '',
-    verifPwd: ''
+    verifPwd: '',
+    token: ProfilCSRFToken
   }
 
-  console.log(deletePassword);
   const userReducer = (state, action) => {
     switch(action.type) {
       case 'email':
@@ -50,9 +50,10 @@ const UserAccount = ({userId}) => {
     }
   }
 
-  const deleteClient = async () => {
+  const deleteClient = async (token) => {
     const body = {
-      password: deletePassword
+      password: deletePassword,
+      token: token
     }
     console.log(body);
     try {
@@ -92,7 +93,7 @@ const UserAccount = ({userId}) => {
     </form>
     <form className='user_form margin_password' onSubmit={(e)=> {
       e.preventDefault()
-      deleteClient()
+      deleteClient(ProfilCSRFToken)
     }}>
       <div className='password_verif_div'>
         <label htmlFor="deletion_verif">Entrez votre mot de passe pour confirmer la suppression :</label>

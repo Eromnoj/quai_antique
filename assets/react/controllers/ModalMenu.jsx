@@ -1,13 +1,13 @@
 import React, { useState } from 'react'
 import axios from 'axios'
-const ModalMenu = ({menu, showEdit}) => {
+const ModalMenu = ({menu, showEdit, token}) => {
 
   const [menuName, setMenuName] = menu ? useState(menu.name) : useState('')
 
   const submitMenu = async () => {
     let url = menu ? `/api/update/menus/${menu.id}` : '/api/add/menus'
     try {
-      const res = menu ? await axios.put(url, {name: menuName}) : await axios.post(url, {name: menuName})
+      const res = menu ? await axios.put(url, {name: menuName, token: token}) : await axios.post(url, {name: menuName, token: token})
       const data = await res.data
       console.log(data.message);
       setTimeout(()=> {

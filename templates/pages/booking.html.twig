@@ -4,7 +4,7 @@
 {% endblock %}
 
 {% block body %}
-	{% if app.user %}
+	{% if app.user.client %}
 		{% set userId = app.user.id %}
 		{% set userLastname = app.user.client.lastname %}
 		{% set userFirstname = app.user.client.firstname %}
@@ -19,7 +19,8 @@
 		{% set userPhone = null %}
 		{% set userNumber = null %}
 	{% endif %}
+{% set BookingCSRFToken = csrf_token('booking') %}
 
 
-	<div {{ react_component('Booking', {userId, userLastname, userFirstname, userAllergies, userPhone, userNumber} )}}></div>
+	<div {{ react_component('Booking', {userId, userLastname, userFirstname, userAllergies, userPhone, userNumber, BookingCSRFToken } )}}></div>
 {% endblock %}

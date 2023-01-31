@@ -4,7 +4,7 @@ import ModalImage from './ModalImage'
 import axios from 'axios'
 import moment from 'moment/moment'
 
-const TableRow = ({ day }) => {
+const TableRow = ({ day, token }) => {
 
   const [showEdit, setShowEdit] = useState(false)
   return (
@@ -39,7 +39,7 @@ const TableRow = ({ day }) => {
           setShowEdit(prev => !prev)
 
         }}><img src="../img/Edit-alt.png" alt="edit" /></div>
-          {showEdit ? <EditSchedule day={day} setEdit={() => setShowEdit(prev => !prev)} /> : null}
+          {showEdit ? <EditSchedule day={day} token={token} setEdit={() => setShowEdit(prev => !prev)} /> : null}
 
         </td>
       </tr>
@@ -47,14 +47,18 @@ const TableRow = ({ day }) => {
   )
 }
 
-const ImageCard = ({ image }) => {
+const ImageCard = ({ image, token }) => {
 
   const [showEdit, setShowEdit] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
 
-  const deleteImage = async () => {
+  const deleteImage = async (token) => {
     try {
-      const res = await axios.delete(`/api/delete/image/${image.id}`)
+      const res = await axios.delete(`/api/delete/image/${image.id}`, {
+        data: {
+          token
+        }
+      })
 
       const data = await res.data
       setTimeout(() => {
@@ -80,7 +84,7 @@ const ImageCard = ({ image }) => {
         </div>
       </div>
       {showEdit ?
-        <ModalImage image={image} showEdit={() => setShowEdit(prev => !prev)} />
+        <ModalImage image={image} token={token} showEdit={() => setShowEdit(prev => !prev)} />
         : null}
       {confirmDelete ?
         <div className='confirm_delete_window'>
@@ -90,7 +94,7 @@ const ImageCard = ({ image }) => {
               <button className='cancel_delete' onClick={() => setConfirmDelete(prev => !prev)}>Annuler</button>
               <button className='delete' onClick={() => {
                 // Manage deletion
-                deleteImage()
+                deleteImage(token)
               }
               }>Supprimer</button>
             </div>
@@ -102,7 +106,7 @@ const ImageCard = ({ image }) => {
 }
 
 
-const AdminRestaurant = () => {
+const AdminRestaurant = ({RestaurantCSRFToken, ScheduleCSRFToken, ImageCSRFToken } ) => {
 
   const [schedule, setSchedule] = useState([])
 
@@ -114,7 +118,8 @@ const AdminRestaurant = () => {
     city: '',
     phone: '',
     post_code: '',
-    max_capacity: ''
+    max_capacity: '',
+    token: RestaurantCSRFToken
   }
 
   const reducer = (state, action) => {
@@ -192,13 +197,13 @@ const AdminRestaurant = () => {
 
   const tableRows = schedule.map(day => {
     return (
-      <TableRow day={day} key={day.id} />
+      <TableRow day={day} key={day.id} token={ScheduleCSRFToken} />
     )
   })
 
   const imageCards = gallery.map((image) => {
     return (
-      <ImageCard image={image} key={image.id} />
+      <ImageCard image={image} key={image.id} token={ImageCSRFToken} />
     )
   })
 
@@ -279,7 +284,7 @@ const AdminRestaurant = () => {
         <button className='submit_button' onClick={() => setShowModalImage(prev => !prev)}>Ajouter une image</button>
       </section>
       {showModalImage ?
-        <ModalImage showEdit={() => setShowModalImage(prev => !prev)} />
+        <ModalImage showEdit={() => setShowModalImage(prev => !prev)} token={ImageCSRFToken} />
         : null}
 
     </div>

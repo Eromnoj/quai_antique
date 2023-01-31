@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\GalleryRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: GalleryRepository::class)]
 class Gallery
@@ -18,6 +19,7 @@ class Gallery
     private ?string $url = null;
 
     #[ORM\Column(type: Types::TEXT)]
+    #[Assert\NotBlank(message:"Vous devez indiquer une description")]
     private ?string $description = null;
 
     public function getId(): ?int

@@ -6,6 +6,7 @@ use App\Repository\DishRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: DishRepository::class)]
 class Dish
@@ -18,19 +19,23 @@ class Dish
 
     #[ORM\Column(length: 255)]
     #[Groups(['get_category_with_dishes', 'get_dishes'])]
+    #[Assert\NotBlank(message:"Veuillez choisir un nom pour le plat")]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::TEXT)]
     #[Groups(['get_category_with_dishes', 'get_dishes'])]
+    #[Assert\NotBlank(message:"Vous devez indiquer une description")]
     private ?string $description = null;
 
     #[ORM\Column]
     #[Groups(['get_category_with_dishes', 'get_dishes'])]
+    #[Assert\NotBlank(message:"Vous devez préciser un prix")]
     private ?float $price = null;
 
     #[ORM\ManyToOne(inversedBy: 'dishes')]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['get_dishes'])]
+    #[Assert\NotBlank(message:"Vous devez choisir une catégorie pour le plat")]
     private ?Category $category = null;
 
     public function getId(): ?int

@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\RestaurantRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: RestaurantRepository::class)]
 class Restaurant
@@ -20,22 +21,27 @@ class Restaurant
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Groups(['get_restaurant'])]
+    #[Assert\NotBlank(message:"Vous devez indiquer une adresse pour le restaurant")]
     private ?string $address = null;
 
     #[ORM\Column(length: 5, nullable: true)]
     #[Groups(['get_restaurant'])]
+    #[Assert\NotBlank(message:"Vous devez indiquer un code postal")]
     private ?string $post_code = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Groups(['get_restaurant'])]
+    #[Assert\NotBlank(message:"Vous devez indiquer la ville du restaurant")]
     private ?string $city = null;
 
     #[ORM\Column(length: 10, nullable: true)]
     #[Groups(['get_restaurant'])]
+    #[Assert\NotBlank(message:"Vous devez indiquer un numéro de téléphone")]
     private ?string $phone = null;
 
     #[ORM\Column(nullable: true)]
     #[Groups(['get_restaurant'])]
+    #[Assert\NotBlank(message:"Veuillez indiquer la capacité maximale pour un service")]
     private ?int $max_capacity = null;
 
     public function getId(): ?int

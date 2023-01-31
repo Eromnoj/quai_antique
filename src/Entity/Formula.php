@@ -6,6 +6,7 @@ use App\Repository\FormulaRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: FormulaRepository::class)]
 class Formula
@@ -18,14 +19,17 @@ class Formula
 
     #[ORM\Column(length: 255)]
     #[Groups(['get_menu_with_formulas'])]
+    #[Assert\NotBlank(message:"Vous devez choisir un nom de formules")]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::TEXT)]
     #[Groups(['get_menu_with_formulas'])]
+    #[Assert\NotBlank(message:"Vous devez indiquer une description")]
     private ?string $description = null;
 
     #[ORM\Column]
     #[Groups(['get_menu_with_formulas'])]
+    #[Assert\NotBlank(message:"Vous devez préciser un prix")]
     private ?float $price = null;
 
     #[ORM\ManyToOne(inversedBy: 'formulas')]

@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: CategoryRepository::class)]
 class Category
@@ -19,10 +20,12 @@ class Category
 
     #[ORM\Column(length: 255)]
     #[Groups(['get_category_with_dishes', 'get_category', 'get_dishes'])]
+    #[Assert\NotBlank(message:"Veuillez indiquer un nom pour la catégorie")]
     private ?string $name = null;
 
     #[ORM\Column]
     #[Groups(['get_category_with_dishes', 'get_category', 'get_dishes'])]
+    #[Assert\NotBlank(message:"Vous devez indiquer un rang pour l'ordre d'affichage")]
     private ?int $rank_display = null;
 
     #[ORM\OneToMany(mappedBy: 'category', targetEntity: Dish::class, orphanRemoval: true)]

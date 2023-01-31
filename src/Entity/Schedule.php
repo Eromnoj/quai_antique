@@ -5,7 +5,6 @@ namespace App\Entity;
 use App\Repository\ScheduleRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\DBAL\Types\Types;
-
 #[ORM\Entity(repositoryClass: ScheduleRepository::class)]
 class Schedule
 {

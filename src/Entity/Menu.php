@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: MenuRepository::class)]
 class Menu
@@ -19,6 +20,7 @@ class Menu
 
     #[ORM\Column(length: 255)]
     #[Groups(['get_menu_with_formulas'])]
+    #[Assert\NotBlank(message:"Vous devez choisir un nom de menu")]
     private ?string $name = null;
 
     #[ORM\OneToMany(mappedBy: 'menu', targetEntity: Formula::class, orphanRemoval: true)]

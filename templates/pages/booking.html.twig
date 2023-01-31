@@ -4,13 +4,23 @@
 {% endblock %}
 
 {% block body %}
-	{% if app.user.client %}
-		{% set userId = app.user.id %}
-		{% set userLastname = app.user.client.lastname %}
-		{% set userFirstname = app.user.client.firstname %}
-		{% set userAllergies = app.user.client.allergies %}
-		{% set userPhone = app.user.client.phone %}
-		{% set userNumber = app.user.client.number %}
+	{% if app.user %}
+
+		{% if app.user.client %}
+			{% set userId = app.user.id %}
+			{% set userLastname = app.user.client.lastname %}
+			{% set userFirstname = app.user.client.firstname %}
+			{% set userAllergies = app.user.client.allergies %}
+			{% set userPhone = app.user.client.phone %}
+			{% set userNumber = app.user.client.number %}
+		{% else %}
+			{% set userId = null %}
+			{% set userLastname = null %}
+			{% set userFirstname = null %}
+			{% set userAllergies = null %}
+			{% set userPhone = null %}
+			{% set userNumber = null %}
+		{% endif %}
 	{% else %}
 		{% set userId = null %}
 		{% set userLastname = null %}
@@ -19,7 +29,7 @@
 		{% set userPhone = null %}
 		{% set userNumber = null %}
 	{% endif %}
-{% set BookingCSRFToken = csrf_token('booking') %}
+	{% set BookingCSRFToken = csrf_token('booking') %}
 
 
 	<div {{ react_component('Booking', {userId, userLastname, userFirstname, userAllergies, userPhone, userNumber, BookingCSRFToken } )}}></div>

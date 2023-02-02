@@ -20,8 +20,8 @@ use App\Repository\MenuRepository;
 use App\Repository\RestaurantRepository;
 use App\Repository\ScheduleRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Error;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
@@ -29,6 +29,8 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Address;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -49,9 +51,9 @@ class ApiController extends AbstractController
     public function gallery(GalleryRepository $galleryRepository, SerializerInterface $serializer): JsonResponse
     {
         $images = $galleryRepository->findAll();
-        $imagesJson = $serializer->serialize($images, 'json', []);
+        $responseJson = $serializer->serialize($images, 'json', []);
 
-        return new JsonResponse($imagesJson, Response::HTTP_OK, [], true);
+        return new JsonResponse($responseJson, Response::HTTP_OK, [], true);
     }
 
     #[Route('/category_with_dishes', name: 'app_get_category_with_formula', methods: ['GET'])]
@@ -159,14 +161,14 @@ class ApiController extends AbstractController
             $content = [
                 'message' => 'Changement sauvegardé. Veuillez patienter pendant le rechargement de la page'
             ];
-            $imagesJson = $serializer->serialize($content, 'json', []);
-            return new JsonResponse($imagesJson, Response::HTTP_OK, [], true);
+            $responseJson = $serializer->serialize($content, 'json', []);
+            return new JsonResponse($responseJson, Response::HTTP_OK, [], true);
         } else {
             $content = [
                 'message' => 'Une erreur est survenue'
             ];
-            $imagesJson = $serializer->serialize($content, 'json', []);
-            return new JsonResponse($imagesJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
+            $responseJson = $serializer->serialize($content, 'json', []);
+            return new JsonResponse($responseJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
         }
     }
 
@@ -205,14 +207,14 @@ class ApiController extends AbstractController
             $content = [
                 'message' => 'Image supprimée. Veuillez patienter pendant le rechargement de la page'
             ];
-            $imagesJson = $serializer->serialize($content, 'json', []);
-            return new JsonResponse($imagesJson, Response::HTTP_OK, [], true);
+            $responseJson = $serializer->serialize($content, 'json', []);
+            return new JsonResponse($responseJson, Response::HTTP_OK, [], true);
         } else {
             $content = [
                 'message' => 'Une erreur est survenue'
             ];
-            $imagesJson = $serializer->serialize($content, 'json', []);
-            return new JsonResponse($imagesJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
+            $responseJson = $serializer->serialize($content, 'json', []);
+            return new JsonResponse($responseJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
         }
     }
 
@@ -287,14 +289,14 @@ class ApiController extends AbstractController
             $content = [
                 'message' => 'Changement sauvegardé. Veuillez patienter pendant le rechargement de la page'
             ];
-            $imagesJson = $serializer->serialize($content, 'json', []);
-            return new JsonResponse($imagesJson, Response::HTTP_OK, [], true);
+            $responseJson = $serializer->serialize($content, 'json', []);
+            return new JsonResponse($responseJson, Response::HTTP_OK, [], true);
         } else {
             $content = [
                 'message' => 'Une erreur est survenue'
             ];
-            $imagesJson = $serializer->serialize($content, 'json', []);
-            return new JsonResponse($imagesJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
+            $responseJson = $serializer->serialize($content, 'json', []);
+            return new JsonResponse($responseJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
         }
     }
 
@@ -346,14 +348,18 @@ class ApiController extends AbstractController
             }
             $em->persist($restaurant);
             $em->flush();
+            $content = [
+                'message' => 'Changement enregistré'
+            ];
+            $responseJson = $serializer->serialize($content, 'json', []);
 
-            return new JsonResponse($request->getContent(), Response::HTTP_OK, [], true);
+            return new JsonResponse($responseJson, Response::HTTP_OK, [], true);
         } else {
             $content = [
                 'message' => 'Une erreur est survenue'
             ];
-            $imagesJson = $serializer->serialize($content, 'json', []);
-            return new JsonResponse($imagesJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
+            $responseJson = $serializer->serialize($content, 'json', []);
+            return new JsonResponse($responseJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
         }
     }
 
@@ -390,6 +396,16 @@ class ApiController extends AbstractController
                 Schedule::class,
                 'json'
             );
+            
+            // Prevent to save incoherent schedule
+            if($updateSchedule->getNoonStart() > $updateSchedule->getNoonEnd() || $updateSchedule->getEveningStart() > $updateSchedule->getEveningEnd()){
+                $content = [
+                    'message' => 'L\' heure de début ne peut pas être supérieur à l\'heure de fin.'
+                ];
+                $responseJson = $serializer->serialize($content, 'json', []);
+                return new JsonResponse($responseJson, Response::HTTP_BAD_REQUEST, [], true);
+            }
+
             $schedule->setNoonStart($updateSchedule->getNoonStart());
             $schedule->setNoonEnd($updateSchedule->getNoonEnd());
             $schedule->setNoonClosed($updateSchedule->isNoonClosed());
@@ -410,8 +426,8 @@ class ApiController extends AbstractController
             $content = [
                 'message' => 'Une erreur est survenue'
             ];
-            $imagesJson = $serializer->serialize($content, 'json', []);
-            return new JsonResponse($imagesJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
+            $responseJson = $serializer->serialize($content, 'json', []);
+            return new JsonResponse($responseJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
         }
     }
 
@@ -477,8 +493,8 @@ class ApiController extends AbstractController
             $content = [
                 'message' => 'Une erreur est survenue'
             ];
-            $imagesJson = $serializer->serialize($content, 'json', []);
-            return new JsonResponse($imagesJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
+            $responseJson = $serializer->serialize($content, 'json', []);
+            return new JsonResponse($responseJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
         }
     }
 
@@ -500,14 +516,14 @@ class ApiController extends AbstractController
             $content = [
                 'message' => 'Catégorie supprimée. Veuillez patienter pendant le rechargement de la page'
             ];
-            $imagesJson = $serializer->serialize($content, 'json', []);
-            return new JsonResponse($imagesJson, Response::HTTP_OK, [], true);
+            $responseJson = $serializer->serialize($content, 'json', []);
+            return new JsonResponse($responseJson, Response::HTTP_OK, [], true);
         } else {
             $content = [
                 'message' => 'Une erreur est survenue'
             ];
-            $imagesJson = $serializer->serialize($content, 'json', []);
-            return new JsonResponse($imagesJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
+            $responseJson = $serializer->serialize($content, 'json', []);
+            return new JsonResponse($responseJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
         }
     }
 
@@ -554,8 +570,8 @@ class ApiController extends AbstractController
             $content = [
                 'message' => 'Une erreur est survenue'
             ];
-            $imagesJson = $serializer->serialize($content, 'json', []);
-            return new JsonResponse($imagesJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
+            $responseJson = $serializer->serialize($content, 'json', []);
+            return new JsonResponse($responseJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
         }
     }
 
@@ -624,8 +640,8 @@ class ApiController extends AbstractController
             $content = [
                 'message' => 'Une erreur est survenue'
             ];
-            $imagesJson = $serializer->serialize($content, 'json', []);
-            return new JsonResponse($imagesJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
+            $responseJson = $serializer->serialize($content, 'json', []);
+            return new JsonResponse($responseJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
         }
     }
 
@@ -680,8 +696,8 @@ class ApiController extends AbstractController
             $content = [
                 'message' => 'Une erreur est survenue'
             ];
-            $imagesJson = $serializer->serialize($content, 'json', []);
-            return new JsonResponse($imagesJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
+            $responseJson = $serializer->serialize($content, 'json', []);
+            return new JsonResponse($responseJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
         }
     }
 
@@ -703,14 +719,14 @@ class ApiController extends AbstractController
             $content = [
                 'message' => 'Catégorie supprimée. Veuillez patienter pendant le rechargement de la page'
             ];
-            $imagesJson = $serializer->serialize($content, 'json', []);
-            return new JsonResponse($imagesJson, Response::HTTP_OK, [], true);
+            $responseJson = $serializer->serialize($content, 'json', []);
+            return new JsonResponse($responseJson, Response::HTTP_OK, [], true);
         } else {
             $content = [
                 'message' => 'Une erreur est survenue'
             ];
-            $imagesJson = $serializer->serialize($content, 'json', []);
-            return new JsonResponse($imagesJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
+            $responseJson = $serializer->serialize($content, 'json', []);
+            return new JsonResponse($responseJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
         }
     }
 
@@ -774,8 +790,8 @@ class ApiController extends AbstractController
             $content = [
                 'message' => 'Une erreur est survenue'
             ];
-            $imagesJson = $serializer->serialize($content, 'json', []);
-            return new JsonResponse($imagesJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
+            $responseJson = $serializer->serialize($content, 'json', []);
+            return new JsonResponse($responseJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
         }
     }
 
@@ -797,14 +813,14 @@ class ApiController extends AbstractController
             $content = [
                 'message' => 'Catégorie supprimée. Veuillez patienter pendant le rechargement de la page'
             ];
-            $imagesJson = $serializer->serialize($content, 'json', []);
-            return new JsonResponse($imagesJson, Response::HTTP_OK, [], true);
+            $responseJson = $serializer->serialize($content, 'json', []);
+            return new JsonResponse($responseJson, Response::HTTP_OK, [], true);
         } else {
             $content = [
                 'message' => 'Une erreur est survenue'
             ];
-            $imagesJson = $serializer->serialize($content, 'json', []);
-            return new JsonResponse($imagesJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
+            $responseJson = $serializer->serialize($content, 'json', []);
+            return new JsonResponse($responseJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
         }
     }
 
@@ -848,8 +864,8 @@ class ApiController extends AbstractController
             $content = [
                 'message' => 'Une erreur est survenue'
             ];
-            $imagesJson = $serializer->serialize($content, 'json', []);
-            return new JsonResponse($imagesJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
+            $responseJson = $serializer->serialize($content, 'json', []);
+            return new JsonResponse($responseJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
         }
     }
 
@@ -897,8 +913,8 @@ class ApiController extends AbstractController
             $content = [
                 'message' => 'Une erreur est survenue'
             ];
-            $imagesJson = $serializer->serialize($content, 'json', []);
-            return new JsonResponse($imagesJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
+            $responseJson = $serializer->serialize($content, 'json', []);
+            return new JsonResponse($responseJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
         }
     }
 
@@ -953,8 +969,8 @@ class ApiController extends AbstractController
             $content = [
                 'message' => 'Une erreur est survenue'
             ];
-            $imagesJson = $serializer->serialize($content, 'json', []);
-            return new JsonResponse($imagesJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
+            $responseJson = $serializer->serialize($content, 'json', []);
+            return new JsonResponse($responseJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
         }
     }
 
@@ -976,14 +992,14 @@ class ApiController extends AbstractController
             $content = [
                 'message' => 'Catégorie supprimée. Veuillez patienter pendant le rechargement de la page'
             ];
-            $imagesJson = $serializer->serialize($content, 'json', []);
-            return new JsonResponse($imagesJson, Response::HTTP_OK, [], true);
+            $responseJson = $serializer->serialize($content, 'json', []);
+            return new JsonResponse($responseJson, Response::HTTP_OK, [], true);
         } else {
             $content = [
                 'message' => 'Une erreur est survenue'
             ];
-            $imagesJson = $serializer->serialize($content, 'json', []);
-            return new JsonResponse($imagesJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
+            $responseJson = $serializer->serialize($content, 'json', []);
+            return new JsonResponse($responseJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
         }
     }
 
@@ -1049,8 +1065,8 @@ class ApiController extends AbstractController
             $content = [
                 'message' => 'Une erreur est survenue'
             ];
-            $imagesJson = $serializer->serialize($content, 'json', []);
-            return new JsonResponse($imagesJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
+            $responseJson = $serializer->serialize($content, 'json', []);
+            return new JsonResponse($responseJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
         }
     }
 
@@ -1059,18 +1075,38 @@ class ApiController extends AbstractController
         Request $request,
         SerializerInterface $serializer,
         EntityManagerInterface $em,
-        ValidatorInterface $validator
+        ValidatorInterface $validator,
+        RestaurantRepository $restaurantRepository,
+        BookingRepository $bookingRepository,
+        MailerInterface $mailer
     ): JsonResponse {
         $requestArray = $request->toArray();
-
         $submittedToken = $requestArray['token'];
-
+        $userEmail = $requestArray['email'];
         if ($this->isCsrfTokenValid('booking', $submittedToken)) {
             $updateBooking = $serializer->deserialize(
                 $request->getContent(),
                 Booking::class,
                 'json'
             );
+
+            $date = date_format($updateBooking->getDate(), 'c');
+            $shift = $updateBooking->getShift();
+            $number = $updateBooking->getNumber();
+
+            $maxCapacity = $restaurantRepository->getMaxCapacity();
+
+            $seatsTaken = $bookingRepository->getAvailable($date, $shift)[0]['seats'] === null ? 0 : intval($bookingRepository->getAvailable($date, $shift)[0]['seats']);
+
+            $seatsLeft = $maxCapacity - $seatsTaken;
+
+            if($seatsLeft - $number < 0) {
+                $content = [
+                    'message' => 'Il \'a plus assez de place pour valider cette réservation'
+                ];
+                $responseJson = $serializer->serialize($content, 'json', []);
+                return new JsonResponse($responseJson, Response::HTTP_BAD_REQUEST, [], true);
+            }
 
             $booking = new Booking();
             $booking->setLastName($updateBooking->getLastName());
@@ -1089,8 +1125,27 @@ class ApiController extends AbstractController
             $em->persist($booking);
             $em->flush();
 
+            // Send confirmation email
+            $restaurantInfos = $restaurantRepository->findAll();
+
+
+            $email = (new TemplatedEmail())
+            ->from(new Address('j.moreschi@outlook.fr', 'Le Quai Antique'))
+            ->to($userEmail)
+            ->subject('Confirmation de réservation')
+            ->htmlTemplate('mail_templates/confirmbooking.html.twig')
+            ->context([
+                'name' => $updateBooking->getLastname(),
+                'date' => date_format($updateBooking->getDate(), 'c'),
+                'time' => date_format($updateBooking->getTime(), 'c'),
+                'tel' => $restaurantInfos[0]->getPhone(),
+            ])
+        ;
+
+        $mailer->send($email);
+
             $content = [
-                "message" => "Changement sauvegardé. Veuillez patienter pendant le chargement de la page"
+                "message" => "Votre réservation a bien été enregistrée. Vous recevrez sous peu un mail de réservation"
             ];
 
             $contentJson = $serializer->serialize($content, 'json', []);
@@ -1100,8 +1155,8 @@ class ApiController extends AbstractController
             $content = [
                 'message' => 'Une erreur est survenue'
             ];
-            $imagesJson = $serializer->serialize($content, 'json', []);
-            return new JsonResponse($imagesJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
+            $responseJson = $serializer->serialize($content, 'json', []);
+            return new JsonResponse($responseJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
         }
     }
 
@@ -1123,14 +1178,14 @@ class ApiController extends AbstractController
             $content = [
                 'message' => 'Réservation supprimée. Veuillez patienter pendant le rechargement de la page'
             ];
-            $imagesJson = $serializer->serialize($content, 'json', []);
-            return new JsonResponse($imagesJson, Response::HTTP_OK, [], true);
+            $responseJson = $serializer->serialize($content, 'json', []);
+            return new JsonResponse($responseJson, Response::HTTP_OK, [], true);
         } else {
             $content = [
                 'message' => 'Une erreur est survenue'
             ];
-            $imagesJson = $serializer->serialize($content, 'json', []);
-            return new JsonResponse($imagesJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
+            $responseJson = $serializer->serialize($content, 'json', []);
+            return new JsonResponse($responseJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
         }
     }
 
@@ -1264,8 +1319,8 @@ class ApiController extends AbstractController
             $content = [
                 'message' => 'Une erreur est survenue'
             ];
-            $imagesJson = $serializer->serialize($content, 'json', []);
-            return new JsonResponse($imagesJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
+            $responseJson = $serializer->serialize($content, 'json', []);
+            return new JsonResponse($responseJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
         }
     }
 
@@ -1332,8 +1387,8 @@ class ApiController extends AbstractController
             $content = [
                 'message' => 'Une erreur est survenue'
             ];
-            $imagesJson = $serializer->serialize($content, 'json', []);
-            return new JsonResponse($imagesJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
+            $responseJson = $serializer->serialize($content, 'json', []);
+            return new JsonResponse($responseJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
         }
     }
 
@@ -1395,8 +1450,8 @@ class ApiController extends AbstractController
             $content = [
                 'message' => 'Une erreur est survenue'
             ];
-            $imagesJson = $serializer->serialize($content, 'json', []);
-            return new JsonResponse($imagesJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
+            $responseJson = $serializer->serialize($content, 'json', []);
+            return new JsonResponse($responseJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
         }
     }
 }

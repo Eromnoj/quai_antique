@@ -30,7 +30,7 @@ class Booking
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     #[Assert\NotBlank(message:"Veuillez choisir une date de réservation")]
-    #[Assert\GreaterThan(value:'today', message: "Veuillez choisir une date à partir d'aujourd'hui")]
+    #[Assert\GreaterThan(value:'yesterday', message: "Veuillez choisir une date à partir d'aujourd'hui")]
     private ?\DateTimeInterface $date = null;
 
     #[ORM\Column(type: Types::TIME_MUTABLE)]

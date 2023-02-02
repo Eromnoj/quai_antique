@@ -67,6 +67,7 @@ const EditSchedule = ({ day, setEdit, token }) => {
           console.log(element.title);
         });
       } else {
+        setMessage(array => [...array, { type: 'error', input: 'message', message: error.response.data.message }])
         console.log(error.response.data.message);
       }
     }
@@ -96,7 +97,7 @@ const EditSchedule = ({ day, setEdit, token }) => {
               </div>
               <div>
                 <label htmlFor="noonEnd">Fin du service</label>
-                <input type="time" name="noonEnd" id="noonEnd" min={moment(schedule.noonStart).utcOffset(1).format('HH:mm')} value={moment(schedule.noonEnd).utcOffset(1).format('HH:mm')} onChange={(e) => dispatch({ type: 'noonEnd', value: e.target.value })} />
+                <input type="time" name="noonEnd" id="noonEnd" value={moment(schedule.noonEnd).utcOffset(1).format('HH:mm')} onChange={(e) => dispatch({ type: 'noonEnd', value: e.target.value })} />
                 
                 <ShowApiResponse array={message} input={'noonEnd'} />
 

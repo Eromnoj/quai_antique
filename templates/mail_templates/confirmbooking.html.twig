@@ -1,0 +1,21 @@
+<h1>Bonjour,</h1>
+
+<p>Votre réservation pour le restaurant Le Quai Antique a bien été enregistrée.</p>
+
+<p>Voici le détail des informations :</p>
+<p>
+	<strong>Nom de la réservation</strong>:
+	{{ name }}</p>
+<p>
+	<strong>Jour</strong>:
+	{{ date|date('d/m/Y', "Europe/Paris") }}</p>
+<p>
+	<strong>Heure</strong>:
+	{{ time|date('H:i', "Europe/Paris") }}</p>
+
+<p>Le restaurant est susceptible de vous rappeler la veille de votre venue sur place afin de confirmer la réservation.</p>
+<p>En raison de la forte popularité de l'établissement, tout retard de plus de 30 minutes pour lequel nous n'aurions pas été informé pourra
+	avoir comme conséquence l'annulation de votre réservation, ainsi que la réattribution de votre table.</p>
+<p>Pour annuler ou modifier votre réservation, veuillez contacter le restaurant via ce numéro : {{ tel }}
+</p>
+<p>Merci !</p>

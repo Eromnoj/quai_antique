@@ -4,15 +4,16 @@ import axios from 'axios'
 import { useState } from 'react'
 import ShowApiResponse from './ShowApiResponse'
 
-const Booking = ({ userLastname, userFirstname, userAllergies, userPhone, userNumber, BookingCSRFToken}) => {
-   // Display response from API
-   const [message, setMessage] = useState([])
+const Booking = ({ userEmail, userLastname, userFirstname, userAllergies, userPhone, userNumber, BookingCSRFToken }) => {
+  // Display response from API
+  const [message, setMessage] = useState([])
 
 
   const initialState = {
     lastname: userLastname ? userLastname : '',
     firstname: userFirstname ? userFirstname : '',
-    date: moment().format('YYYY-MM-DD') + 'T00:00:00.000Z',
+    email: userEmail ? userEmail : '',
+    date: moment().add(1, 'days').format('YYYY-MM-DD') + 'T00:00:00.000Z',
     time: '',
     allergies: userAllergies ? userAllergies : '',
     phone: userPhone ? userPhone : '',
@@ -27,6 +28,8 @@ const Booking = ({ userLastname, userFirstname, userAllergies, userPhone, userNu
         return { ...state, lastname: action.value }
       case 'firstname':
         return { ...state, firstname: action.value }
+      case 'email':
+        return { ...state, email: action.value }
       case 'date':
         let date = moment(action.value + 'T00:00:00.000Z').utcOffset(0).toISOString()
         return { ...state, date: date }
@@ -53,13 +56,11 @@ const Booking = ({ userLastname, userFirstname, userAllergies, userPhone, userNu
     '/api/add/booking'
     try {
       const res = await axios.put('/api/add/booking', state)
-       const data = await res.data
+      const data = await res.data
       if (data.message) {
         setMessage(array => [...array, { type: 'info', input: 'message', message: data.message }])
       }
-      setTimeout(() => {
-        window.location.replace('/')
-      }, 3000)
+      
     } catch (error) {
       if (error.response.data.violations) {
         const violation = error.response.data.violations
@@ -70,9 +71,8 @@ const Booking = ({ userLastname, userFirstname, userAllergies, userPhone, userNu
         });
       } else {
         console.log(error.response.data.message);
-        setMessage(array => [...array, { type: 'info', input: 'message', message: error.response.data.message }])
+        setMessage(array => [...array, { type: 'error', input: 'message1', message: error.response.data.message }])
       }
-      console.log(error);
     }
   }
 
@@ -95,7 +95,7 @@ const Booking = ({ userLastname, userFirstname, userAllergies, userPhone, userNu
       setHourArray(tempArray)
 
       // Make sure the time send to the the server is available
-      dispatch({type: 'time', value: moment(data.shiftStart).utcOffset(1).format('HH:mm')})
+      dispatch({ type: 'time', value: moment(data.shiftStart).utcOffset(1).format('HH:mm') })
     } catch (error) {
       console.log(error);
     }
@@ -129,25 +129,26 @@ const Booking = ({ userLastname, userFirstname, userAllergies, userPhone, userNu
         bookingSubmit()
       }}>
         <ShowApiResponse array={message} input={'message'} />
+        <ShowApiResponse array={message} input={'message1'} />
         <div className='booking_infos'>
           <div className='date_div'>
             <label htmlFor="date">Date : </label>
             <input type="date" name="date" id="date"
-              min={moment().format('YYYY-MM-DD')}
+              min={moment().add(1, 'days').format('YYYY-MM-DD')}
               value={moment(state.date).format('YYYY-MM-DD')}
               onChange={(e) => {
                 dispatch({ type: 'date', value: e.target.value })
-              }}  />
+              }} />
 
-      <ShowApiResponse array={message} input={'date'} />
+            <ShowApiResponse array={message} input={'date'} />
 
           </div>
           <div className='number_div'>
             <label htmlFor="number">Couverts :</label>
-            <input type="number" name="number" id="number" value={state.number} onChange={(e) => dispatch({ type: 'number', value: e.target.value })}  />
+            <input type="number" name="number" id="number" value={state.number} onChange={(e) => dispatch({ type: 'number', value: e.target.value })} />
 
-      <ShowApiResponse array={message} input={'number'} />
-              
+            <ShowApiResponse array={message} input={'number'} />
+
           </div>
           <div className='shift_div'>
             <label htmlFor="shift">Service :</label>
@@ -160,7 +161,7 @@ const Booking = ({ userLastname, userFirstname, userAllergies, userPhone, userNu
               <option value="soir">Soir</option>
             </select>
 
-      <ShowApiResponse array={message} input={'shift'} />
+            <ShowApiResponse array={message} input={'shift'} />
 
           </div>
         </div>
@@ -180,7 +181,7 @@ const Booking = ({ userLastname, userFirstname, userAllergies, userPhone, userNu
             <div className='hour_choice'>
               {timeOptions}
 
-      <ShowApiResponse array={message} input={'time'} />
+              <ShowApiResponse array={message} input={'time'} />
 
             </div>
           </>
@@ -190,38 +191,44 @@ const Booking = ({ userLastname, userFirstname, userAllergies, userPhone, userNu
           <label htmlFor="allergies">Veuillez signaler d'éventuelles allergies</label>
           <textarea name="allergies" id="allergies" value={state.allergies} onChange={(e) => dispatch({ type: 'allergies', value: e.target.value })}></textarea>
 
-      <ShowApiResponse array={message} input={'allergies'} />
+          <ShowApiResponse array={message} input={'allergies'} />
 
         </div>
         <div className='user_info'>
           <div className='lastname_div'>
             <label htmlFor="lastname">Votre nom :</label>
-            <input type="text" name="lastname" id="lastname" value={state.lastname} onChange={(e) => dispatch({ type: 'lastname', value: e.target.value })}  />
+            <input type="text" name="lastname" id="lastname" value={state.lastname} onChange={(e) => dispatch({ type: 'lastname', value: e.target.value })} />
 
-      <ShowApiResponse array={message} input={'lastname'} />
+            <ShowApiResponse array={message} input={'lastname'} />
 
           </div>
           <div className='firstname_div'>
             <label htmlFor="firstname">Votre prénom :</label>
-            <input type="text" name="firstname" id="firstname" value={state.firstname} onChange={(e) => dispatch({ type: 'firstname', value: e.target.value })}  />
+            <input type="text" name="firstname" id="firstname" value={state.firstname} onChange={(e) => dispatch({ type: 'firstname', value: e.target.value })} />
 
-      <ShowApiResponse array={message} input={'firstname'} />
+            <ShowApiResponse array={message} input={'firstname'} />
+
+          </div>
+          <div className='email_div'>
+            <label htmlFor="email">Votre email :</label>
+            <input type="email" name="email" id="email" value={state.email} onChange={(e) => dispatch({ type: 'email', value: e.target.value })} />
+
+            <ShowApiResponse array={message} input={'firstname'} />
 
           </div>
           <div className='phone_div'>
             <label htmlFor="phone">Votre téléphone :</label>
-            <input type="tel" name="phone" id="phone" value={state.phone} onChange={(e) => dispatch({ type: 'phone', value: e.target.value })}  />
+            <input type="tel" name="phone" id="phone" value={state.phone} onChange={(e) => dispatch({ type: 'phone', value: e.target.value })} />
 
-      <ShowApiResponse array={message} input={'phone'} />
+            <ShowApiResponse array={message} input={'phone'} />
 
           </div>
         </div>
         <div className='disclaimer'>
           <p>Le restaurant est susceptible de vous appeler pour confirmer la réservation</p>
-          
-      
+
+
         </div>
-        <ShowApiResponse array={message} input={'message'} />
         <button type="submit" className='submit_button' disabled={seatsLeft <= 0 || isShiftClosed ? true : false}>Confirmer la réservation</button>
 
 

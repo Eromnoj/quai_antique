@@ -8,6 +8,7 @@
 
 		{% if app.user.client %}
 			{% set userId = app.user.id %}
+			{% set userEmail = app.user.email %}
 			{% set userLastname = app.user.client.lastname %}
 			{% set userFirstname = app.user.client.firstname %}
 			{% set userAllergies = app.user.client.allergies %}
@@ -15,6 +16,7 @@
 			{% set userNumber = app.user.client.number %}
 		{% else %}
 			{% set userId = null %}
+			{% set userEmail = null %}
 			{% set userLastname = null %}
 			{% set userFirstname = null %}
 			{% set userAllergies = null %}
@@ -32,5 +34,5 @@
 	{% set BookingCSRFToken = csrf_token('booking') %}
 
 
-	<div {{ react_component('Booking', {userId, userLastname, userFirstname, userAllergies, userPhone, userNumber, BookingCSRFToken } )}}></div>
+	<div {{ react_component('Booking', {userId, userEmail, userLastname, userFirstname, userAllergies, userPhone, userNumber, BookingCSRFToken } )}}></div>
 {% endblock %}

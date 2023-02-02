@@ -1,17 +1,20 @@
-import React, { useReducer } from 'react'
+import React, { useReducer, useState } from 'react'
 import moment from 'moment/moment'
 import axios from 'axios'
+import ShowApiResponse from './ShowApiResponse'
 
 const ModalBooking = ({ booking, showEdit, token }) => {
+  // Display response from API
+  const [message, setMessage] = useState([])
 
   const initialState = {
     lastname: booking ? booking.lastname : '',
-    date: booking ? booking.date : '',
-    time: booking ? booking.time : '',
+    date: booking ? booking.date : moment().utcOffset(0).toISOString(),
+    time: booking ? booking.time : moment().utcOffset(0).toISOString(),
     allergies: booking ? booking.allergies : '',
     phone: booking ? booking.phone : '',
     shift: booking ? booking.shift : '',
-    number: booking ? booking.number : 1,
+    number: booking ? booking.number : 0,
     token: token
   }
 
@@ -45,12 +48,24 @@ const ModalBooking = ({ booking, showEdit, token }) => {
     try {
       const res = booking ? await axios.put(url, state) : await axios.put(url, state)
       const data = await res.data
-
-      console.log(data);
+      if (data.message) {
+        setMessage(array => [...array, { type: 'info', input: 'message', message: data.message }])
+      }
       setTimeout(() => {
         window.location.reload(true)
       }, 1000)
     } catch (error) {
+      if (error.response.data.violations) {
+        const violation = error.response.data.violations
+        violation.forEach(element => {
+          setMessage(array => [...array, { type: 'error', input: element.propertyPath, message: element.title }])
+          console.log(element.propertyPath);
+          console.log(element.title);
+        });
+      } else {
+        console.log(error.response.data.message);
+        setMessage(array => [...array, { type: 'info', input: 'message', message: error.response.data.message }])
+      }
       console.log(error);
     }
   }
@@ -60,42 +75,66 @@ const ModalBooking = ({ booking, showEdit, token }) => {
       <div className='modal_container'>
         <div className='modal_header'><button className='close_button' onClick={showEdit}>Fermer</button></div>
         <div className='modal_body'>
+          <ShowApiResponse array={message} input={'message'} />
+
           <form onSubmit={(e) => {
             e.preventDefault()
+            setMessage([])
             bookingSubmit()
           }}>
             <p>{booking ? `Modifier la réservation de ${booking.lastname}` : 'Ajouter une réservation'}</p>
             <div className='lastname_div'>
               <label htmlFor="lastname">Nom</label>
               <input type="text" name="lastname" id="lastname" value={state.lastname} onChange={(e) => dispatch({ type: 'lastname', value: e.target.value })} />
+
+              <ShowApiResponse array={message} input={'lastname'} />
+
             </div>
             <div className='number_div'>
               <label htmlFor="number">Nombre de couverts</label>
               <input type="number" name="number" id="number" value={state.number} onChange={(e) => dispatch({ type: 'number', value: e.target.value })} />
+
+              <ShowApiResponse array={message} input={'number'} />
+
             </div>
             <div className='date_div'>
               <label htmlFor="date">Date</label>
               <input type="date" name="date" id="date" value={moment(state.date).utcOffset(1).format('YYYY-MM-DD')} onChange={(e) => dispatch({ type: 'date', value: e.target.value })} />
+
+              <ShowApiResponse array={message} input={'date'} />
+
             </div>
             <div className='shift_div'>
               <label htmlFor="shift">Service</label>
               <select name="shift" id="shift" onChange={(e) => dispatch({ type: 'shift', value: e.target.value })} value={state.shift}>
-                <option value={''}>Choisissez une Catégorie</option>
+                <option value={''}>Choisissez un Service</option>
                 <option value='midi'>Midi</option>
                 <option value='soir'>Soir</option>
               </select>
+
+              <ShowApiResponse array={message} input={'shift'} />
+
             </div>
             <div className='time_div'>
               <label htmlFor="time">Heure</label>
               <input type="time" name="time" id="time" value={moment(state.time).utcOffset(1).format('HH:mm')} onChange={(e) => dispatch({ type: 'time', value: e.target.value })} />
+
+              <ShowApiResponse array={message} input={'time'} />
+
             </div>
             <div className='phone_div'>
               <label htmlFor="phone">Téléphone</label>
               <input type="tel" name="phone" id="phone" value={state.phone} onChange={(e) => dispatch({ type: 'phone', value: e.target.value })} />
+
+              <ShowApiResponse array={message} input={'phone'} />
+
             </div>
             <div className='allergies_div'>
               <label htmlFor="allergies">Allergènes</label>
               <textarea name="allergies" id="allergies" value={state.allergies} onChange={(e) => dispatch({ type: 'allergies', value: e.target.value })}></textarea>
+
+              <ShowApiResponse array={message} input={'allergies'} />
+
             </div>
             <input type="submit" value="Enregistrer" className='submit_button' />
           </form>

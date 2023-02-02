@@ -1,19 +1,21 @@
 import React, { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import axios from 'axios'
+import ShowApiResponse from './ShowApiResponse'
 
 const ModalImage = ({ image, showEdit, token }) => {
 
   const {register, handleSubmit} = useForm()
-  console.log(token);
-  const [showMessage, setShowMessage] = useState('false')
-  const [message, setMessage] = useState('')
+
+    // Display response from API
+    const [message, setMessage] = useState([])
 
   const submitForm = async (data) => {
+    setMessage([])
     const formData = new FormData()
+    formData.append('token', token)
     formData.append('image', data.image[0])
     formData.append('description', data.description)
-    formData.append('token', token)
     const url = image ? `/api/update/image/${image.id}` : `/api/add/image`
     try {
       const res = await axios.post(url, formData, {
@@ -22,17 +24,24 @@ const ModalImage = ({ image, showEdit, token }) => {
         },
       })
       const data = await res.data
-      console.log(data);
-      setMessage(data.message);
-      setShowMessage(true)
-      setTimeout(()=> {
+      if (data.message) {
+        setMessage(array => [...array, { type: 'info', input: 'message', message: data.message }])
+      }
+      setTimeout(() => {
         window.location.reload(true)
-      },
-      3000)
+      }, 1000)
     } catch (error) {
-      console.log(error);
-      setShowMessage(true)
-      setMessage(error.response.data.message);
+      if (error.response.data.violations) {
+        const violation = error.response.data.violations
+        violation.forEach(element => {
+          setMessage(array => [...array, { type: 'error', input: element.propertyPath, message: element.title }])
+          console.log(element.propertyPath);
+          console.log(element.title);
+        });
+      } else {
+        console.log(error.response.data.message);
+        setMessage(array => [...array, { type: 'info', input: 'message', message: error.response.data.message }])
+      }
     }
   }
   return (
@@ -40,18 +49,22 @@ const ModalImage = ({ image, showEdit, token }) => {
       <div className='modal_container'>
         <div className='modal_header'><button className='close_button' onClick={showEdit}>Fermer</button></div>
         <div className='modal_body'>
-          {showMessage ?
-          <div className='modal_message'>{message}</div>
-        :null}
+        <ShowApiResponse array={message} input={'message'} />
+
           <form encType='multipart/form-data' onSubmit={handleSubmit(submitForm)}>
           <p>{image ? `Modifier ${image.description}` : 'Ajouter une image'}</p>
             <div className='img_div'>
               <label htmlFor="image">Changer l'image</label>
               <input type="file" name="image" id="image" {...register('image')} />
+              <ShowApiResponse array={message} input={'url'} />
+
             </div>
             <div className='description_div'>
               <label htmlFor="description">Changer la description</label>
               <input type="text" name="description" id="description" {...register('description', {value: image ? image.description: ''})} />
+              
+              <ShowApiResponse array={message} input={'description'} />
+
             </div>
             <input type="submit" value="Enregistrer" className='submit_button' />
           </form>

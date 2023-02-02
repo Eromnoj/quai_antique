@@ -3,6 +3,7 @@ import EditSchedule from './EditSchedule'
 import ModalImage from './ModalImage'
 import axios from 'axios'
 import moment from 'moment/moment'
+import ShowApiResponse from './ShowApiResponse'
 
 const TableRow = ({ day, token }) => {
 
@@ -21,8 +22,8 @@ const TableRow = ({ day, token }) => {
             <td>{moment(day.noonStart).utcOffset(1).format('HH:mm')}</td>
             <td>{moment(day.noonEnd).utcOffset(1).format('HH:mm')}</td>
           </>
-      }
-        <td className='closed'>{day.noonClosed ? 'x' : null }</td>
+        }
+        <td className='closed'>{day.noonClosed ? 'x' : null}</td>
         {day.eveningClosed ?
           <>
             <td></td>
@@ -33,9 +34,9 @@ const TableRow = ({ day, token }) => {
             <td>{moment(day.eveningStart).utcOffset(1).format('HH:mm')}</td>
             <td>{moment(day.eveningEnd).utcOffset(1).format('HH:mm')}</td>
           </>
-      }
-        <td className='closed'>{day.eveningClosed ? 'x' : null }</td>
-        <td><div onClick={() => {
+        }
+        <td className='closed'>{day.eveningClosed ? 'x' : null}</td>
+        <td><div className='button_edit' onClick={() => {
           setShowEdit(prev => !prev)
 
         }}><img src="../img/Edit-alt.png" alt="edit" /></div>
@@ -106,7 +107,10 @@ const ImageCard = ({ image, token }) => {
 }
 
 
-const AdminRestaurant = ({RestaurantCSRFToken, ScheduleCSRFToken, ImageCSRFToken } ) => {
+const AdminRestaurant = ({ RestaurantCSRFToken, ScheduleCSRFToken, ImageCSRFToken }) => {
+
+  // Display response from API
+  const [message, setMessage] = useState([])
 
   const [schedule, setSchedule] = useState([])
 
@@ -118,7 +122,7 @@ const AdminRestaurant = ({RestaurantCSRFToken, ScheduleCSRFToken, ImageCSRFToken
     city: '',
     phone: '',
     post_code: '',
-    max_capacity: '',
+    max_capacity: 0,
     token: RestaurantCSRFToken
   }
 
@@ -135,7 +139,7 @@ const AdminRestaurant = ({RestaurantCSRFToken, ScheduleCSRFToken, ImageCSRFToken
       case 'post_code':
         return { ...state, post_code: action.value }
       case 'max_capacity':
-        return { ...state, max_capacity: action.value }
+        return { ...state, max_capacity: Number(action.value) }
       default:
         return
     }
@@ -160,9 +164,24 @@ const AdminRestaurant = ({RestaurantCSRFToken, ScheduleCSRFToken, ImageCSRFToken
   const updateRestaurant = async () => {
     try {
       const res = await axios.put(`/api/update/restaurant/${restaurant.id}`, restaurant)
-      window.location.reload(true)
+      const data = await res.data
+      if (data.message) {
+        setMessage(array => [...array, { type: 'info', input: 'message', message: data.message }])
+      }
+      setTimeout(() => {
+        window.location.reload(true)
+      }, 1000)
     } catch (error) {
-
+      if (error.response.data.violations) {
+        const violation = error.response.data.violations
+        violation.forEach(element => {
+          setMessage(array => [...array, { type: 'error', input: element.propertyPath, message: element.title }])
+          console.log(element.propertyPath);
+          console.log(element.title);
+        });
+      } else {
+        console.log(error.response.data.message);
+      }
     }
   }
 
@@ -173,7 +192,16 @@ const AdminRestaurant = ({RestaurantCSRFToken, ScheduleCSRFToken, ImageCSRFToken
       const data = await res.data
       setGallery(data)
     } catch (error) {
-      console.log(error);
+      if (error.response.data.violations) {
+        const violation = error.response.data.violations
+        violation.forEach(element => {
+          console.log(element.propertyPath);
+          console.log(element.title);
+        });
+      } else {
+        console.log(error.response.data.message);
+        setMessage(array => [...array, { type: 'info', input: 'message', message: error.response.data.message }])
+      }
     }
   }
 
@@ -184,7 +212,17 @@ const AdminRestaurant = ({RestaurantCSRFToken, ScheduleCSRFToken, ImageCSRFToken
       const data = await res.data
       setSchedule(data)
     } catch (error) {
-      console.log(error);
+      if (error.response.data.violations) {
+        const violation = error.response.data.violations
+        violation.forEach(element => {
+          console.log(element.propertyPath);
+          console.log(element.title);
+        });
+      } else if (error.response.data.message) {
+        console.log(error.response.data.message);
+      } else {
+
+      }
     }
   }
 
@@ -208,13 +246,17 @@ const AdminRestaurant = ({RestaurantCSRFToken, ScheduleCSRFToken, ImageCSRFToken
   })
 
   const [showModalImage, setShowModalImage] = useState(false)
-  
+
+
   return (
     <div className='admin_container'>
       <section>
         <h3>Information du Restaurant</h3>
+        <ShowApiResponse array={message} input={'message'} />
+
         <form className='info_form' onSubmit={(e) => {
           e.preventDefault()
+          setMessage([])
           updateRestaurant()
         }}>
           <div className='form_inputs'>
@@ -222,22 +264,36 @@ const AdminRestaurant = ({RestaurantCSRFToken, ScheduleCSRFToken, ImageCSRFToken
             <div className='addess_div'>
               <label htmlFor="address">Adresse :</label>
               <input type="text" name="address" id="address" value={restaurant.address} onChange={(e) => dispatch({ type: 'address', value: e.target.value })} />
+              <ShowApiResponse array={message} input={'address'} />
+
             </div>
             <div className='city_div'>
               <label htmlFor="city">Ville :</label>
               <input type="text" name="city" id="city" value={restaurant.city} onChange={(e) => dispatch({ type: 'city', value: e.target.value })} />
+              <ShowApiResponse array={message} input={'city'} />
+
+
             </div>
             <div className='postcode_div'>
               <label htmlFor="post_code">Code Postal :</label>
               <input type="number" name="post_code" id="post_code" value={restaurant.post_code} onChange={(e) => dispatch({ type: 'post_code', value: e.target.value })} />
+                    <ShowApiResponse array={message} input={'post_code'} />
+
+
             </div>
             <div className='phone_div'>
               <label htmlFor="phone">Numéro de téléphone :</label>
               <input type="tel" name="phone" id="phone" value={restaurant.phone} onChange={(e) => dispatch({ type: 'phone', value: e.target.value })} />
+              <ShowApiResponse array={message} input={'phone'} />
+
+
             </div>
             <div className='maxcapacity_div'>
               <label htmlFor="max_capacity">Capacité maximale :</label>
-              <input type="tel" name="max_capacity" id="max_capacity" value={restaurant.max_capacity} onChange={(e) => dispatch({ type: 'max_capacity', value: e.target.value })} />
+              <input type="number" name="max_capacity" id="max_capacity" value={restaurant.max_capacity} onChange={(e) => dispatch({ type: 'max_capacity', value: e.target.value })} />
+              <ShowApiResponse array={message} input={'max_capacity'} />
+
+
             </div>
           </div>
           <button type="submit" className='submit_button'>Sauvegarder</button>
@@ -277,7 +333,7 @@ const AdminRestaurant = ({RestaurantCSRFToken, ScheduleCSRFToken, ImageCSRFToken
       </section>
 
       <section>
-        <h3>Images de la page d'accueil</h3>
+        <h3>Images de la page d'accueil :</h3>
         <div className='image_showcase'>
           {imageCards}
         </div>

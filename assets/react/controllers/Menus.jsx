@@ -24,6 +24,7 @@ const Menus = () => {
     return (
       <div className='item' key={menu.id}>
         <div className='item_title'><h3>{menu.name}</h3></div>
+      <div className='item_body'>
 
         {
           menu.formulas.map(formula => {
@@ -38,6 +39,7 @@ const Menus = () => {
             )
           })
         }
+        </div>
       </div>
     )
   })

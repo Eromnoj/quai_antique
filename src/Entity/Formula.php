@@ -30,6 +30,7 @@ class Formula
     #[ORM\Column]
     #[Groups(['get_menu_with_formulas'])]
     #[Assert\NotBlank(message:"Vous devez préciser un prix")]
+    #[Assert\GreaterThan(value:0, message: "veuillez indiquer un nombre supérieur à {{ value }}")]
     private ?float $price = null;
 
     #[ORM\ManyToOne(inversedBy: 'formulas')]

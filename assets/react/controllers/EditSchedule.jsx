@@ -3,11 +3,13 @@ import React from 'react'
 import { useState } from 'react'
 import { useReducer } from 'react'
 import moment from 'moment/moment'
+import ShowApiResponse from './ShowApiResponse'
 
 const EditSchedule = ({ day, setEdit, token }) => {
 
-  const [showMessage, setShowMessage] = useState(false)
-  const [message, setMessage] = useState('')
+  // Display response from API
+  const [message, setMessage] = useState([])
+
   const initialSchedule = {
     id: day.id,
     day: day.day,
@@ -50,41 +52,58 @@ const EditSchedule = ({ day, setEdit, token }) => {
     try {
       const res = await axios.put(`/api/update/schedule/${day.id}`, schedule)
       const data = await res.data
-
-      setMessage(data.message)
-      setShowMessage(true)
-      setTimeout(()=> {
+      if (data.message) {
+        setMessage(array => [...array, { type: 'info', input: 'message', message: data.message }])
+      }
+      setTimeout(() => {
         window.location.reload(true)
-      },3000)
+      }, 1000)
     } catch (error) {
-      console.log(error.response.data.detail);
+      if (error.response.data.violations) {
+        const violation = error.response.data.violations
+        violation.forEach(element => {
+          setMessage(array => [...array, { type: 'error', input: element.propertyPath, message: element.title }])
+          console.log(element.propertyPath);
+          console.log(element.title);
+        });
+      } else {
+        console.log(error.response.data.message);
+      }
     }
   }
+  
   return (
     <div className='modal_window'>
       <div className='modal_container'>
         <div className='modal_header'><button className='close_button' onClick={setEdit}>Fermer</button></div>
         <div className='modal_body'>
-          {showMessage ? <p>{message}</p> : null}
+
+        <ShowApiResponse array={message} input={'message'} />
+
           <p>Changer les horaires de {day.day}</p>
           <form onSubmit={(e) => {
             e.preventDefault()
+            setMessage([])
             submitChange()
           }}>
             <div className='noon_schedule'>
               <p>Service du midi</p>
               <div>
                 <label htmlFor="noonStart">Début du service</label>
-                <input type="time" name="noonStart" id="noonStart" value={moment(schedule.noonStart).utcOffset(1).format('HH:mm')} onChange={(e)=> dispatch({type:'noonStart', value : e.target.value})} />
+                <input type="time" name="noonStart" id="noonStart" value={moment(schedule.noonStart).utcOffset(1).format('HH:mm')} onChange={(e) => dispatch({ type: 'noonStart', value: e.target.value })} />
+                <ShowApiResponse array={message} input={'noonStart'} />
+
               </div>
               <div>
-
                 <label htmlFor="noonEnd">Fin du service</label>
-                <input type="time" name="noonEnd" id="noonEnd" value={moment(schedule.noonEnd).utcOffset(1).format('HH:mm')} onChange={(e)=> dispatch({type:'noonEnd', value : e.target.value})} />
+                <input type="time" name="noonEnd" id="noonEnd" min={moment(schedule.noonStart).utcOffset(1).format('HH:mm')} value={moment(schedule.noonEnd).utcOffset(1).format('HH:mm')} onChange={(e) => dispatch({ type: 'noonEnd', value: e.target.value })} />
+                
+                <ShowApiResponse array={message} input={'noonEnd'} />
+
               </div>
               <div className='noonClosed_div'>
                 <label htmlFor="noonClosed">Cochez pour indiquer la fermeture de la salle</label>
-                <input type="checkbox" name="noonClosed" id="noonClosed" checked={schedule.noonClosed} onChange={(e)=> dispatch({type:'noonClosed', value : e.target.checked})} />
+                <input type="checkbox" name="noonClosed" id="noonClosed" checked={schedule.noonClosed} onChange={(e) => dispatch({ type: 'noonClosed', value: e.target.checked })} />
               </div>
 
             </div>
@@ -92,18 +111,19 @@ const EditSchedule = ({ day, setEdit, token }) => {
 
               <p>Service du soir</p>
               <div>
-
                 <label htmlFor="eveningStart">Début du service</label>
-                <input type="time" name="eveningStart" id="eveningStart" value={moment(schedule.eveningStart).utcOffset(1).format('HH:mm')} onChange={(e)=> dispatch({type:'eveningStart', value : e.target.value})}/>
+                <input type="time" name="eveningStart" id="eveningStart" value={moment(schedule.eveningStart).utcOffset(1).format('HH:mm')} onChange={(e) => dispatch({ type: 'eveningStart', value: e.target.value })} />
+                <ShowApiResponse array={message} input={'eveningStart'} />
+
               </div>
               <div>
-
                 <label htmlFor="eveningEnd">Fin du service</label>
-                <input type="time" name="eveningEnd" id="eveningEnd" value={moment(schedule.eveningEnd).utcOffset(1).format('HH:mm')} onChange={(e)=> dispatch({type:'eveningEnd', value : e.target.value})} />
+                <input type="time" name="eveningEnd" id="eveningEnd" value={moment(schedule.eveningEnd).utcOffset(1).format('HH:mm')} onChange={(e) => dispatch({ type: 'eveningEnd', value: e.target.value })} />
+                <ShowApiResponse array={message} input={'eveningEnd'} />
               </div>
               <div className='evening_closed_div'>
                 <label htmlFor="eveningClosed">Cochez pour indiquer la fermeture de la salle</label>
-                <input type="checkbox" name="eveningClosed" id="eveningClosed" checked={schedule.evening_closed} onChange={(e)=> dispatch({type:'eveningClosed', value : e.target.checked})} />
+                <input type="checkbox" name="eveningClosed" id="eveningClosed" checked={schedule.evening_closed} onChange={(e) => dispatch({ type: 'eveningClosed', value: e.target.checked })} />
               </div>
             </div>
             <input type="submit" value="Enregistrer" className='submit_button' />

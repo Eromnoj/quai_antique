@@ -26,6 +26,7 @@ class Category
     #[ORM\Column]
     #[Groups(['get_category_with_dishes', 'get_category', 'get_dishes'])]
     #[Assert\NotBlank(message:"Vous devez indiquer un rang pour l'ordre d'affichage")]
+    #[Assert\GreaterThan(value:0, message: "veuillez indiquer un nombre supérieur à {{ value }}")]
     private ?int $rank_display = null;
 
     #[ORM\OneToMany(mappedBy: 'category', targetEntity: Dish::class, orphanRemoval: true)]

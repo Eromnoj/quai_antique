@@ -30,6 +30,7 @@ class Dish
     #[ORM\Column]
     #[Groups(['get_category_with_dishes', 'get_dishes'])]
     #[Assert\NotBlank(message:"Vous devez préciser un prix")]
+    #[Assert\GreaterThan(value:0, message: "veuillez indiquer un nombre supérieur à {{ value }}")]
     private ?float $price = null;
 
     #[ORM\ManyToOne(inversedBy: 'dishes')]

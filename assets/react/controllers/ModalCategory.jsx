@@ -1,13 +1,16 @@
 import React from 'react'
-import { useReducer } from 'react'
+import { useReducer, useState } from 'react'
 import axios from 'axios'
+import ShowApiResponse from './ShowApiResponse'
 
 const ModalCategory = ({ cat, showEdit, token }) => {
-  console.log(token);
+   // Display response from API
+   const [message, setMessage] = useState([])
+
   const initialCategory = {
     id: cat ? cat.id : 0,
     name: cat ? cat.name : '',
-    rank_display: cat ? cat.rank_display : '',
+    rank_display: cat ? cat.rank_display : 0,
     token: token
   }
 
@@ -29,14 +32,24 @@ const ModalCategory = ({ cat, showEdit, token }) => {
       const res = cat ? await axios.put(url, category) : await axios.post(url, category)
 
       const data = await res.data
-
-      console.log(data.message);
-
+      if (data.message) {
+        setMessage(array => [...array, { type: 'info', input: 'message', message: data.message }])
+      }
       setTimeout(() => {
         window.location.reload(true)
-      },3000)
+      }, 1000)
     } catch (error) {
-      console.log(error);
+      if (error.response.data.violations) {
+        const violation = error.response.data.violations
+        violation.forEach(element => {
+          setMessage(array => [...array, { type: 'error', input: element.propertyPath, message: element.title }])
+          console.log(element.propertyPath);
+          console.log(element.title);
+        });
+      } else {
+        console.log(error.response.data.message);
+        setMessage(array => [...array, { type: 'info', input: 'message', message: error.response.data.message }])
+      }
     }
   }
   return (
@@ -44,18 +57,25 @@ const ModalCategory = ({ cat, showEdit, token }) => {
       <div className='modal_container'>
         <div className='modal_header'><button className='close_button' onClick={showEdit}>Fermer</button></div>
         <div className='modal_body'>
+        <ShowApiResponse array={message} input={'message'} />
+
           <form onSubmit={(e) => {
             e.preventDefault()
+            setMessage([])
             submitCategory()
           }}>
             <p>{cat ? `Modifier la catégorie` : 'Ajouter une catégorie'}</p>
             <div className='description_div'>
-              <label htmlFor="description">Changer le nom de la catégorie</label>
-              <input type="text" name="description" id="description" value={category.name} onChange={(e) => dispatch({type: 'name', value:e.target.value})} />
+              <label htmlFor="name">Changer le nom de la catégorie</label>
+              <input type="text" name="name" id="name" value={category.name} onChange={(e) => dispatch({type: 'name', value:e.target.value})} />
+              <ShowApiResponse array={message} input={'name'} />
+
             </div>
             <div className='description_div'>
               <label htmlFor="description">Changer le rang d'affichage</label>
               <input type="number" name="rank_display" id="rank_display" value={category.rank_display} onChange={(e) => dispatch({type: 'rank_display', value:e.target.value})} />
+              <ShowApiResponse array={message} input={'rank_display'} />
+
             </div>
             <input type="submit" value="Enregistrer" className='submit_button' />
           </form>

@@ -21,6 +21,7 @@ class Booking
 
     #[ORM\Column]
     #[Assert\NotBlank(message:"Vous devez indiquer un nombre de couverts")]
+    #[Assert\GreaterThan(value:0, message: "veuillez indiquer un nombre supérieur à {{ value }}")]
     private ?int $number = null;
 
     #[ORM\Column]
@@ -29,10 +30,11 @@ class Booking
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     #[Assert\NotBlank(message:"Veuillez choisir une date de réservation")]
+    #[Assert\GreaterThan(value:'today', message: "Veuillez choisir une date à partir d'aujourd'hui")]
     private ?\DateTimeInterface $date = null;
 
     #[ORM\Column(type: Types::TIME_MUTABLE)]
-    #[Assert\NotBlank(message:"Veuillez choisir une heure d'arriver")]
+    #[Assert\NotBlank(message:"Veuillez choisir une heure d'arrivée")]
     private ?\DateTimeInterface $time = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
@@ -40,6 +42,7 @@ class Booking
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(message:"Veuillez choisir un service")]
+    #[Assert\Choice(options:['midi', 'soir'], message: "Veuillez choisir un service")]
     private ?string $shift = null;
 
     public function getId(): ?int

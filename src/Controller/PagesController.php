@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use App\Repository\RestaurantRepository;
-use Symfony\Bridge\Twig\Attribute\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -11,11 +10,8 @@ use Symfony\Component\Routing\Annotation\Route;
 class PagesController extends AbstractController
 {
     #[Route('/', name: 'app_index')]
-    public function index(RestaurantRepository $restaurantRepository): Response
+    public function index(): Response
     {
-        $getRestaurantInfo = $restaurantRepository->findAll();
-
-        $info = $getRestaurantInfo[0];
         return $this->render('pages/index.html.twig');
     }
 

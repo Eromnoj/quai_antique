@@ -54,19 +54,33 @@ class BookingRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    public function getAvailable(string $date, string $shift) : array
+    public function getAvailable(string $date, string $shift): array
     {
         $qb = $this->createQueryBuilder('r')
-        ->andWhere('r.date = :date')
-        ->andWhere('r.shift = :shift')
-        ->select('SUM(r.number) as seats')
-        ->setParameters(new ArrayCollection([
-            new Parameter('date', $date),
-            new Parameter('shift', $shift)
-        ]));
+            ->andWhere('r.date = :date')
+            ->andWhere('r.shift = :shift')
+            ->select('SUM(r.number) as seats')
+            ->setParameters(new ArrayCollection([
+                new Parameter('date', $date),
+                new Parameter('shift', $shift)
+            ]));
 
         return $qb->getQuery()->getResult();
     }
+
+    public function findWithPagination(int $page, int $maxResult): array
+    {
+        
+        $firstResult = $page * $maxResult;
+        return $this->createQueryBuilder('b')
+            ->addOrderBy('b.date', 'ASC')
+            ->addOrderBy('b.time', 'ASC')
+            ->setFirstResult($firstResult)
+            ->setMaxResults($maxResult)
+            ->getQuery()
+            ->getResult();
+    }
+
     //    /**
     //     * @return Booking[] Returns an array of Booking objects
     //     */

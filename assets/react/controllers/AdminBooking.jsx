@@ -62,19 +62,25 @@ const AdminBooking = ({BookingCSRFToken}) => {
 
   const [bookings, setBookings] = useState([])
 
+  const [page, setPage] = useState(0)
+
+  const [max, setMax] = useState(10)
+
+  const [count, setCount] = useState(0)
   const getBookings = async () => {
     try {
-      const res = await axios.get('/api/booking')
+      const res = await axios.get(`/api/booking?page=${page}&max=${max}`)
       const data = await res.data
-      setBookings(data)
+      setCount(data.count)
+      setBookings(data.booking)
     } catch (error) {
       console.log(error);
     }
   }
-
+  
   useEffect(() => {
     getBookings()
-  },[])
+  },[page])
   
   const showBookings = bookings.map(booking=> {
     return (
@@ -105,7 +111,11 @@ const AdminBooking = ({BookingCSRFToken}) => {
           </tbody>
         </table>
         </div>
-
+        <div className='pagination'>
+          <button disabled={page === 0 ? true : false} onClick={() => setPage(prev => prev - 1)}><img src='../img/CaretLeft.png' /></button>
+          <p>{page + 1}</p>
+          <button onClick={() => setPage(prev => prev + 1)} disabled={count <= page * max + bookings.length ? true : false} ><img src='../img/CaretRight.png' /></button>
+        </div>
         <button className='submit_button' onClick={() => { setShowAddBooking(prev => !prev)}}>Ajouter une réservation</button>
         {showAddBooking ?
         <ModalBooking showEdit={() => setShowAddBooking(prev => !prev)} token={BookingCSRFToken} />

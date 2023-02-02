@@ -396,7 +396,7 @@ class ApiController extends AbstractController
                 Schedule::class,
                 'json'
             );
-            
+
             // Prevent to save incoherent schedule
             if($updateSchedule->getNoonStart() > $updateSchedule->getNoonEnd() || $updateSchedule->getEveningStart() > $updateSchedule->getEveningEnd()){
                 $content = [
@@ -1010,9 +1010,18 @@ class ApiController extends AbstractController
     public function get_booking(
         BookingRepository $bookingRepository,
         SerializerInterface $serializer,
-
+        Request $request
     ): JsonResponse {
-        $booking = $bookingRepository->findOrderByDate();
+
+        $count = count($bookingRepository->findAll());
+
+        $page = intval($request->query->get('page'));
+        $maxResults = intval($request->query->get('max'));
+
+        $booking = [
+            'count' => $count,
+            'booking' => $bookingRepository->findWithPagination($page, $maxResults)
+        ];
 
         $bookingJson = $serializer->serialize($booking, 'json', []);
         return new JsonResponse($bookingJson, Response::HTTP_OK, [], true);

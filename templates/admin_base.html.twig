@@ -7,10 +7,32 @@
   <div class="sidebar">
 			
       <ul class="sidebar_list">
-        <a href="{{path('app_admin_restaurant')}}"><li class="sidebar_item">Infos Restaurant</li></a>
-        <a href="{{path('app_admin_dishes')}}"><li class="sidebar_item">La Carte</li></a>
-        <a href="{{path('app_admin_menus')}}"><li class="sidebar_item">Les Menus</li></a>
-        <a href="{{path('app_admin_booking')}}"><li class="sidebar_item">Les Réservations</li></a>
+      {% set currentPath = app.request.attributes.get('_route') %}
+
+        <a href="{{path('app_admin_restaurant')}}"><li
+        {% if currentPath == 'app_admin_restaurant' %}
+          class="sidebar_item sidebar_active"
+          {% else %}
+          class="sidebar_item"
+        {% endif %}>Infos Restaurant</li></a>
+        <a href="{{path('app_admin_dishes')}}"><li
+        {% if currentPath == 'app_admin_dishes' %}
+          class="sidebar_item sidebar_active"
+          {% else %}
+          class="sidebar_item"
+        {% endif %}>La Carte</li></a>
+        <a href="{{path('app_admin_menus')}}"><li
+        {% if currentPath == 'app_admin_menus' %}
+          class="sidebar_item sidebar_active"
+          {% else %}
+          class="sidebar_item"
+        {% endif %}>Les Menus</li></a>
+        <a href="{{path('app_admin_booking')}}"><li
+        {% if currentPath == 'app_admin_booking' %}
+          class="sidebar_item sidebar_active"
+          {% else %}
+          class="sidebar_item"
+        {% endif %}>Les Réservations</li></a>
         <a href="{{path('app_logout')}}"><li class="sidebar_item disconnect">Déconnexion</li></a>
       </ul>
   </div>

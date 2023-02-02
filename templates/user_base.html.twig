@@ -5,10 +5,20 @@
 	<div class="user_body">
 		{% block sidebar %}
   <div class="sidebar">
-			
+			{% set currentPath = app.request.attributes.get('_route') %}
       <ul class="sidebar_list">
-        <a href="{{path('app_user_profil')}}"><li class="sidebar_item">Mon Profil</li></a>
-        <a href="{{path('app_user_account')}}"><li class="sidebar_item">Mon Compte</li></a>
+        <a href="{{path('app_user_profil')}}"><li
+        {% if currentPath == 'app_user_profil' %}
+          class="sidebar_item sidebar_active"
+          {% else %}
+          class="sidebar_item"
+        {% endif %}>Mon Profil</li></a>
+        <a href="{{path('app_user_account')}}"><li
+        {% if currentPath == 'app_user_account' %}
+          class="sidebar_item sidebar_active"
+          {% else %}
+          class="sidebar_item"
+        {% endif %}>Mon Compte</li></a>
         <a href="{{path('app_logout')}}"><li class="sidebar_item disconnect">Déconnexion</li></a>
       </ul>
   </div>

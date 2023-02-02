@@ -156,11 +156,13 @@
       justify-content: space-evenly;
 
       .delete {
+        margin: 5px;
         padding: 0px 10px;
         @include variables.button(50px, 230px, variables.$deep-chestnut, 7px, 20px);
       }
 
       .cancel_delete {
+        margin: 5px;
         padding: 0px 10px;
         @include variables.button(50px, 230px, variables.$rich-black-fogra-29, 7px, 20px);
 

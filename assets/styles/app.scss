@@ -13,7 +13,7 @@
 
 @import 'modal.scss';
 @import 'table.scss';
-
+@import 'messages.scss';
 @import url('https://fonts.googleapis.com/css2?family=Average+Sans&family=Karma:wght@300;400;500;600;700&family=Titillium+Web:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,200;1,300;1,400;1,600;1,700&display=swap');
 
 // CSS reset
@@ -107,6 +107,10 @@ header {
                     padding-right: 10px;
                     margin-top: 40px;
                     margin-bottom: 40px;
+                }
+                .link_active{
+                    filter: drop-shadow(0px 0px 1px variables.$green-crayola);
+                    color : variables.$green-crayola;
                 }
 
                 :hover {
@@ -226,8 +230,8 @@ footer {
                     .link_item {
                         margin-top: 0px;
                         margin-bottom: 0px;
-                        margin-left: 40px;
-                        margin-right: 40px;
+                        margin-left: 30px;
+                        margin-right: 30px;
                     }
                 }
             }

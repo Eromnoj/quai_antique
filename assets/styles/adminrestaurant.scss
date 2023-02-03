@@ -25,7 +25,18 @@
     font-size: 20px;
     display: flex;
     flex-direction: column;
-
+    .select_category_div {
+      align-self: center;
+      select {
+        margin-top: 35px;
+        width: 300px;
+        height: 45px;
+        border: solid 1px variables.$rich-black-fogra-29;
+        border-radius: 10px;
+        font-size: 20px;
+        text-align: center;
+      }
+    }
     .info_form {
       display: flex;
       flex-direction: column;

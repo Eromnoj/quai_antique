@@ -580,13 +580,32 @@ class ApiController extends AbstractController
     public function get_dishes(
         DishRepository $dishRepository,
         SerializerInterface $serializer,
-
+        Request $request,
+        CategoryRepository $categoryRepository
     ): JsonResponse {
-        $dish = $dishRepository->findAll();
+
+        $page = intval($request->query->get('page'));
+        $maxResults = intval($request->query->get('max'));
+        $categoryId =intval($request->query->get('category'));
+
+        if ($categoryId) {
+            $category = $categoryRepository->find($categoryId);
+            $count = count($dishRepository->findBy(['category' => $category]));
+            $dishList = $dishRepository->findByCategoryWithPagination($page, $maxResults, $categoryId);
+        } else {
+            $count = count($dishRepository->findAll());
+            $dishList = $dishRepository->findWithPagination($page, $maxResults);
+        }
+
+        $dish = [
+            'count' => $count,
+            'dish' => $dishList
+        ];
         $context = (new ObjectNormalizerContextBuilder())
             ->withGroups('get_dishes')
             ->toArray();
         $dishJson = $serializer->serialize($dish, 'json', $context);
+
         return new JsonResponse($dishJson, Response::HTTP_OK, [], true);
     }
 

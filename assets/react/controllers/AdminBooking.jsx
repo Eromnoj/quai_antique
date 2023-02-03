@@ -3,11 +3,13 @@ import ModalBooking from './ModalBooking'
 import axios from 'axios'
 import { useEffect } from 'react'
 import moment from 'moment/moment'
+import ShowApiResponse from './ShowApiResponse'
 
 const BookingRows = ({booking, token}) => {
 
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [showModalBooking, setShowModalBooking] = useState(false)
+  const [message, setMessage] = useState([])
 
   const deleteBooking = async (token) => {
     try {
@@ -17,18 +19,30 @@ const BookingRows = ({booking, token}) => {
         }
       })
       const data = await res.data
-
-      console.log(data);
-      setTimeout(()=> {
+      if (data.message) {
+        setMessage(array => [...array, { type: 'info', input: 'message', message: data.message }])
+      }
+      setTimeout(() => {
         window.location.reload(true)
-      },1000)
+      }, 1000)
     } catch (error) {
+      if (error.response.data.violations) {
+        const violation = error.response.data.violations
+        violation.forEach(element => {
+          setMessage(array => [...array, { type: 'error', input: element.propertyPath, message: element.title }])
+          console.log(element.propertyPath);
+          console.log(element.title);
+        });
+      } else {
+        console.log(error.response.data.message);
+        setMessage(array => [...array, { type: 'info', input: 'message', message: error.response.data.message }])
+      }
       console.log(error);
     }
   }
   return (
     <tr>
-      <td>{booking.lastname}</td>
+      <td onClick={() => { setShowModalBooking(prev => !prev) }}>{booking.lastname}</td>
       <td>{moment(booking.date).format('DD/MM/YYYY')}</td>
       <td>{moment(booking.time).utcOffset(1).format('HH:mm')}</td>
       <td className='end'>{booking.allergies}</td>
@@ -42,6 +56,7 @@ const BookingRows = ({booking, token}) => {
       {confirmDelete ?
               <div className='confirm_delete_window'>
                 <div className='confirm_delete_container'>
+                <ShowApiResponse array={message} input={'message'} />
                   <p>Voulez-vous vraiment supprimer la reservation de : {booking.lastname} ?</p>
                   <div className='delete_buttons'>
                     <button className='cancel_delete' onClick={() => setConfirmDelete(prev => !prev)}>Annuler</button>

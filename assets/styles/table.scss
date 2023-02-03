@@ -58,9 +58,14 @@
       background-color: variables.$ocean-green;
     }
     
-    tbody tr:nth-child(odd) {
-      background-color: variables.$middle-blue-green;
-    }
+    tbody {
+      tr:nth-child(odd) {
+        background-color: variables.$middle-blue-green;
+      }
+      tr:hover{
+        background-color: variables.$ocean-green ;
+      } 
+  }
   }
   
 }

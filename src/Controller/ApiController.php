@@ -398,7 +398,7 @@ class ApiController extends AbstractController
             );
 
             // Prevent to save incoherent schedule
-            if($updateSchedule->getNoonStart() > $updateSchedule->getNoonEnd() || $updateSchedule->getEveningStart() > $updateSchedule->getEveningEnd()){
+            if ($updateSchedule->getNoonStart() > $updateSchedule->getNoonEnd() || $updateSchedule->getEveningStart() > $updateSchedule->getEveningEnd()) {
                 $content = [
                     'message' => 'L\' heure de début ne peut pas être supérieur à l\'heure de fin.'
                 ];
@@ -717,7 +717,7 @@ class ApiController extends AbstractController
             $em->remove($dish);
             $em->flush();
             $content = [
-                'message' => 'Catégorie supprimée. Veuillez patienter pendant le rechargement de la page'
+                'message' => 'Plat supprimé. Veuillez patienter pendant le rechargement de la page'
             ];
             $responseJson = $serializer->serialize($content, 'json', []);
             return new JsonResponse($responseJson, Response::HTTP_OK, [], true);
@@ -1091,7 +1091,6 @@ class ApiController extends AbstractController
     ): JsonResponse {
         $requestArray = $request->toArray();
         $submittedToken = $requestArray['token'];
-        $userEmail = $requestArray['email'];
         if ($this->isCsrfTokenValid('booking', $submittedToken)) {
             $updateBooking = $serializer->deserialize(
                 $request->getContent(),
@@ -1109,7 +1108,7 @@ class ApiController extends AbstractController
 
             $seatsLeft = $maxCapacity - $seatsTaken;
 
-            if($seatsLeft - $number < 0) {
+            if ($seatsLeft - $number < 0) {
                 $content = [
                     'message' => 'Il \'a plus assez de place pour valider cette réservation'
                 ];
@@ -1135,26 +1134,28 @@ class ApiController extends AbstractController
             $em->flush();
 
             // Send confirmation email
-            $restaurantInfos = $restaurantRepository->findAll();
+            if ($requestArray['email']) {
+
+                $restaurantInfos = $restaurantRepository->findAll();
 
 
-            $email = (new TemplatedEmail())
-            ->from(new Address('j.moreschi@outlook.fr', 'Le Quai Antique'))
-            ->to($userEmail)
-            ->subject('Confirmation de réservation')
-            ->htmlTemplate('mail_templates/confirmbooking.html.twig')
-            ->context([
-                'name' => $updateBooking->getLastname(),
-                'date' => date_format($updateBooking->getDate(), 'c'),
-                'time' => date_format($updateBooking->getTime(), 'c'),
-                'tel' => $restaurantInfos[0]->getPhone(),
-            ])
-        ;
+                $email = (new TemplatedEmail())
+                    ->from(new Address('j.moreschi@outlook.fr', 'Le Quai Antique'))
+                    ->to($requestArray['email'])
+                    ->subject('Confirmation de réservation')
+                    ->htmlTemplate('mail_templates/confirmbooking.html.twig')
+                    ->context([
+                        'name' => $updateBooking->getLastname(),
+                        'date' => date_format($updateBooking->getDate(), 'c'),
+                        'time' => date_format($updateBooking->getTime(), 'c'),
+                        'tel' => $restaurantInfos[0]->getPhone(),
+                    ]);
 
-        $mailer->send($email);
+                $mailer->send($email);
+            }
 
             $content = [
-                "message" => "Votre réservation a bien été enregistrée. Vous recevrez sous peu un mail de réservation"
+                "message" => "Votre réservation a bien été enregistrée. Vous recevrez sous peu un mail de confirmation"
             ];
 
             $contentJson = $serializer->serialize($content, 'json', []);

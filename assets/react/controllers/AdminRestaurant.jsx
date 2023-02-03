@@ -11,7 +11,7 @@ const TableRow = ({ day, token }) => {
   return (
     <>
       <tr>
-        <td className="day">{day.day}</td>
+        <td className="day" onClick={() => {setShowEdit(prev => !prev)}}>{day.day}</td>
         {day.noonClosed ?
           <>
             <td></td>
@@ -36,10 +36,9 @@ const TableRow = ({ day, token }) => {
           </>
         }
         <td className='closed'>{day.eveningClosed ? 'x' : null}</td>
-        <td><div className='button_edit' onClick={() => {
-          setShowEdit(prev => !prev)
-
-        }}><img src="../img/Edit-alt.png" alt="edit" /></div>
+        <td>
+          <div className='button_edit' onClick={() => {setShowEdit(prev => !prev)}} >
+          <img src="../img/Edit-alt.png" alt="edit" /></div>
           {showEdit ? <EditSchedule day={day} token={token} setEdit={() => setShowEdit(prev => !prev)} /> : null}
 
         </td>
@@ -52,6 +51,7 @@ const ImageCard = ({ image, token }) => {
 
   const [showEdit, setShowEdit] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
+  const [message, setMessage] = useState([])
 
   const deleteImage = async (token) => {
     try {
@@ -60,13 +60,25 @@ const ImageCard = ({ image, token }) => {
           token
         }
       })
-
       const data = await res.data
+      if (data.message) {
+        setMessage(array => [...array, { type: 'info', input: 'message', message: data.message }])
+      }
       setTimeout(() => {
         window.location.reload(true)
-      },
-        1000)
+      }, 1000)
     } catch (error) {
+      if (error.response.data.violations) {
+        const violation = error.response.data.violations
+        violation.forEach(element => {
+          setMessage(array => [...array, { type: 'error', input: element.propertyPath, message: element.title }])
+          console.log(element.propertyPath);
+          console.log(element.title);
+        });
+      } else {
+        console.log(error.response.data.message);
+        setMessage(array => [...array, { type: 'info', input: 'message', message: error.response.data.message }])
+      }
       console.log(error);
     }
   }
@@ -90,6 +102,7 @@ const ImageCard = ({ image, token }) => {
       {confirmDelete ?
         <div className='confirm_delete_window'>
           <div className='confirm_delete_container'>
+                <ShowApiResponse array={message} input={'message'} />
             <p>Voulez-vous vraiment supprimer l'image {image.description} ?</p>
             <div className='delete_buttons'>
               <button className='cancel_delete' onClick={() => setConfirmDelete(prev => !prev)}>Annuler</button>

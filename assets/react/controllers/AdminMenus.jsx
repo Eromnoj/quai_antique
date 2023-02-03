@@ -3,10 +3,12 @@ import ModalMenu from './ModalMenu'
 import ModalFormula from './ModalFormula'
 import axios from 'axios'
 import { useEffect } from 'react'
+import ShowApiResponse from './ShowApiResponse'
 
 const FormulasRows = ({ formula, menuId, token }) => {
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [showModalFormula, setShowModalFormula] = useState(false)
+  const [message, setMessage] = useState([])
 
   const deleteFormula = async (token) => {
     try {
@@ -16,13 +18,25 @@ const FormulasRows = ({ formula, menuId, token }) => {
         }
       })
       const data = await res.data
-
-      console.log(data.message);
-      setTimeout(()=> {
+      if (data.message) {
+        setMessage(array => [...array, { type: 'info', input: 'message', message: data.message }])
+      }
+      setTimeout(() => {
         window.location.reload(true)
-      },1000)
+      }, 1000)
     } catch (error) {
-      
+      if (error.response.data.violations) {
+        const violation = error.response.data.violations
+        violation.forEach(element => {
+          setMessage(array => [...array, { type: 'error', input: element.propertyPath, message: element.title }])
+          console.log(element.propertyPath);
+          console.log(element.title);
+        });
+      } else {
+        console.log(error.response.data.message);
+        setMessage(array => [...array, { type: 'info', input: 'message', message: error.response.data.message }])
+      }
+      console.log(error);
     }
   }
   return (
@@ -40,6 +54,7 @@ const FormulasRows = ({ formula, menuId, token }) => {
       {confirmDelete ?
               <div className='confirm_delete_window'>
                 <div className='confirm_delete_container'>
+                <ShowApiResponse array={message} input={'message'} />
                   <p>Voulez-vous vraiment supprimer le menu : {formula.name} ?</p>
                   <div className='delete_buttons'>
                     <button className='cancel_delete' onClick={() => setConfirmDelete(prev => !prev)}>Annuler</button>
@@ -66,7 +81,7 @@ const MenuTables = ({ menu, tokenMenu, tokenFormula}) => {
 
   const [showModalMenu, setShowModalMenu] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
-
+  const [message, setMessage] = useState([])
   const [showModalFormula, setShowModalFormula] = useState(false)
 
   const deleteMenu = async (token) => {
@@ -77,12 +92,25 @@ const MenuTables = ({ menu, tokenMenu, tokenFormula}) => {
         }
       })
       const data = await res.data
-      console.log(data.message);
+      if (data.message) {
+        setMessage(array => [...array, { type: 'info', input: 'message', message: data.message }])
+      }
       setTimeout(() => {
         window.location.reload(true)
-      },[])
+      }, 1000)
     } catch (error) {
-      
+      if (error.response.data.violations) {
+        const violation = error.response.data.violations
+        violation.forEach(element => {
+          setMessage(array => [...array, { type: 'error', input: element.propertyPath, message: element.title }])
+          console.log(element.propertyPath);
+          console.log(element.title);
+        });
+      } else {
+        console.log(error.response.data.message);
+        setMessage(array => [...array, { type: 'info', input: 'message', message: error.response.data.message }])
+      }
+      console.log(error);
     }
   }
   return (
@@ -109,6 +137,7 @@ const MenuTables = ({ menu, tokenMenu, tokenFormula}) => {
             {confirmDelete ?
               <div className='confirm_delete_window'>
                 <div className='confirm_delete_container'>
+                <ShowApiResponse array={message} input={'message'} />
                   <p>Voulez-vous vraiment supprimer le menu : {menu.name} ?</p>
                   <div className='delete_buttons'>
                     <button className='cancel_delete' onClick={() => setConfirmDelete(prev => !prev)}>Annuler</button>

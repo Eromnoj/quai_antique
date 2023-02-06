@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Repository\ScheduleRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Response;
@@ -11,7 +12,7 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 class LoginController extends AbstractController
 {
     #[Route('/login', name: 'app_login')]
-    public function index(AuthenticationUtils $authenticationUtils): Response
+    public function index(AuthenticationUtils $authenticationUtils,ScheduleRepository $scheduleRepository): Response
     {
 
         // get the error login if there is ob_end_clean
@@ -20,9 +21,11 @@ class LoginController extends AbstractController
         //last username entered by the user_error
         $lastUsername = $authenticationUtils->getLastUsername();
 
+        $schedule = $scheduleRepository->findAll();
         return $this->render('login/index.html.twig', [
             'last_username' => $lastUsername,
-            'error' => $error
+            'error' => $error,
+            'schedule' => $schedule
         ]);
     }
 

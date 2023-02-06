@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Repository\RestaurantRepository;
+use App\Repository\ScheduleRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -10,27 +11,39 @@ use Symfony\Component\Routing\Annotation\Route;
 class PagesController extends AbstractController
 {
     #[Route('/', name: 'app_index')]
-    public function index(): Response
+    public function index(ScheduleRepository $scheduleRepository): Response
     {
-        return $this->render('pages/index.html.twig');
+        $schedule = $scheduleRepository->findAll();
+        return $this->render('pages/index.html.twig',[
+            'schedule' => $schedule
+        ]);
     }
 
     #[Route('/carte', name: 'app_dishes')]
-    public function dishes(): Response
+    public function dishes(ScheduleRepository $scheduleRepository): Response
     {
-        return $this->render('pages/dishes.html.twig');
+        $schedule = $scheduleRepository->findAll();
+        return $this->render('pages/dishes.html.twig',[
+            'schedule' => $schedule
+        ]);
     }
 
     #[Route('/menus', name: 'app_menus')]
-    public function menus(): Response
+    public function menus(ScheduleRepository $scheduleRepository): Response
     {
-        return $this->render('pages/menus.html.twig');
+        $schedule = $scheduleRepository->findAll();
+        return $this->render('pages/menus.html.twig',[
+            'schedule' => $schedule
+        ]);
     }
 
     #[Route('/reservation', name: 'app_booking')]
-    public function booking(): Response
+    public function booking(ScheduleRepository $scheduleRepository): Response
     {
-        return $this->render('pages/booking.html.twig');
+        $schedule = $scheduleRepository->findAll();
+        return $this->render('pages/booking.html.twig',[
+            'schedule' => $schedule
+        ]);
     }
 
 }

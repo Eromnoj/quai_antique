@@ -93,7 +93,37 @@
 			<footer>
 				<div class="schedule">
 					<p>Horaires d'ouverture</p>
-					<div {{ react_component('ScheduleBase')}}></div>
+						    <table>
+      <thead>
+        <tr>
+          <th></th>
+          <th>Midi</th>
+          <th>Soir</th>
+        </tr>
+      </thead>
+      <tbody>
+					{% for day in schedule %}
+        <tr>
+        <td>{{day.day}}</td>
+				{% if day.noonClosed %}
+					<td>Fermé</td>
+					{% else %}
+					<td>
+					{{day.noonStart|date("H:i", "Europe/Paris")}} {{day.noonEnd|date("H:i", "Europe/Paris")}} 
+					</td>
+				{% endif %}
+				{% if day.eveningClosed %}
+					<td>Fermé</td>
+					{% else %}
+					<td>
+					{{day.eveningStart|date("H:i", "Europe/Paris")}} {{day.eveningEnd|date("H:i", "Europe/Paris")}} 
+					</td>
+				{% endif %}
+      </tr>
+					{% endfor %}
+      </tbody>
+    </table>
+
 				</div>
 				<div class="site_map">
 					<div class="map">

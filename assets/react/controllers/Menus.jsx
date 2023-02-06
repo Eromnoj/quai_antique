@@ -22,7 +22,7 @@ const Menus = () => {
 
   const showMenus = menus.map(menu => {
     return (
-      <div className='item' key={menu.id}>
+      <div className='item' key={menu.id} style={{display: menu.formulas.length <= 0 ? 'none' : null}}>
         <div className='item_title'><h3>{menu.name}</h3></div>
       <div className='item_body'>
 

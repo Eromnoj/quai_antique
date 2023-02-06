@@ -19,6 +19,8 @@ use App\Repository\GalleryRepository;
 use App\Repository\MenuRepository;
 use App\Repository\RestaurantRepository;
 use App\Repository\ScheduleRepository;
+use DateTime;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
@@ -368,9 +370,41 @@ class ApiController extends AbstractController
     #[Route('/schedule', name: 'app_get_schedule', methods: ['GET'])]
     public function get_schedule(
         ScheduleRepository $scheduleRepository,
-        SerializerInterface $serializer
+        SerializerInterface $serializer,
+        EntityManagerInterface $em
     ): JsonResponse {
         $schedule = $scheduleRepository->findAll();
+
+        // This part prevent the schedule to be empty or not coherent, like missing days, or several same days or 
+        // If the schedule was not created with the fixtures...
+        if (count($schedule) < 7) {
+            // If the schedule table has less than 7 entries, it gets truncated... 
+            $connection = $em->getConnection();
+            $plateform = $connection->getDatabasePlatform();
+            $connection->executeQuery($plateform->getTruncateTableSQL('schedule', true));
+
+            //... Then filled with dummy values. Those values are the same of the AppFixtures
+            $days = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
+
+            $schedule = array();
+
+            for ($i = 0; $i < count($days); $i++) {
+                $schedule[$i] = new Schedule();
+
+                $schedule[$i]->setDay($days[$i]);
+                $i <= 4 ? $schedule[$i]->setNoonClosed(false) : $schedule[$i]->setNoonClosed(true);
+                $schedule[$i]->setNoonStart(new DateTime('11:00'));
+                $schedule[$i]->setNoonEnd(new DateTime('14:00'));
+                $i >= 4 && $i < 6 ? $schedule[$i]->setEveningClosed(false) : $schedule[$i]->setEveningClosed(true);
+                $schedule[$i]->setEveningStart(new DateTime('17:00'));
+                $schedule[$i]->setEveningEnd(new DateTime('21:00'));
+
+                $em->persist($schedule[$i]);
+                $em->flush();
+
+            }
+            $schedule = $scheduleRepository->findAll();
+        }
         $scheduleJson = $serializer->serialize($schedule, 'json', []);
 
         return new JsonResponse($scheduleJson, Response::HTTP_OK, [], true);
@@ -386,18 +420,16 @@ class ApiController extends AbstractController
     ): JsonResponse {
 
         $requestArray = $request->toArray();
-
         $submittedToken = $requestArray['token'];
 
         if ($this->isCsrfTokenValid('schedule', $submittedToken)) {
-
             $updateSchedule = $serializer->deserialize(
                 $request->getContent(),
                 Schedule::class,
                 'json'
             );
 
-            // Prevent to save incoherent schedule
+            // Prevent to save incoherent schedule with start shift hour later than end shift hour
             if ($updateSchedule->getNoonStart() > $updateSchedule->getNoonEnd() || $updateSchedule->getEveningStart() > $updateSchedule->getEveningEnd()) {
                 $content = [
                     'message' => 'L\' heure de début ne peut pas être supérieur à l\'heure de fin.'
@@ -586,7 +618,7 @@ class ApiController extends AbstractController
 
         $page = intval($request->query->get('page'));
         $maxResults = intval($request->query->get('max'));
-        $categoryId =intval($request->query->get('category'));
+        $categoryId = intval($request->query->get('category'));
 
         if ($categoryId) {
             $category = $categoryRepository->find($categoryId);

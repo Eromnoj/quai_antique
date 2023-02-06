@@ -6,6 +6,7 @@ use App\Entity\Client;
 use App\Entity\Restaurant;
 use App\Entity\User;
 use App\Form\RegistrationFormType;
+use App\Repository\RestaurantRepository;
 use App\Repository\ScheduleRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -23,7 +24,7 @@ class RegistrationController extends AbstractController
     UserPasswordHasherInterface $userPasswordHasher, 
     EntityManagerInterface $entityManager, 
     UserRepository $allUser,
-    ScheduleRepository $scheduleRepository,
+    ScheduleRepository $scheduleRepository, RestaurantRepository $restaurantRepository,
     Security $security): Response
     {
         $user = new User();
@@ -66,10 +67,12 @@ class RegistrationController extends AbstractController
                 return $this->redirectToRoute('app_user_profil');
             }
         }
+        $info = $restaurantRepository->findAll();
         $schedule = $scheduleRepository->findAll();
         return $this->render('registration/register.html.twig', [
             'registrationForm' => $form->createView(),
-            'schedule' => $schedule
+            'schedule' => $schedule,
+            'info' => $info[0]
         ]);
     }
 }

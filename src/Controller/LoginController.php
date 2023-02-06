@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Repository\RestaurantRepository;
 use App\Repository\ScheduleRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -12,7 +13,7 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 class LoginController extends AbstractController
 {
     #[Route('/login', name: 'app_login')]
-    public function index(AuthenticationUtils $authenticationUtils,ScheduleRepository $scheduleRepository): Response
+    public function index(AuthenticationUtils $authenticationUtils,ScheduleRepository $scheduleRepository, RestaurantRepository $restaurantRepository): Response
     {
 
         // get the error login if there is ob_end_clean
@@ -21,11 +22,13 @@ class LoginController extends AbstractController
         //last username entered by the user_error
         $lastUsername = $authenticationUtils->getLastUsername();
 
+        $info = $restaurantRepository->findAll();
         $schedule = $scheduleRepository->findAll();
         return $this->render('login/index.html.twig', [
             'last_username' => $lastUsername,
             'error' => $error,
-            'schedule' => $schedule
+            'schedule' => $schedule,
+            'info' => $info[0]
         ]);
     }
 

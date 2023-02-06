@@ -36,31 +36,13 @@
 					{% set currentPath = app.request.attributes.get('_route') %}
 					<ul class="link_list">
 						<a href="{{path('app_dishes')}}">
-							<li 
-							{% if currentPath == 'app_dishes' %}
-							class="link_active link_item"
-							{% else %}	
-							class="link_item"
-							{% endif %}
-							>La Carte</li>
+							<li {% if currentPath == 'app_dishes' %} class="link_active link_item" {% else %} class="link_item" {% endif %}>La Carte</li>
 						</a>
 						<a href="{{path('app_menus')}}">
-							<li 
-							{% if currentPath == 'app_menus' %}
-							class="link_active link_item"
-							{% else %}	
-							class="link_item"
-							{% endif %}
-							>Les Menus</li>
+							<li {% if currentPath == 'app_menus' %} class="link_active link_item" {% else %} class="link_item" {% endif %}>Les Menus</li>
 						</a>
 						<a href="{{path('login_success')}}">
-							<li 
-							{% if currentPath == 'app_login' or currentPath == 'app_register' or 'app_admin' in currentPath or 'app_user' in currentPath %}
-							class="link_active link_item"
-							{% else %}	
-							class="link_item"
-							{% endif %}
-							>Mon Compte</li>
+							<li {% if currentPath == 'app_login' or currentPath == 'app_register' or 'app_admin' in currentPath or 'app_user' in currentPath %} class="link_active link_item" {% else %} class="link_item" {% endif %}>Mon Compte</li>
 						</a>
 					</ul>
 
@@ -93,36 +75,38 @@
 			<footer>
 				<div class="schedule">
 					<p>Horaires d'ouverture</p>
-						    <table>
-      <thead>
-        <tr>
-          <th></th>
-          <th>Midi</th>
-          <th>Soir</th>
-        </tr>
-      </thead>
-      <tbody>
-					{% for day in schedule %}
-        <tr>
-        <td>{{day.day}}</td>
-				{% if day.noonClosed %}
-					<td>Fermé</td>
-					{% else %}
-					<td>
-					{{day.noonStart|date("H:i", "Europe/Paris")}} {{day.noonEnd|date("H:i", "Europe/Paris")}} 
-					</td>
-				{% endif %}
-				{% if day.eveningClosed %}
-					<td>Fermé</td>
-					{% else %}
-					<td>
-					{{day.eveningStart|date("H:i", "Europe/Paris")}} {{day.eveningEnd|date("H:i", "Europe/Paris")}} 
-					</td>
-				{% endif %}
-      </tr>
-					{% endfor %}
-      </tbody>
-    </table>
+					<table>
+						<thead>
+							<tr>
+								<th></th>
+								<th>Midi</th>
+								<th>Soir</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for day in schedule %}
+								<tr>
+									<td>{{day.day}}</td>
+									{% if day.noonClosed %}
+										<td>Fermé</td>
+									{% else %}
+										<td>
+											{{day.noonStart|date("H:i", "Europe/Paris")}}
+											{{day.noonEnd|date("H:i", "Europe/Paris")}}
+										</td>
+									{% endif %}
+									{% if day.eveningClosed %}
+										<td>Fermé</td>
+									{% else %}
+										<td>
+											{{day.eveningStart|date("H:i", "Europe/Paris")}}
+											{{day.eveningEnd|date("H:i", "Europe/Paris")}}
+										</td>
+									{% endif %}
+								</tr>
+							{% endfor %}
+						</tbody>
+					</table>
 
 				</div>
 				<div class="site_map">
@@ -150,7 +134,13 @@
 					</div>
 				</div>
 				<div class="address">
-					<div {{ react_component('AddressBase')}}></div>
+
+					<p>Le Quai Antique</p>
+					<p>{{info.address}}</p>
+					<p>{{info.postCode}}
+						{{info.city}}</p>
+					<p>tél :
+						{{info.phone}}</p>
 				</div>
 			</footer>
 		{% endblock %}

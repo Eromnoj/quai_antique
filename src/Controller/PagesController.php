@@ -11,38 +11,46 @@ use Symfony\Component\Routing\Annotation\Route;
 class PagesController extends AbstractController
 {
     #[Route('/', name: 'app_index')]
-    public function index(ScheduleRepository $scheduleRepository): Response
+    public function index(ScheduleRepository $scheduleRepository, RestaurantRepository $restaurantRepository): Response
     {
+        $info = $restaurantRepository->findAll();
         $schedule = $scheduleRepository->findAll();
         return $this->render('pages/index.html.twig',[
-            'schedule' => $schedule
+            'schedule' => $schedule,
+            'info' => $info[0]
         ]);
     }
 
     #[Route('/carte', name: 'app_dishes')]
-    public function dishes(ScheduleRepository $scheduleRepository): Response
+    public function dishes(ScheduleRepository $scheduleRepository, RestaurantRepository $restaurantRepository): Response
     {
+        $info = $restaurantRepository->findAll();
         $schedule = $scheduleRepository->findAll();
         return $this->render('pages/dishes.html.twig',[
-            'schedule' => $schedule
+            'schedule' => $schedule,
+            'info' => $info[0]
         ]);
     }
 
     #[Route('/menus', name: 'app_menus')]
-    public function menus(ScheduleRepository $scheduleRepository): Response
+    public function menus(ScheduleRepository $scheduleRepository, RestaurantRepository $restaurantRepository): Response
     {
+        $info = $restaurantRepository->findAll();
         $schedule = $scheduleRepository->findAll();
         return $this->render('pages/menus.html.twig',[
-            'schedule' => $schedule
+            'schedule' => $schedule,
+            'info' => $info[0]
         ]);
     }
 
     #[Route('/reservation', name: 'app_booking')]
-    public function booking(ScheduleRepository $scheduleRepository): Response
+    public function booking(ScheduleRepository $scheduleRepository, RestaurantRepository $restaurantRepository): Response
     {
+        $info = $restaurantRepository->findAll();
         $schedule = $scheduleRepository->findAll();
         return $this->render('pages/booking.html.twig',[
-            'schedule' => $schedule
+            'schedule' => $schedule,
+            'info' => $info[0]
         ]);
     }
 

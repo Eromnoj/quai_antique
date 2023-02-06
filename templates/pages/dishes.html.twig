@@ -4,5 +4,38 @@
 {% endblock %}
 
 {% block body %}
-		<div {{ react_component('Dishes', {'data': "l'autre test"} )}}></div>
+	<div class='dishes_container'>
+		<div class='page_title'>
+			<h2>La Carte</h2>
+		</div>
+		{% for category in categories %}
+			{% if category.dishes|length > 0 %}
+
+				<div class='category_container'>
+					<div class='category_title'>
+						<h3>{{category.name}}</h3>
+					</div>
+
+					<div class='category_items'>
+						{% for dish in category.dishes %}
+							<div class='item'>
+								<div class='item_name'>
+									{{dish.name}}
+								</div>
+								<div class='item_description'>
+									{{dish.description}}
+								</div>
+								<div class='item_price'>
+									{{dish.price}}
+									€
+								</div>
+							</div>
+
+						{% endfor %}
+					</div>
+				</div>
+			{% endif %}
+		{% endfor %}
+
+	</div>
 {% endblock %}

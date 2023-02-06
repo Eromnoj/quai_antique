@@ -15,11 +15,29 @@
 	</div>
 
 	<div class="home_content">
-		<div {{ react_component('Home', {'data': "l'autre test"} )}}></div>
 
-		<a href="{{path('app_booking')}}"><div class="booking_button">
-			<p>Réserver</p>
+		<div class="home_catch">
+			<p>La gourmandise est un vilain défaut...<br/>promis on ne dira rien</p>
 		</div>
+
+		<div class='home_gallery'>
+			{% for image in gallery %}
+				<div class='image_container' key={image.id}>
+					<div class='image'>
+						<img src="/img/{{image.url}}" alt="{{image.description}}"/>
+					</div>
+					<div class='description'>
+						<p>{{image.description}}</p>
+					</div>
+				</div>
+			{% endfor %}
+		</div>
+
+
+		<a href="{{path('app_booking')}}">
+			<div class="booking_button">
+				<p>Réserver</p>
+			</div>
 		</a>
 	</div>
 

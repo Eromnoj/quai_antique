@@ -146,6 +146,7 @@ main {
       text-decoration: none;
       justify-self: center;
       .booking_button {
+        margin-top: 35px;
         @include variables.button(50px, 250px, variables.$green-crayola, 12px, 20px)
       }
     }

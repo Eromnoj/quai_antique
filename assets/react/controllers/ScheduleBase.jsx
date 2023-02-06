@@ -17,7 +17,13 @@ const ScheduleBase = () => {
   }
 
   useEffect(() => {
-    getSchedule()
+    let ignore = false
+    if(!ignore){
+      getSchedule()
+    }
+    return () => {
+      ignore = true
+    }
   }, [])
   
   const showSchedule = schedule.map(day => {

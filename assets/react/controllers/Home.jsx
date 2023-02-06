@@ -18,7 +18,13 @@ const Home = () => {
     }
   }
   useEffect(()=>{
-    getGallery()
+    let ignore = false
+    if(!ignore){
+      getGallery()
+    }
+    return () => {
+      ignore = true
+    }
   }, [])
 
   const showGallery = gallery.map(image => {

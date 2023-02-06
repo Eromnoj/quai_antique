@@ -240,9 +240,15 @@ const AdminRestaurant = ({ RestaurantCSRFToken, ScheduleCSRFToken, ImageCSRFToke
   }
 
   useEffect(() => {
-    getGallery()
-    getRestaurant()
-    getSchedule()
+    let ignore = false
+    if(!ignore){
+      getGallery()
+      getRestaurant()
+      getSchedule()
+  }
+    return () => {
+      ignore = true
+    }
   }, [])
 
 

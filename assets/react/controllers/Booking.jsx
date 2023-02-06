@@ -1,7 +1,6 @@
-import React, { useEffect, useReducer } from 'react'
+import React, { useEffect, useReducer, useState } from 'react'
 import moment from 'moment/moment'
 import axios from 'axios'
-import { useState } from 'react'
 import ShowApiResponse from './ShowApiResponse'
 
 const Booking = ({ userEmail, userLastname, userFirstname, userAllergies, userPhone, userNumber, BookingCSRFToken }) => {
@@ -52,15 +51,17 @@ const Booking = ({ userEmail, userLastname, userFirstname, userAllergies, userPh
 
   const [state, dispatch] = useReducer(reducer, initialState)
 
+  const [confirmBooking, setConfirmBooking] = useState(false)
   const bookingSubmit = async () => {
     '/api/add/booking'
     try {
       const res = await axios.put('/api/add/booking', state)
       const data = await res.data
       if (data.message) {
+        setConfirmBooking(true)
         setMessage(array => [...array, { type: 'info', input: 'message', message: data.message }])
       }
-      
+
     } catch (error) {
       if (error.response.data.violations) {
         const violation = error.response.data.violations
@@ -71,14 +72,17 @@ const Booking = ({ userEmail, userLastname, userFirstname, userAllergies, userPh
         });
       } else {
         console.log(error.response.data.message);
-        setMessage(array => [...array, { type: 'error', input: 'message1', message: error.response.data.message }])
+        setMessage(array => [...array, { type: 'error', input: 'errorMessage', message: error.response.data.message }])
       }
     }
   }
 
+
+  /**
+  * Getting available seats depending on the shift chosen by the customer, with the schedule
+  */
   const [seatsLeft, setSeatsLeft] = useState(0)
   const [isShiftClosed, setIsShiftClosed] = useState(false)
-
   const [hourArray, setHourArray] = useState([])
 
   const getAvailableSeatsAndSchedule = async () => {
@@ -88,13 +92,15 @@ const Booking = ({ userEmail, userLastname, userFirstname, userAllergies, userPh
       setSeatsLeft(data.seatsLeft)
       setIsShiftClosed(data.shiftClosed)
 
+      /**
+       * Filling the array to map through, to create the options for the arrival hour
+       */
       let tempArray = []
       for (let i = moment(data.shiftStart).utcOffset(0); i <= moment(data.shiftEnd).utcOffset(0).subtract(1, 'h'); i = moment(i).add(15, 'm')) {
         tempArray.push(moment(i).utcOffset(1).format('HH:mm'));
       }
       setHourArray(tempArray)
 
-      // Make sure the time send to the the server is available
       dispatch({ type: 'time', value: moment(data.shiftStart).utcOffset(1).format('HH:mm') })
     } catch (error) {
       console.log(error);
@@ -102,7 +108,13 @@ const Booking = ({ userEmail, userLastname, userFirstname, userAllergies, userPh
   }
 
   useEffect(() => {
-    getAvailableSeatsAndSchedule()
+    let ignore = false
+    if (!ignore) {
+      getAvailableSeatsAndSchedule()
+    }
+    return () => {
+      ignore = true
+    }
   }, [state.date, state.shift])
 
 
@@ -114,6 +126,18 @@ const Booking = ({ userEmail, userLastname, userFirstname, userAllergies, userPh
       </ div>
     )
   })
+
+  // Show Confirmation
+  if (confirmBooking) {
+    return (
+      <div className='booking_container'>
+        <div className='booking_title'>
+          <h2>Réserver une table</h2>
+          <ShowApiResponse array={message} input={'message'} />
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className='booking_container'>
@@ -128,8 +152,7 @@ const Booking = ({ userEmail, userLastname, userFirstname, userAllergies, userPh
         window.scrollTo(0, 0);
         bookingSubmit()
       }}>
-        <ShowApiResponse array={message} input={'message'} />
-        <ShowApiResponse array={message} input={'message1'} />
+        <ShowApiResponse array={message} input={'errorMessage'} />
         <div className='booking_infos'>
           <div className='date_div'>
             <label htmlFor="date">Date : </label>

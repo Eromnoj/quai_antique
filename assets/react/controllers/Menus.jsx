@@ -17,7 +17,13 @@ const Menus = () => {
   }
 
   useEffect(() => {
-    getMenusWithFormulas()
+    let ignore = false
+    if(!ignore){
+      getMenusWithFormulas()
+    }
+    return () => {
+      ignore = true
+    }
   }, [])
 
   const showMenus = menus.map(menu => {

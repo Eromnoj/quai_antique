@@ -89,7 +89,13 @@ const UserAccount = ({userId, ProfilCSRFToken}) => {
     }
   }
   useEffect(() => {
-    getEmail()
+    let ignore = false
+    if(!ignore){
+      getEmail()
+    }
+    return () => {
+      ignore = true
+    }
   },[])
   return (
     <div className='user_container'>

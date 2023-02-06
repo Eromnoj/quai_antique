@@ -20,7 +20,13 @@ const Dishes = () => {
 
   }
   useEffect(() => {
-    getCategoriesWithDishes()
+    let ignore = false
+    if(!ignore){
+      getCategoriesWithDishes()
+    }
+    return () => {
+      ignore = true
+    }
   }, [])
 
   const showCategories = categories.map(category => {

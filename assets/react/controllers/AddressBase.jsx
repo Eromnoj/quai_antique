@@ -1,5 +1,4 @@
-import React from 'react'
-import { useEffect, useReducer } from 'react'
+import React, { useEffect, useReducer } from 'react'
 import axios from 'axios'
 
 const AddressBase = () => {
@@ -49,7 +48,13 @@ const AddressBase = () => {
   }
   
   useEffect(()=> {
-    getRestaurant()
+    let ignore = false
+    if(!ignore){
+      getRestaurant()
+    }
+    return () => {
+      ignore = true
+    }
   },[])
   return (
     <>

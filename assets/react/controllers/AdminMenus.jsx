@@ -192,7 +192,13 @@ const AdminMenus = ({MenuCSRFToken, FormulaCSRFToken }) => {
   }
 
   useEffect(()=> {
-    getMenus()
+    let ignore = false
+    if(!ignore){
+      getMenus()
+    }
+    return () => {
+      ignore = true
+    }
   },[])
  
   const [showModalMenu, setShowModalMenu] = useState(false)

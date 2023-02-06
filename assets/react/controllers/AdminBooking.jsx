@@ -93,8 +93,14 @@ const AdminBooking = ({BookingCSRFToken}) => {
     }
   }
   
-  useEffect(() => {
-    getBookings()
+  useEffect(()=> {
+    let ignore = false
+    if(!ignore){
+      getBookings()
+    }
+    return () => {
+      ignore = true
+    }
   },[page])
   
   const showBookings = bookings.map(booking=> {

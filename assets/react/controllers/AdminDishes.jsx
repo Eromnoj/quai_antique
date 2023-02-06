@@ -181,10 +181,23 @@ const AdminDishes = ({ CategoryCSRFToken, DishesCSRFToken }) => {
   }
 
   useEffect(() => {
-    getCategory()
+    let ignore = false
+    if(!ignore){
+      getCategory()
+    }
+    return () => {
+      ignore = true
+    }
   }, [])
+
   useEffect(() => {
-    getDish()
+    let ignore = false
+    if(!ignore){
+      getDish()
+    }
+    return () => {
+      ignore = true
+    }
   }, [page, categoryId])
 
 

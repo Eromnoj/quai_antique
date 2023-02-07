@@ -1,132 +1,19 @@
 import React, { useState, useEffect, useReducer } from 'react'
-import EditSchedule from './EditSchedule'
-import ModalImage from './ModalImage'
 import axios from 'axios'
-import moment from 'moment/moment'
-import ShowApiResponse from './ShowApiResponse'
 
-const TableRow = ({ day, token }) => {
-
-  const [showEdit, setShowEdit] = useState(false)
-  return (
-    <>
-      <tr>
-        <td className="day" onClick={() => {setShowEdit(prev => !prev)}}>{day.day}</td>
-        {day.noonClosed ?
-          <>
-            <td></td>
-            <td></td>
-          </>
-          :
-          <>
-            <td>{moment(day.noonStart).utcOffset(1).format('HH:mm')}</td>
-            <td>{moment(day.noonEnd).utcOffset(1).format('HH:mm')}</td>
-          </>
-        }
-        <td className='closed'>{day.noonClosed ? 'x' : null}</td>
-        {day.eveningClosed ?
-          <>
-            <td></td>
-            <td></td>
-          </>
-          :
-          <>
-            <td>{moment(day.eveningStart).utcOffset(1).format('HH:mm')}</td>
-            <td>{moment(day.eveningEnd).utcOffset(1).format('HH:mm')}</td>
-          </>
-        }
-        <td className='closed'>{day.eveningClosed ? 'x' : null}</td>
-        <td>
-          <div className='button_edit' onClick={() => {setShowEdit(prev => !prev)}} >
-          <img src="../img/Edit-alt.png" alt="edit" /></div>
-          {showEdit ? <EditSchedule day={day} token={token} setEdit={() => setShowEdit(prev => !prev)} /> : null}
-
-        </td>
-      </tr>
-    </>
-  )
-}
-
-const ImageCard = ({ image, token }) => {
-
-  const [showEdit, setShowEdit] = useState(false)
-  const [confirmDelete, setConfirmDelete] = useState(false)
-  const [message, setMessage] = useState([])
-
-  const deleteImage = async (token) => {
-    try {
-      const res = await axios.delete(`/api/delete/image/${image.id}`, {
-        data: {
-          token
-        }
-      })
-      const data = await res.data
-      if (data.message) {
-        setMessage(array => [...array, { type: 'info', input: 'message', message: data.message }])
-      }
-      setTimeout(() => {
-        window.location.reload(true)
-      }, 1000)
-    } catch (error) {
-      if (error.response.data.violations) {
-        const violation = error.response.data.violations
-        violation.forEach(element => {
-          setMessage(array => [...array, { type: 'error', input: element.propertyPath, message: element.title }])
-          console.log(element.propertyPath);
-          console.log(element.title);
-        });
-      } else {
-        console.log(error.response.data.message);
-        setMessage(array => [...array, { type: 'info', input: 'message', message: error.response.data.message }])
-      }
-      console.log(error);
-    }
-  }
-  return (
-    <>
-      <div className='card'>
-        <div className='card_image'>
-          <img src={`../img/${image.url}`} alt={image.description} />
-        </div>
-        <div className='card_description'>
-          <p>{image.description}</p>
-        </div>
-        <div className='card_buttons'>
-          <div className='button_edit' onClick={() => setShowEdit(prev => !prev)} > <img src="../img/Edit-alt.png" alt="edit" /> </div>
-          <div className='button_delete' onClick={() => setConfirmDelete(prev => !prev)}> <img src="../img/Trash.png" alt="delete" /></div>
-        </div>
-      </div>
-      {showEdit ?
-        <ModalImage image={image} token={token} showEdit={() => setShowEdit(prev => !prev)} />
-        : null}
-      {confirmDelete ?
-        <div className='confirm_delete_window'>
-          <div className='confirm_delete_container'>
-                <ShowApiResponse array={message} input={'message'} />
-            <p>Voulez-vous vraiment supprimer l'image {image.description} ?</p>
-            <div className='delete_buttons'>
-              <button className='cancel_delete' onClick={() => setConfirmDelete(prev => !prev)}>Annuler</button>
-              <button className='delete' onClick={() => {
-                // Manage deletion
-                deleteImage(token)
-              }
-              }>Supprimer</button>
-            </div>
-          </div>
-        </div> : null}
-    </>
-  )
-
-}
+import ModalImage from './components/modals/ModalImage'
+import ShowApiResponse from './components/ShowApiResponse'
+import ScheduleRow from './components/ScheduleRow'
+import ImageCard from './components/ImageCard'
 
 
 const AdminRestaurant = ({ RestaurantCSRFToken, ScheduleCSRFToken, ImageCSRFToken }) => {
 
-  // Display response from API
+  //const to store response from API
   const [message, setMessage] = useState([])
 
+  //const to store data from the Database
   const [schedule, setSchedule] = useState([])
-
   const [gallery, setGallery] = useState([])
 
   const initialState = {
@@ -159,112 +46,36 @@ const AdminRestaurant = ({ RestaurantCSRFToken, ScheduleCSRFToken, ImageCSRFToke
   }
   const [restaurant, dispatch] = useReducer(reducer, initialState)
 
-  const getRestaurant = async () => {
-    try {
-      const res = await axios.get('/api/restaurant')
-      const data = await res.data
-      dispatch({ type: 'id', value: data[0].id })
-      dispatch({ type: 'address', value: data[0].address })
-      dispatch({ type: 'city', value: data[0].city })
-      dispatch({ type: 'phone', value: data[0].phone })
-      dispatch({ type: 'post_code', value: data[0].post_code })
-      dispatch({ type: 'max_capacity', value: data[0].max_capacity })
-    } catch (error) {
-      console.log(error);
-    }
-  }
+  // Const to display or not the modal allowing to add an image
+  const [showModalImage, setShowModalImage] = useState(false)
 
-  const updateRestaurant = async () => {
-    try {
-      const res = await axios.put(`/api/update/restaurant/${restaurant.id}`, restaurant)
-      const data = await res.data
-      if (data.message) {
-        setMessage(array => [...array, { type: 'info', input: 'message', message: data.message }])
-      }
-      setTimeout(() => {
-        window.location.reload(true)
-      }, 1000)
-    } catch (error) {
-      if (error.response.data.violations) {
-        const violation = error.response.data.violations
-        violation.forEach(element => {
-          setMessage(array => [...array, { type: 'error', input: element.propertyPath, message: element.title }])
-          console.log(element.propertyPath);
-          console.log(element.title);
-        });
-      } else {
-        console.log(error.response.data.message);
-      }
-    }
-  }
-
-  const getGallery = async () => {
-    try {
-      const res = await axios.get('/api/gallery')
-
-      const data = await res.data
-      setGallery(data)
-    } catch (error) {
-      if (error.response.data.violations) {
-        const violation = error.response.data.violations
-        violation.forEach(element => {
-          console.log(element.propertyPath);
-          console.log(element.title);
-        });
-      } else {
-        console.log(error.response.data.message);
-        setMessage(array => [...array, { type: 'info', input: 'message', message: error.response.data.message }])
-      }
-    }
-  }
-
-  const getSchedule = async () => {
-    try {
-      const res = await axios.get('/api/schedule')
-
-      const data = await res.data
-      setSchedule(data)
-    } catch (error) {
-      if (error.response.data.violations) {
-        const violation = error.response.data.violations
-        violation.forEach(element => {
-          console.log(element.propertyPath);
-          console.log(element.title);
-        });
-      } else if (error.response.data.message) {
-        console.log(error.response.data.message);
-      } else {
-
-      }
-    }
-  }
-
+// Fetching data
   useEffect(() => {
     let ignore = false
     if(!ignore){
-      getGallery()
-      getRestaurant()
-      getSchedule()
+      getGallery(setGallery, setMessage)
+      getRestaurant(dispatch, setMessage)
+      getSchedule(setSchedule, setMessage)
   }
     return () => {
       ignore = true
     }
   }, [])
 
-
-  const tableRows = schedule.map(day => {
+  // Mapping through schedule datas to display rows
+  const ScheduleRows = schedule.map(day => {
     return (
-      <TableRow day={day} key={day.id} token={ScheduleCSRFToken} />
+      <ScheduleRow day={day} key={day.id} token={ScheduleCSRFToken} />
     )
   })
 
+  // Mapping through gallery datas to display cards
   const imageCards = gallery.map((image) => {
     return (
       <ImageCard image={image} key={image.id} token={ImageCSRFToken} />
     )
   })
 
-  const [showModalImage, setShowModalImage] = useState(false)
 
 
   return (
@@ -276,7 +87,7 @@ const AdminRestaurant = ({ RestaurantCSRFToken, ScheduleCSRFToken, ImageCSRFToke
         <form className='info_form' onSubmit={(e) => {
           e.preventDefault()
           setMessage([])
-          updateRestaurant()
+          updateRestaurant(restaurant, setMessage)
         }}>
           <div className='form_inputs'>
 
@@ -284,36 +95,32 @@ const AdminRestaurant = ({ RestaurantCSRFToken, ScheduleCSRFToken, ImageCSRFToke
               <label htmlFor="address">Adresse :</label>
               <input type="text" name="address" id="address" value={restaurant.address} onChange={(e) => dispatch({ type: 'address', value: e.target.value })} />
               <ShowApiResponse array={message} input={'address'} />
-
             </div>
+
             <div className='city_div'>
               <label htmlFor="city">Ville :</label>
               <input type="text" name="city" id="city" value={restaurant.city} onChange={(e) => dispatch({ type: 'city', value: e.target.value })} />
               <ShowApiResponse array={message} input={'city'} />
-
-
             </div>
+
             <div className='postcode_div'>
               <label htmlFor="post_code">Code Postal :</label>
               <input type="number" name="post_code" id="post_code" value={restaurant.post_code} onChange={(e) => dispatch({ type: 'post_code', value: e.target.value })} />
                     <ShowApiResponse array={message} input={'post_code'} />
-
-
             </div>
+
             <div className='phone_div'>
               <label htmlFor="phone">Numéro de téléphone :</label>
               <input type="tel" name="phone" id="phone" value={restaurant.phone} onChange={(e) => dispatch({ type: 'phone', value: e.target.value })} />
               <ShowApiResponse array={message} input={'phone'} />
-
-
             </div>
+
             <div className='maxcapacity_div'>
               <label htmlFor="max_capacity">Capacité maximale :</label>
               <input type="number" name="max_capacity" id="max_capacity" value={restaurant.max_capacity} onChange={(e) => dispatch({ type: 'max_capacity', value: e.target.value })} />
               <ShowApiResponse array={message} input={'max_capacity'} />
-
-
             </div>
+            
           </div>
           <button type="submit" className='submit_button'>Sauvegarder</button>
         </form>
@@ -321,10 +128,7 @@ const AdminRestaurant = ({ RestaurantCSRFToken, ScheduleCSRFToken, ImageCSRFToke
 
       <section>
         <h3>Modifier les horaires : </h3>
-
-
         <div className='div_table'>
-
           <table>
             <thead>
               <tr>
@@ -345,7 +149,7 @@ const AdminRestaurant = ({ RestaurantCSRFToken, ScheduleCSRFToken, ImageCSRFToke
               </tr>
             </thead>
             <tbody>
-              {tableRows}
+              {ScheduleRows}
             </tbody>
           </table>
         </div>
@@ -367,3 +171,73 @@ const AdminRestaurant = ({ RestaurantCSRFToken, ScheduleCSRFToken, ImageCSRFToke
 }
 
 export default AdminRestaurant
+
+// Getting and Setting function
+
+const getRestaurant = async (dispatch, setMessage) => {
+  try {
+    const res = await axios.get('/api/restaurant')
+    const data = await res.data
+    dispatch({ type: 'id', value: data[0].id })
+    dispatch({ type: 'address', value: data[0].address })
+    dispatch({ type: 'city', value: data[0].city })
+    dispatch({ type: 'phone', value: data[0].phone })
+    dispatch({ type: 'post_code', value: data[0].post_code })
+    dispatch({ type: 'max_capacity', value: data[0].max_capacity })
+  } catch (error) {
+    setMessage(array => [...array, { type: 'info', input: 'message', message: error.response.data.message }])
+  }
+}
+
+const updateRestaurant = async (restaurant, setMessage) => {
+  try {
+    const res = await axios.put(`/api/update/restaurant/${restaurant.id}`, restaurant)
+    const data = await res.data
+    if (data.message) {
+      setMessage(array => [...array, { type: 'info', input: 'message', message: data.message }])
+    }
+    setTimeout(() => {
+      window.location.reload(true)
+    }, 1000)
+  } catch (error) {
+    if (error.response.data.violations) {
+      const violation = error.response.data.violations
+      violation.forEach(element => {
+        setMessage(array => [...array, { type: 'error', input: element.propertyPath, message: element.title }])
+      });
+    } else {
+      setMessage(array => [...array, { type: 'info', input: 'message', message: error.response.data.message }])
+    }
+  }
+}
+
+const getGallery = async (setGallery, setMessage) => {
+  try {
+    const res = await axios.get('/api/gallery')
+
+    const data = await res.data
+    setGallery(data)
+  } catch (error) {
+    if (error.response.data.violations) {
+      const violation = error.response.data.violations
+      violation.forEach(element => {
+        console.log(element.propertyPath);
+        console.log(element.title);
+      });
+    } else {
+      console.log(error.response.data.message);
+      setMessage(array => [...array, { type: 'info', input: 'message', message: error.response.data.message }])
+    }
+  }
+}
+
+const getSchedule = async (setSchedule, setMessage) => {
+  try {
+    const res = await axios.get('/api/schedule')
+
+    const data = await res.data
+    setSchedule(data)
+  } catch (error) {
+    setMessage(array => [...array, { type: 'info', input: 'message', message: error.response.data.message }])
+  }
+}

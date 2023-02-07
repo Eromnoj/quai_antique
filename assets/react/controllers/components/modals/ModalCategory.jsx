@@ -1,7 +1,7 @@
 import React from 'react'
 import { useReducer, useState } from 'react'
 import axios from 'axios'
-import ShowApiResponse from './ShowApiResponse'
+import ShowApiResponse from '../ShowApiResponse'
 
 const ModalCategory = ({ cat, showEdit, token }) => {
    // Display response from API

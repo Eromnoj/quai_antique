@@ -1,6 +1,6 @@
 import axios from 'axios'
 import React, { useReducer, useState } from 'react'
-import ShowApiResponse from './ShowApiResponse'
+import ShowApiResponse from '../ShowApiResponse'
 
 const ModalDish = ({ dish, categories, showEdit, token }) => {
 

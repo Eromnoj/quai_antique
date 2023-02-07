@@ -3,7 +3,7 @@ import React from 'react'
 import { useState } from 'react'
 import { useEffect } from 'react'
 import { useReducer } from 'react'
-import ShowApiResponse from './ShowApiResponse'
+import ShowApiResponse from './components/ShowApiResponse'
 
 const UserAccount = ({userId, ProfilCSRFToken}) => {
 

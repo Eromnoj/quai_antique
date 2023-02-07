@@ -1,7 +1,7 @@
 import React, { useEffect, useReducer, useState } from 'react'
 import moment from 'moment/moment'
 import axios from 'axios'
-import ShowApiResponse from './ShowApiResponse'
+import ShowApiResponse from './components/ShowApiResponse'
 
 const Booking = ({ userEmail, userLastname, userFirstname, userAllergies, userPhone, userNumber, BookingCSRFToken }) => {
   // Display response from API

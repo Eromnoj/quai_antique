@@ -1,6 +1,6 @@
 import React, { useReducer, useState } from 'react'
 import axios from 'axios'
-import ShowApiResponse from './ShowApiResponse'
+import ShowApiResponse from '../ShowApiResponse'
 
 const ModalFormula = ({ menuId, formula, showEdit, token }) => {
   // Display response from API

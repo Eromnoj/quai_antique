@@ -2,7 +2,7 @@ import axios from 'axios';
 import React from 'react'
 import { useState } from 'react';
 import { useReducer } from 'react';
-import ShowApiResponse from './ShowApiResponse';
+import ShowApiResponse from './components/ShowApiResponse';
 
 const UserProfil = ({ userId, userLastname, userFirstname, userAllergies, userPhone, userNumber, ProfilCSRFToken }) => {
 

@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import axios from 'axios'
-import ShowApiResponse from './ShowApiResponse'
+import ShowApiResponse from '../ShowApiResponse'
 
 const ModalMenu = ({ menu, showEdit, token }) => {
   // Display response from API

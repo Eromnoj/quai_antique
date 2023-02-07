@@ -20,7 +20,6 @@ use App\Repository\MenuRepository;
 use App\Repository\RestaurantRepository;
 use App\Repository\ScheduleRepository;
 use DateTime;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
@@ -45,10 +44,13 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 #[Route('/api')]
 class ApiController extends AbstractController
 {
+    
     ///////////////////////
-    // PAGES CONTROLLERS //
+    // ADMIN CONTROLLERS //
     ///////////////////////
-
+    
+    // Gallery
+    ////////////
     #[Route('/gallery', name: 'app_get_gallery', methods: ['GET'])]
     public function gallery(GalleryRepository $galleryRepository, SerializerInterface $serializer): JsonResponse
     {
@@ -58,36 +60,6 @@ class ApiController extends AbstractController
         return new JsonResponse($responseJson, Response::HTTP_OK, [], true);
     }
 
-    #[Route('/category_with_dishes', name: 'app_get_category_with_formula', methods: ['GET'])]
-    public function category_with_dishes(CategoryRepository $categoryRepository, SerializerInterface $serializer): JsonResponse
-    {
-        $categories = $categoryRepository->findOrderByRank();
-        $context = (new ObjectNormalizerContextBuilder())
-            ->withGroups('get_category_with_dishes')
-            ->toArray();
-        $categoriesJson = $serializer->serialize($categories, 'json', $context);
-
-        return new JsonResponse($categoriesJson, Response::HTTP_OK, [], true);
-    }
-
-    #[Route('/menu_with_formulas', name: 'app_get_menu_with_formulas', methods: ['GET'])]
-    public function menu_with_formula(MenuRepository $menuRepository, SerializerInterface $serializer): JsonResponse
-    {
-        $menus = $menuRepository->findAll();
-        $context = (new ObjectNormalizerContextBuilder())
-            ->withGroups('get_menu_with_formulas')
-            ->toArray();
-        $menusJson = $serializer->serialize($menus, 'json', $context);
-
-        return new JsonResponse($menusJson, Response::HTTP_OK, [], true);
-    }
-
-    ///////////////////////
-    // ADMIN CONTROLLERS //
-    ///////////////////////
-
-    // Gallery
-    ////////////
     #[Route('/update/image/{id}', name: 'app_update_image', methods: ['POST'])]
     #[IsGranted('ROLE_ADMIN', message: 'Vous n\'avez pas les droits suffisants pour effectuer cette action')]
     public function update_image(
@@ -130,14 +102,14 @@ class ApiController extends AbstractController
                 $newFilename = $safeFilename . '-' . uniqid() . '.' . $updateImage->guessExtension();
                 try {
                     $updateImage->move(
-                        $this->getParameter('image_directory'),
+                        $this->getParameter('image_upload_directory'),
                         $newFilename
                     );
 
                     $filesystem = new Filesystem();
 
                     $oldImage = $image->getUrl();
-                    $filesystem->remove([$this->getParameter('image_directory') . '/' . $oldImage]);
+                    $filesystem->remove([$this->getParameter('image_upload_directory') . '/' . $oldImage]);
 
                     $image->setUrl($newFilename);
                 } catch (FileException $e) {
@@ -191,7 +163,7 @@ class ApiController extends AbstractController
             try {
                 $filesystem = new Filesystem();
 
-                $filesystem->remove([$this->getParameter('image_directory') . '/' . $imageUrl]);
+                $filesystem->remove([$this->getParameter('image_upload_directory') . '/' . $imageUrl]);
             } catch (FileException $e) {
                 // ... handle exception if something happens during file upload
                 $message = [
@@ -262,7 +234,7 @@ class ApiController extends AbstractController
                 $newFilename = $safeFilename . '-' . uniqid() . '.' . $updateImage->guessExtension();
                 try {
                     $updateImage->move(
-                        $this->getParameter('image_directory'),
+                        $this->getParameter('image_upload_directory'),
                         $newFilename
                     );
 
@@ -721,7 +693,6 @@ class ApiController extends AbstractController
             $dish->setName($updateDish->getName());
             $dish->setDescription($updateDish->getDescription());
             $dish->setPrice($updateDish->getPrice());
-
 
             $content = $request->toArray();
             $idCategory = $content['category'];

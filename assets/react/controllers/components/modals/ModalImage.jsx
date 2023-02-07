@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import axios from 'axios'
-import ShowApiResponse from './ShowApiResponse'
+import ShowApiResponse from '../ShowApiResponse'
 
 const ModalImage = ({ image, showEdit, token }) => {
 

@@ -1,7 +1,7 @@
 import React, { useReducer, useState } from 'react'
 import moment from 'moment/moment'
 import axios from 'axios'
-import ShowApiResponse from './ShowApiResponse'
+import ShowApiResponse from '../ShowApiResponse'
 
 const ModalBooking = ({ booking, showEdit, token }) => {
   // Display response from API

@@ -1,11 +1,9 @@
 import axios from 'axios'
-import React from 'react'
-import { useState } from 'react'
-import { useReducer } from 'react'
+import React, {useState, useReducer} from 'react'
 import moment from 'moment/moment'
-import ShowApiResponse from './ShowApiResponse'
+import ShowApiResponse from '../ShowApiResponse'
 
-const EditSchedule = ({ day, setEdit, token }) => {
+const ModalSchedule = ({ day, setEdit, token }) => {
 
   // Display response from API
   const [message, setMessage] = useState([])
@@ -47,7 +45,6 @@ const EditSchedule = ({ day, setEdit, token }) => {
 
   const [schedule, dispatch] = useReducer(scheduleReducer, initialSchedule)
 
-  console.log(schedule);
   const submitChange = async () => {
     try {
       const res = await axios.put(`/api/update/schedule/${day.id}`, schedule)
@@ -135,4 +132,4 @@ const EditSchedule = ({ day, setEdit, token }) => {
   )
 }
 
-export default EditSchedule
+export default ModalSchedule

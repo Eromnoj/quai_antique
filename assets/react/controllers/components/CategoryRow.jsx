@@ -1,44 +1,15 @@
 import React, {useState} from 'react'
-import axios from 'axios'
+import { deleteItem } from '../../utils/functions'
 
 import ModalCategory from './modals/ModalCategory'
 import ShowApiResponse from './ShowApiResponse'
 
-const CategoryRow = ({ category, token }) => {
+const CategoryRow = ({ category, token, getData}) => {
 
   const [showModalCategory, setShowModalCategory] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [message, setMessage] = useState([])
 
-  const deleteCategory = async (token) => {
-    try {
-      const res = await axios.delete(`/api/delete/categories/${category.id}`, {
-        data: {
-          token
-        }
-      })
-      const data = await res.data
-      if (data.message) {
-        setMessage(array => [...array, { type: 'info', input: 'message', message: data.message }])
-      }
-      setTimeout(() => {
-        window.location.reload(true)
-      }, 1000)
-    } catch (error) {
-      if (error.response.data.violations) {
-        const violation = error.response.data.violations
-        violation.forEach(element => {
-          setMessage(array => [...array, { type: 'error', input: element.propertyPath, message: element.title }])
-          console.log(element.propertyPath);
-          console.log(element.title);
-        });
-      } else {
-        console.log(error.response.data.message);
-        setMessage(array => [...array, { type: 'info', input: 'message', message: error.response.data.message }])
-      }
-      console.log(error);
-    }
-  }
   return (
     <tr>
       <td onClick={() => { setShowModalCategory(prev => !prev) }}>{category.name}</td>
@@ -49,7 +20,7 @@ const CategoryRow = ({ category, token }) => {
           <div className='button_delete' onClick={() => setConfirmDelete(prev => !prev)}> <img src="../img/Trash.png" alt="delete" /></div>
         </div>
         {showModalCategory ?
-          <ModalCategory cat={category} showEdit={() => { setShowModalCategory(prev => !prev) }} token={token} />
+          <ModalCategory cat={category} showEdit={() => { setShowModalCategory(prev => !prev) }} token={token} getData={() => {getData()}} />
           : null}
         {confirmDelete ?
           <div className='confirm_delete_window'>
@@ -60,7 +31,7 @@ const CategoryRow = ({ category, token }) => {
                 <button className='cancel_delete' onClick={() => setConfirmDelete(prev => !prev)}>Annuler</button>
                 <button className='delete' onClick={() => {
                   // Manage deletion
-                  deleteCategory(token)
+                  deleteItem(token,'/api/delete/categories/', category.id, setMessage, getData)
                 }
                 }>Supprimer</button>
               </div>

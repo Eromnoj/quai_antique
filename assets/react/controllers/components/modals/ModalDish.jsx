@@ -1,8 +1,8 @@
-import axios from 'axios'
 import React, { useReducer, useState } from 'react'
+import { submitItem } from '../../../utils/functions'
 import ShowApiResponse from '../ShowApiResponse'
 
-const ModalDish = ({ dish, categories, showEdit, token }) => {
+const ModalDish = ({ dish, categories, showEdit, token, getData }) => {
 
      // Display response from API
      const [message, setMessage] = useState([])
@@ -32,44 +32,21 @@ const ModalDish = ({ dish, categories, showEdit, token }) => {
 
   const [dishState, dispatch] = useReducer(reducer, initialState)
 
-  const submitDish = async ()=> {
-    const url = dish ? `/api/update/dishes/${dish.id}` : '/api/add/dishes'
-    try {
-      const res = dish ? await axios.put(url, dishState) : await axios.post(url, dishState)
-
-      const data = await res.data
-      if (data.message) {
-        setMessage(array => [...array, { type: 'info', input: 'message', message: data.message }])
-      }
-      setTimeout(() => {
-        window.location.reload(true)
-      }, 1000)
-    } catch (error) {
-      if (error.response.data.violations) {
-        const violation = error.response.data.violations
-        violation.forEach(element => {
-          setMessage(array => [...array, { type: 'error', input: element.propertyPath, message: element.title }])
-          console.log(element.propertyPath);
-          console.log(element.title);
-        });
-      } else {
-        console.log(error.response.data.message);
-        setMessage(array => [...array, { type: 'info', input: 'message', message: error.response.data.message }])
-      }
-    }
-  }
-  
   return (
     <div className='modal_window'>
       <div className='modal_container'>
-        <div className='modal_header'><button className='close_button' onClick={showEdit}>Fermer</button></div>
+        <div className='modal_header'><button className='close_button' 
+        onClick={() => {
+          getData()
+          showEdit()
+          }}>Fermer</button></div>
         <div className='modal_body'>
       <ShowApiResponse array={message} input={'message'} />
 
           <form onSubmit={(e)=> {
             e.preventDefault()
             setMessage([])
-            submitDish()
+            submitItem(dish, dishState, setMessage, getData, showEdit, 'dishes')
           }}>
           <p>{dish ? `Modifier ${dish.name}`: 'Ajouter un plat'}</p>
             <div className='name_div'>

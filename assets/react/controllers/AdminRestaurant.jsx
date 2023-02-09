@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useReducer } from 'react'
-import axios from 'axios'
 
+import { getRestaurant, updateRestaurant, getGallery, getSchedule } from '../utils/functions'
 import ModalImage from './components/modals/ModalImage'
 import ShowApiResponse from './components/ShowApiResponse'
 import ScheduleRow from './components/ScheduleRow'
@@ -65,14 +65,21 @@ const AdminRestaurant = ({ RestaurantCSRFToken, ScheduleCSRFToken, ImageCSRFToke
   // Mapping through schedule datas to display rows
   const ScheduleRows = schedule.map(day => {
     return (
-      <ScheduleRow day={day} key={day.id} token={ScheduleCSRFToken} />
+      <ScheduleRow day={day} key={day.id} token={ScheduleCSRFToken}
+      getData={()=> {
+        getSchedule(setSchedule, setMessage)
+      }} />
     )
   })
 
   // Mapping through gallery datas to display cards
   const imageCards = gallery.map((image) => {
     return (
-      <ImageCard image={image} key={image.id} token={ImageCSRFToken} />
+      <ImageCard image={image} key={image.id} token={ImageCSRFToken}
+      getData={()=> {
+        getGallery(setGallery, setMessage)
+      }}
+      />
     )
   })
 
@@ -87,7 +94,7 @@ const AdminRestaurant = ({ RestaurantCSRFToken, ScheduleCSRFToken, ImageCSRFToke
         <form className='info_form' onSubmit={(e) => {
           e.preventDefault()
           setMessage([])
-          updateRestaurant(restaurant, setMessage)
+          updateRestaurant(restaurant, setMessage, dispatch)
         }}>
           <div className='form_inputs'>
 
@@ -163,7 +170,11 @@ const AdminRestaurant = ({ RestaurantCSRFToken, ScheduleCSRFToken, ImageCSRFToke
         <button className='submit_button' onClick={() => setShowModalImage(prev => !prev)}>Ajouter une image</button>
       </section>
       {showModalImage ?
-        <ModalImage showEdit={() => setShowModalImage(prev => !prev)} token={ImageCSRFToken} />
+        <ModalImage showEdit={() => setShowModalImage(prev => !prev)} token={ImageCSRFToken} 
+        getData={() => {
+          getGallery(setGallery, setMessage)
+        }}
+        />
         : null}
 
     </div>
@@ -171,73 +182,3 @@ const AdminRestaurant = ({ RestaurantCSRFToken, ScheduleCSRFToken, ImageCSRFToke
 }
 
 export default AdminRestaurant
-
-// Getting and Setting function
-
-const getRestaurant = async (dispatch, setMessage) => {
-  try {
-    const res = await axios.get('/api/restaurant')
-    const data = await res.data
-    dispatch({ type: 'id', value: data[0].id })
-    dispatch({ type: 'address', value: data[0].address })
-    dispatch({ type: 'city', value: data[0].city })
-    dispatch({ type: 'phone', value: data[0].phone })
-    dispatch({ type: 'post_code', value: data[0].post_code })
-    dispatch({ type: 'max_capacity', value: data[0].max_capacity })
-  } catch (error) {
-    setMessage(array => [...array, { type: 'info', input: 'message', message: error.response.data.message }])
-  }
-}
-
-const updateRestaurant = async (restaurant, setMessage) => {
-  try {
-    const res = await axios.put(`/api/update/restaurant/${restaurant.id}`, restaurant)
-    const data = await res.data
-    if (data.message) {
-      setMessage(array => [...array, { type: 'info', input: 'message', message: data.message }])
-    }
-    setTimeout(() => {
-      window.location.reload(true)
-    }, 1000)
-  } catch (error) {
-    if (error.response.data.violations) {
-      const violation = error.response.data.violations
-      violation.forEach(element => {
-        setMessage(array => [...array, { type: 'error', input: element.propertyPath, message: element.title }])
-      });
-    } else {
-      setMessage(array => [...array, { type: 'info', input: 'message', message: error.response.data.message }])
-    }
-  }
-}
-
-const getGallery = async (setGallery, setMessage) => {
-  try {
-    const res = await axios.get('/api/gallery')
-
-    const data = await res.data
-    setGallery(data)
-  } catch (error) {
-    if (error.response.data.violations) {
-      const violation = error.response.data.violations
-      violation.forEach(element => {
-        console.log(element.propertyPath);
-        console.log(element.title);
-      });
-    } else {
-      console.log(error.response.data.message);
-      setMessage(array => [...array, { type: 'info', input: 'message', message: error.response.data.message }])
-    }
-  }
-}
-
-const getSchedule = async (setSchedule, setMessage) => {
-  try {
-    const res = await axios.get('/api/schedule')
-
-    const data = await res.data
-    setSchedule(data)
-  } catch (error) {
-    setMessage(array => [...array, { type: 'info', input: 'message', message: error.response.data.message }])
-  }
-}

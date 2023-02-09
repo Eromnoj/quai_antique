@@ -1,8 +1,7 @@
-import axios from 'axios';
-import React from 'react'
-import { useState } from 'react';
-import { useReducer } from 'react';
-import ShowApiResponse from './components/ShowApiResponse';
+import React, {useState, useReducer} from 'react'
+
+import { submitUserInfo } from '../utils/functions'
+import ShowApiResponse from './components/ShowApiResponse'
 
 const UserProfil = ({ userId, userLastname, userFirstname, userAllergies, userPhone, userNumber, ProfilCSRFToken }) => {
 
@@ -35,37 +34,16 @@ const UserProfil = ({ userId, userLastname, userFirstname, userAllergies, userPh
 
   const [userProfil, dispatch] = useReducer(userReducer, initialUser)
 
-  const submitUserInfo = async () => {
-    try {
-      const res = await axios.put(`/api/update/profil/${userId}`, userProfil)
-      const data = await res.data
-      if (data.message) {
-        setMessage(array => [...array, { type: 'info', input: 'message', message: data.message }])
-      }
-      setTimeout(() => {
-        window.location.reload(true)
-      }, 1000)
-    } catch (error) {
-      if (error.response.data.violations) {
-        const violation = error.response.data.violations
-        violation.forEach(element => {
-          setMessage(array => [...array, { type: 'error', input: element.propertyPath, message: element.title }])
-          console.log(element.propertyPath);
-          console.log(element.title);
-        });
-      } else {
-        console.log(error.response.data.message);
-      }
-    }
-  }
 
   return (
     <div className='user_container'>
       <h3>Mon profil</h3>
+      <ShowApiResponse array={message} input={'message'} />
+
       <form className='user_form' onSubmit={(e) => {
         e.preventDefault()
         setMessage([])
-        submitUserInfo()
+        submitUserInfo(userId, userProfil, setMessage)
       }}>
         <div className='lastName_div'>
           <label htmlFor="lastName">Votre nom :</label>

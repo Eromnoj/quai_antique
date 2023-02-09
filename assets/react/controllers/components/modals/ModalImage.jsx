@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form'
 import axios from 'axios'
 import ShowApiResponse from '../ShowApiResponse'
 
-const ModalImage = ({ image, showEdit, token }) => {
+const ModalImage = ({ image, showEdit, token, getData }) => {
 
   const {register, handleSubmit} = useForm()
 
@@ -28,8 +28,9 @@ const ModalImage = ({ image, showEdit, token }) => {
         setMessage(array => [...array, { type: 'info', input: 'message', message: data.message }])
       }
       setTimeout(() => {
-        window.location.reload(true)
-      }, 1000)
+        getData()
+        showEdit()
+      }, 2000)
     } catch (error) {
       if (error.response.data.violations) {
         const violation = error.response.data.violations
@@ -44,10 +45,16 @@ const ModalImage = ({ image, showEdit, token }) => {
       }
     }
   }
+
+
   return (
     <div className='modal_window'>
       <div className='modal_container'>
-        <div className='modal_header'><button className='close_button' onClick={showEdit}>Fermer</button></div>
+        <div className='modal_header'><button className='close_button' 
+        onClick={() => {
+          getData()
+          showEdit()
+          }}>Fermer</button></div>
         <div className='modal_body'>
         <ShowApiResponse array={message} input={'message'} />
 

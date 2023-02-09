@@ -1,9 +1,9 @@
 import React from 'react'
 import { useReducer, useState } from 'react'
-import axios from 'axios'
+import { submitItem } from '../../../utils/functions'
 import ShowApiResponse from '../ShowApiResponse'
 
-const ModalCategory = ({ cat, showEdit, token }) => {
+const ModalCategory = ({ cat, showEdit, token, getData }) => {
    // Display response from API
    const [message, setMessage] = useState([])
 
@@ -26,43 +26,21 @@ const ModalCategory = ({ cat, showEdit, token }) => {
   }
   const [category, dispatch] = useReducer(categoryReducer, initialCategory)
 
-  const submitCategory = async () => {
-    let url = cat ? `/api/update/categories/${category.id}` : '/api/add/categories'
-    try {
-      const res = cat ? await axios.put(url, category) : await axios.post(url, category)
-
-      const data = await res.data
-      if (data.message) {
-        setMessage(array => [...array, { type: 'info', input: 'message', message: data.message }])
-      }
-      setTimeout(() => {
-        window.location.reload(true)
-      }, 1000)
-    } catch (error) {
-      if (error.response.data.violations) {
-        const violation = error.response.data.violations
-        violation.forEach(element => {
-          setMessage(array => [...array, { type: 'error', input: element.propertyPath, message: element.title }])
-          console.log(element.propertyPath);
-          console.log(element.title);
-        });
-      } else {
-        console.log(error.response.data.message);
-        setMessage(array => [...array, { type: 'info', input: 'message', message: error.response.data.message }])
-      }
-    }
-  }
   return (
     <div className='modal_window'>
       <div className='modal_container'>
-        <div className='modal_header'><button className='close_button' onClick={showEdit}>Fermer</button></div>
+        <div className='modal_header'><button className='close_button' 
+        onClick={() => {
+          getData()
+          showEdit()
+          }}>Fermer</button></div>
         <div className='modal_body'>
         <ShowApiResponse array={message} input={'message'} />
 
           <form onSubmit={(e) => {
             e.preventDefault()
             setMessage([])
-            submitCategory()
+            submitItem(cat, category, setMessage, getData, showEdit, 'categories')
           }}>
             <p>{cat ? `Modifier la catégorie` : 'Ajouter une catégorie'}</p>
             <div className='description_div'>

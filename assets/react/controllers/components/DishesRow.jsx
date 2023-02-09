@@ -1,44 +1,14 @@
 import React, {useState} from 'react'
-import axios from 'axios'
+import { deleteItem } from '../../utils/functions'
 
 import ModalDish from './modals/ModalDish'
 import ShowApiResponse from './ShowApiResponse'
 
-const DishesRow = ({ dish, categories, token }) => {
+const DishesRow = ({ dish, categories, token, getData}) => {
 
   const [showModalDish, setShowModalDish] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [message, setMessage] = useState([])
-
-  const deleteDish = async (token) => {
-    try {
-      const res = await axios.delete(`/api/delete/dishes/${dish.id}`, {
-        data: {
-          token
-        }
-      })
-      const data = await res.data
-      if (data.message) {
-        setMessage(array => [...array, { type: 'info', input: 'message', message: data.message }])
-      }
-      setTimeout(() => {
-        window.location.reload(true)
-      }, 1000)
-    } catch (error) {
-      if (error.response.data.violations) {
-        const violation = error.response.data.violations
-        violation.forEach(element => {
-          setMessage(array => [...array, { type: 'error', input: element.propertyPath, message: element.title }])
-          console.log(element.propertyPath);
-          console.log(element.title);
-        });
-      } else {
-        console.log(error.response.data.message);
-        setMessage(array => [...array, { type: 'info', input: 'message', message: error.response.data.message }])
-      }
-      console.log(error);
-    }
-  }
 
   return (
     <tr>
@@ -52,7 +22,7 @@ const DishesRow = ({ dish, categories, token }) => {
           <div className='button_delete' onClick={() => setConfirmDelete(prev => !prev)}> <img src="../img/Trash.png" alt="delete" /></div>
         </div>
         {showModalDish ?
-          <ModalDish dish={dish} categories={categories} showEdit={() => { setShowModalDish(prev => !prev) }} token={token} />
+          <ModalDish dish={dish} categories={categories} showEdit={() => { setShowModalDish(prev => !prev) }} token={token} getData={getData}/>
           : null}
         {confirmDelete ?
           <div className='confirm_delete_window'>
@@ -63,7 +33,7 @@ const DishesRow = ({ dish, categories, token }) => {
                 <button className='cancel_delete' onClick={() => setConfirmDelete(prev => !prev)}>Annuler</button>
                 <button className='delete' onClick={() => {
                   // Manage deletion
-                  deleteDish(token)
+                  deleteItem(token, '/api/delete/dishes/', dish.id, setMessage, getData)
                 }
                 }>Supprimer</button>
               </div>
@@ -75,3 +45,6 @@ const DishesRow = ({ dish, categories, token }) => {
 }
 
 export default DishesRow
+
+
+

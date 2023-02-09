@@ -3,9 +3,10 @@ import moment from 'moment/moment'
 
 import ModalSchedule from './modals/ModalSchedule'
 
-const ScheduleRow = ({ day, token }) => {
+const ScheduleRow = ({ day, token, getData }) => {
 
   const [showEdit, setShowEdit] = useState(false)
+  
   return (
     <>
       <tr>
@@ -37,7 +38,11 @@ const ScheduleRow = ({ day, token }) => {
         <td>
           <div className='button_edit' onClick={() => {setShowEdit(prev => !prev)}} >
           <img src="../img/Edit-alt.png" alt="edit" /></div>
-          {showEdit ? <ModalSchedule day={day} token={token} setEdit={() => setShowEdit(prev => !prev)} /> : null}
+          {showEdit ? 
+          <ModalSchedule day={day} token={token} showEdit={() => setShowEdit(prev => !prev)} 
+          getData={getData}
+          /> 
+          : null}
 
         </td>
       </tr>

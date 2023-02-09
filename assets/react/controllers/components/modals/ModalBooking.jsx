@@ -1,9 +1,10 @@
 import React, { useReducer, useState } from 'react'
 import moment from 'moment/moment'
-import axios from 'axios'
+import {submitItem} from '../../../utils/functions'
+
 import ShowApiResponse from '../ShowApiResponse'
 
-const ModalBooking = ({ booking, showEdit, token }) => {
+const ModalBooking = ({ booking, showEdit, token, getData }) => {
   // Display response from API
   const [message, setMessage] = useState([])
 
@@ -15,7 +16,8 @@ const ModalBooking = ({ booking, showEdit, token }) => {
     phone: booking ? booking.phone : '',
     shift: booking ? booking.shift : '',
     number: booking ? booking.number : 0,
-    token: token
+    token: token,
+    email: null
   }
 
   const reducer = (state, action) => {
@@ -43,44 +45,22 @@ const ModalBooking = ({ booking, showEdit, token }) => {
 
   const [state, dispatch] = useReducer(reducer, initialState)
 
-  const bookingSubmit = async () => {
-    let url = booking ? `/api/update/booking/${booking.id}` : '/api/add/booking'
-    try {
-      const res = booking ? await axios.put(url, state) : await axios.put(url, state)
-      const data = await res.data
-      if (data.message) {
-        setMessage(array => [...array, { type: 'info', input: 'message', message: data.message }])
-      }
-      setTimeout(() => {
-        window.location.reload(true)
-      }, 1000)
-    } catch (error) {
-      if (error.response.data.violations) {
-        const violation = error.response.data.violations
-        violation.forEach(element => {
-          setMessage(array => [...array, { type: 'error', input: element.propertyPath, message: element.title }])
-          console.log(element.propertyPath);
-          console.log(element.title);
-        });
-      } else {
-        console.log(error.response.data.message);
-        setMessage(array => [...array, { type: 'info', input: 'message', message: error.response.data.message }])
-      }
-      console.log(error);
-    }
-  }
 
   return (
     <div className='modal_window'>
       <div className='modal_container'>
-        <div className='modal_header'><button className='close_button' onClick={showEdit}>Fermer</button></div>
+        <div className='modal_header'><button className='close_button' 
+        onClick={() => {
+          getData()
+          showEdit()
+          }}>Fermer</button></div>
         <div className='modal_body'>
           <ShowApiResponse array={message} input={'message'} />
 
           <form onSubmit={(e) => {
             e.preventDefault()
             setMessage([])
-            bookingSubmit()
+            submitItem(booking, state, setMessage, getData, showEdit, 'booking')
           }}>
             <p>{booking ? `Modifier la réservation de ${booking.lastname}` : 'Ajouter une réservation'}</p>
             <div className='lastname_div'>

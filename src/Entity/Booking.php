@@ -41,7 +41,6 @@ class Booking
     private ?string $allergies = null;
 
     #[ORM\Column(length: 255)]
-    #[Assert\NotBlank(message:"Veuillez choisir un service")]
     #[Assert\Choice(options:['midi', 'soir'], message: "Veuillez choisir un service")]
     private ?string $shift = null;
 

@@ -1,9 +1,9 @@
-import axios from 'axios'
 import React, {useState, useReducer} from 'react'
 import moment from 'moment/moment'
+import { submitItem } from '../../../utils/functions'
 import ShowApiResponse from '../ShowApiResponse'
 
-const ModalSchedule = ({ day, setEdit, token }) => {
+const ModalSchedule = ({ day, showEdit, token, getData }) => {
 
   // Display response from API
   const [message, setMessage] = useState([])
@@ -45,35 +45,15 @@ const ModalSchedule = ({ day, setEdit, token }) => {
 
   const [schedule, dispatch] = useReducer(scheduleReducer, initialSchedule)
 
-  const submitChange = async () => {
-    try {
-      const res = await axios.put(`/api/update/schedule/${day.id}`, schedule)
-      const data = await res.data
-      if (data.message) {
-        setMessage(array => [...array, { type: 'info', input: 'message', message: data.message }])
-      }
-      setTimeout(() => {
-        window.location.reload(true)
-      }, 1000)
-    } catch (error) {
-      if (error.response.data.violations) {
-        const violation = error.response.data.violations
-        violation.forEach(element => {
-          setMessage(array => [...array, { type: 'error', input: element.propertyPath, message: element.title }])
-          console.log(element.propertyPath);
-          console.log(element.title);
-        });
-      } else {
-        setMessage(array => [...array, { type: 'error', input: 'message', message: error.response.data.message }])
-        console.log(error.response.data.message);
-      }
-    }
-  }
   
   return (
     <div className='modal_window'>
       <div className='modal_container'>
-        <div className='modal_header'><button className='close_button' onClick={setEdit}>Fermer</button></div>
+        <div className='modal_header'><button className='close_button' 
+        onClick={() => {
+          getData()
+          showEdit()
+          }}>Fermer</button></div>
         <div className='modal_body'>
 
         <ShowApiResponse array={message} input={'message'} />
@@ -82,7 +62,7 @@ const ModalSchedule = ({ day, setEdit, token }) => {
           <form onSubmit={(e) => {
             e.preventDefault()
             setMessage([])
-            submitChange()
+            submitItem(day, schedule, setMessage, getData, showEdit, 'schedule')
           }}>
             <div className='noon_schedule'>
               <p>Service du midi</p>

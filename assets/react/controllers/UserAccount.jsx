@@ -1,8 +1,6 @@
-import axios from 'axios'
-import React from 'react'
-import { useState } from 'react'
-import { useEffect } from 'react'
-import { useReducer } from 'react'
+import React, {useState, useEffect, useReducer} from 'react'
+
+import { getEmail, deleteClient, updateClient } from '../utils/functions'
 import ShowApiResponse from './components/ShowApiResponse'
 
 const UserAccount = ({userId, ProfilCSRFToken}) => {
@@ -32,78 +30,24 @@ const UserAccount = ({userId, ProfilCSRFToken}) => {
 
   const [user, dispatch] = useReducer(userReducer, initialUser)
 
-  const getEmail = async () => {
-    try {
-      const res = await axios.get(`/api/get/client/${userId}`)
-      const data = await res.data
-      dispatch({type: 'email', value: data.email })
-    } catch (error) {
-      console.log(error)
-    }
-  }
 
-  const updateClient = async () => {
-    try {
-      const res = await axios.put(`/api/update/client/${userId}`, user)
-      const data = await res.data
-      console.log(data);
-      if (data.message) {
-        setMessage(array => [...array, { type: 'info', input: 'message1', message: data.message }])
-      }
-      setTimeout(() => {
-        window.location.reload(true)
-      }, 1000)
-    } catch (error) {
-      if (error.response.data.violations) {
-        const violation = error.response.data.violations
-        violation.forEach(element => {
-          setMessage(array => [...array, { type: 'error', input: element.propertyPath, message: element.title }])
-          console.log(element.propertyPath);
-          console.log(element.title);
-        });
-      } else {
-        console.log(error.response.data.message);
-        setMessage(array => [...array, { type: 'error', input: 'message1', message: error.response.data.message }])
-
-      }
-    }
-  }
-
-  const deleteClient = async (token) => {
-    const body = {
-      password: deletePassword,
-      token: token
-    }
-    console.log(body);
-    try {
-      const res = await axios.delete(`/api/delete/client/${userId}`, {
-        
-        data: body
-      })
-
-      const data = await res.data
-      window.location.replace('/')
-    } catch (error) {
-      console.log(error);
-      setMessage(array => [...array, { type: 'error', input: 'message2', message: error.response.data.message }])
-    }
-  }
   useEffect(() => {
     let ignore = false
     if(!ignore){
-      getEmail()
+      getEmail(userId, dispatch)
     }
     return () => {
       ignore = true
     }
   },[])
+
   return (
     <div className='user_container'>
       <h3>Gérer mon compte</h3>
     <form className='user_form' onSubmit={(e)=> {
       e.preventDefault()
       setMessage([])
-      updateClient()
+      updateClient(userId, user, setMessage, dispatch, setDeletePassword)
     }}>
       <ShowApiResponse array={message} input={'message1'} />
       <div className='email_div'>
@@ -125,7 +69,7 @@ const UserAccount = ({userId, ProfilCSRFToken}) => {
     <form className='user_form margin_password' onSubmit={(e)=> {
       e.preventDefault()
       setMessage([])
-      deleteClient(ProfilCSRFToken)
+      deleteClient(deletePassword, ProfilCSRFToken, userId, setMessage)
     }}>
       <ShowApiResponse array={message} input={'message2'} />
 

@@ -133,7 +133,7 @@ class ApiController extends AbstractController
             $em->persist($image);
             $em->flush();
             $content = [
-                'message' => 'Changement sauvegardé. Veuillez patienter pendant le rechargement de la page'
+                'message' => 'Changement sauvegardé. '
             ];
             $responseJson = $serializer->serialize($content, 'json', []);
             return new JsonResponse($responseJson, Response::HTTP_OK, [], true);
@@ -179,7 +179,7 @@ class ApiController extends AbstractController
             $em->remove($image);
             $em->flush();
             $content = [
-                'message' => 'Image supprimée. Veuillez patienter pendant le rechargement de la page'
+                'message' => 'Image supprimée. '
             ];
             $responseJson = $serializer->serialize($content, 'json', []);
             return new JsonResponse($responseJson, Response::HTTP_OK, [], true);
@@ -261,7 +261,7 @@ class ApiController extends AbstractController
             $em->persist($image);
             $em->flush();
             $content = [
-                'message' => 'Changement sauvegardé. Veuillez patienter pendant le rechargement de la page'
+                'message' => 'Changement sauvegardé. '
             ];
             $responseJson = $serializer->serialize($content, 'json', []);
             return new JsonResponse($responseJson, Response::HTTP_OK, [], true);
@@ -420,7 +420,7 @@ class ApiController extends AbstractController
             $em->persist($schedule);
             $em->flush();
             $content = [
-                "message" => "Changement sauvegardé. Veuillez patienter pendant le chargement de la page"
+                "message" => "Changement sauvegardé. "
             ];
 
             $contentJson = $serializer->serialize($content, 'json', []);
@@ -487,7 +487,7 @@ class ApiController extends AbstractController
             $em->persist($category);
             $em->flush();
             $content = [
-                "message" => "Changement sauvegardé. Veuillez patienter pendant le chargement de la page"
+                "message" => "Changement sauvegardé. "
             ];
 
             $contentJson = $serializer->serialize($content, 'json', []);
@@ -518,7 +518,7 @@ class ApiController extends AbstractController
             $em->remove($category);
             $em->flush();
             $content = [
-                'message' => 'Catégorie supprimée. Veuillez patienter pendant le rechargement de la page'
+                'message' => 'Catégorie supprimée. '
             ];
             $responseJson = $serializer->serialize($content, 'json', []);
             return new JsonResponse($responseJson, Response::HTTP_OK, [], true);
@@ -564,7 +564,7 @@ class ApiController extends AbstractController
             $em->persist($category);
             $em->flush();
             $content = [
-                "message" => "Catégorie ajoutée. Veuillez patienter pendant le chargement de la page"
+                "message" => "Catégorie ajoutée. "
             ];
 
             $contentJson = $serializer->serialize($content, 'json', []);
@@ -653,7 +653,7 @@ class ApiController extends AbstractController
             $em->flush();
 
             $content = [
-                "message" => "Changement sauvegardé. Veuillez patienter pendant le chargement de la page"
+                "message" => "Changement sauvegardé. "
             ];
 
             $contentJson = $serializer->serialize($content, 'json', []);
@@ -708,7 +708,7 @@ class ApiController extends AbstractController
             $em->flush();
 
             $content = [
-                "message" => "Changement sauvegardé. Veuillez patienter pendant le chargement de la page"
+                "message" => "Changement sauvegardé. "
             ];
 
             $contentJson = $serializer->serialize($content, 'json', []);
@@ -739,7 +739,7 @@ class ApiController extends AbstractController
             $em->remove($dish);
             $em->flush();
             $content = [
-                'message' => 'Plat supprimé. Veuillez patienter pendant le rechargement de la page'
+                'message' => 'Plat supprimé. '
             ];
             $responseJson = $serializer->serialize($content, 'json', []);
             return new JsonResponse($responseJson, Response::HTTP_OK, [], true);
@@ -802,7 +802,7 @@ class ApiController extends AbstractController
             $em->persist($menu);
             $em->flush();
             $content = [
-                "message" => "Changement sauvegardé. Veuillez patienter pendant le chargement de la page"
+                "message" => "Changement sauvegardé. "
             ];
 
             $contentJson = $serializer->serialize($content, 'json', []);
@@ -833,7 +833,7 @@ class ApiController extends AbstractController
             $em->remove($menu);
             $em->flush();
             $content = [
-                'message' => 'Catégorie supprimée. Veuillez patienter pendant le rechargement de la page'
+                'message' => 'Menu supprimé. '
             ];
             $responseJson = $serializer->serialize($content, 'json', []);
             return new JsonResponse($responseJson, Response::HTTP_OK, [], true);
@@ -876,7 +876,7 @@ class ApiController extends AbstractController
             $em->persist($menu);
             $em->flush();
             $content = [
-                "message" => "Catégorie ajoutée. Veuillez patienter pendant le chargement de la page"
+                "message" => "Catégorie ajoutée. "
             ];
 
             $contentJson = $serializer->serialize($content, 'json', []);
@@ -925,7 +925,7 @@ class ApiController extends AbstractController
             $em->flush();
 
             $content = [
-                "message" => "Changement sauvegardé. Veuillez patienter pendant le chargement de la page"
+                "message" => "Changement sauvegardé. "
             ];
 
             $contentJson = $serializer->serialize($content, 'json', []);
@@ -981,7 +981,7 @@ class ApiController extends AbstractController
             $em->flush();
 
             $content = [
-                "message" => "Changement sauvegardé. Veuillez patienter pendant le chargement de la page"
+                "message" => "Changement sauvegardé. "
             ];
 
             $contentJson = $serializer->serialize($content, 'json', []);
@@ -1012,7 +1012,7 @@ class ApiController extends AbstractController
             $em->remove($formula);
             $em->flush();
             $content = [
-                'message' => 'Catégorie supprimée. Veuillez patienter pendant le rechargement de la page'
+                'message' => 'Catégorie supprimée. '
             ];
             $responseJson = $serializer->serialize($content, 'json', []);
             return new JsonResponse($responseJson, Response::HTTP_OK, [], true);
@@ -1035,14 +1035,15 @@ class ApiController extends AbstractController
         Request $request
     ): JsonResponse {
 
-        $count = count($bookingRepository->findAll());
-
+        
         $page = intval($request->query->get('page'));
         $maxResults = intval($request->query->get('max'));
+        $name = $request->query->get('name');
 
+        $count = count($bookingRepository->findByName($name));
         $booking = [
             'count' => $count,
-            'booking' => $bookingRepository->findWithPagination($page, $maxResults)
+            'booking' => $bookingRepository->findWithPagination($page, $maxResults, $name)
         ];
 
         $bookingJson = $serializer->serialize($booking, 'json', []);
@@ -1086,7 +1087,7 @@ class ApiController extends AbstractController
             $em->flush();
 
             $content = [
-                "message" => "Changement sauvegardé. Veuillez patienter pendant le chargement de la page"
+                "message" => "Changement sauvegardé. "
             ];
 
             $contentJson = $serializer->serialize($content, 'json', []);
@@ -1101,7 +1102,7 @@ class ApiController extends AbstractController
         }
     }
 
-    #[Route('/add/booking', name: 'app_add_booking', methods: ['PUT'])]
+    #[Route('/add/booking', name: 'app_add_booking', methods: ['POST'])]
     public function add_booking(
         Request $request,
         SerializerInterface $serializer,
@@ -1156,7 +1157,7 @@ class ApiController extends AbstractController
             $em->flush();
 
             // Send confirmation email
-            if ($requestArray['email']) {
+            if ($requestArray['email'] !== null) {
 
                 $restaurantInfos = $restaurantRepository->findAll();
 
@@ -1208,7 +1209,7 @@ class ApiController extends AbstractController
             $em->remove($booking);
             $em->flush();
             $content = [
-                'message' => 'Réservation supprimée. Veuillez patienter pendant le rechargement de la page'
+                'message' => 'Réservation supprimée. '
             ];
             $responseJson = $serializer->serialize($content, 'json', []);
             return new JsonResponse($responseJson, Response::HTTP_OK, [], true);
@@ -1472,7 +1473,7 @@ class ApiController extends AbstractController
             $em->flush();
 
             $content = [
-                "message" => "Changement sauvegardé. Veuillez patienter pendant le chargement de la page"
+                "message" => "Changement sauvegardé. "
             ];
 
             $contentJson = $serializer->serialize($content, 'json', []);

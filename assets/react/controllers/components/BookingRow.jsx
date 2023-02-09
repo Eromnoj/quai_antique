@@ -1,45 +1,16 @@
 import React, {useState} from 'react'
-import axios from 'axios'
 import moment from 'moment'
+import { deleteItem } from '../../utils/functions'
 
 import ModalBooking from './modals/ModalBooking'
 import ShowApiResponse from './ShowApiResponse'
 
-const BookingRow = ({booking, token}) => {
+const BookingRow = ({booking, token, getData}) => {
 
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [showModalBooking, setShowModalBooking] = useState(false)
   const [message, setMessage] = useState([])
 
-  const deleteBooking = async (token) => {
-    try {
-      const res = await axios.delete(`/api/delete/booking/${booking.id}`, {
-        data: {
-          token: token
-        }
-      })
-      const data = await res.data
-      if (data.message) {
-        setMessage(array => [...array, { type: 'info', input: 'message', message: data.message }])
-      }
-      setTimeout(() => {
-        window.location.reload(true)
-      }, 1000)
-    } catch (error) {
-      if (error.response.data.violations) {
-        const violation = error.response.data.violations
-        violation.forEach(element => {
-          setMessage(array => [...array, { type: 'error', input: element.propertyPath, message: element.title }])
-          console.log(element.propertyPath);
-          console.log(element.title);
-        });
-      } else {
-        console.log(error.response.data.message);
-        setMessage(array => [...array, { type: 'info', input: 'message', message: error.response.data.message }])
-      }
-      console.log(error);
-    }
-  }
   return (
     <tr>
       <td onClick={() => { setShowModalBooking(prev => !prev) }}>{booking.lastname}</td>
@@ -51,7 +22,7 @@ const BookingRow = ({booking, token}) => {
         <div className='button_delete' onClick={() => { setConfirmDelete(prev => !prev) }}> <img src="../img/Trash.png" alt="delete" /></div>
       </div>
       {showModalBooking ?
-      <ModalBooking booking={booking} showEdit={() => {setShowModalBooking(prev => !prev)}} token={token} />
+      <ModalBooking booking={booking} showEdit={() => {setShowModalBooking(prev => !prev)}} token={token} getData={getData} />
     :null}
       {confirmDelete ?
               <div className='confirm_delete_window'>
@@ -62,7 +33,7 @@ const BookingRow = ({booking, token}) => {
                     <button className='cancel_delete' onClick={() => setConfirmDelete(prev => !prev)}>Annuler</button>
                     <button className='delete' onClick={() => {
                       // Manage deletion
-                      deleteBooking(token)
+                      deleteItem(token,'/api/delete/booking/', booking.id, setMessage, getData)
                     }
                     }>Supprimer</button>
                   </div>

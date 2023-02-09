@@ -1,43 +1,14 @@
 import React, {useState} from 'react'
-import axios from 'axios'
+import { deleteItem } from '../../utils/functions'
 import ShowApiResponse from './ShowApiResponse'
 import ModalImage from './modals/ModalImage'
 
-const ImageCard = ({ image, token }) => {
+const ImageCard = ({ image, token, getData }) => {
 
   const [showEdit, setShowEdit] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [message, setMessage] = useState([])
 
-  const deleteImage = async (token) => {
-    try {
-      const res = await axios.delete(`/api/delete/image/${image.id}`, {
-        data: {
-          token
-        }
-      })
-      const data = await res.data
-      if (data.message) {
-        setMessage(array => [...array, { type: 'info', input: 'message', message: data.message }])
-      }
-      setTimeout(() => {
-        window.location.reload(true)
-      }, 1000)
-    } catch (error) {
-      if (error.response.data.violations) {
-        const violation = error.response.data.violations
-        violation.forEach(element => {
-          setMessage(array => [...array, { type: 'error', input: element.propertyPath, message: element.title }])
-          console.log(element.propertyPath);
-          console.log(element.title);
-        });
-      } else {
-        console.log(error.response.data.message);
-        setMessage(array => [...array, { type: 'info', input: 'message', message: error.response.data.message }])
-      }
-      console.log(error);
-    }
-  }
   return (
     <>
       <div className='card'>
@@ -64,7 +35,7 @@ const ImageCard = ({ image, token }) => {
               <button className='cancel_delete' onClick={() => setConfirmDelete(prev => !prev)}>Annuler</button>
               <button className='delete' onClick={() => {
                 // Manage deletion
-                deleteImage(token)
+                deleteItem(token, '/api/delete/image/', image.id, setMessage, getData)
               }
               }>Supprimer</button>
             </div>
@@ -74,6 +45,5 @@ const ImageCard = ({ image, token }) => {
   )
 
 }
-
 
 export default ImageCard

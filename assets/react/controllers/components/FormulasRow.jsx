@@ -1,43 +1,14 @@
 import React, {useState} from 'react'
 import ModalFormula from './modals/ModalFormula'
-import axios from 'axios'
+import { deleteItem } from '../../utils/functions'
 import ShowApiResponse from './ShowApiResponse'
 
 
-const FormulasRow = ({ formula, menuId, token }) => {
+const FormulasRow = ({ formula, menuId, token, getData }) => {
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [showModalFormula, setShowModalFormula] = useState(false)
   const [message, setMessage] = useState([])
 
-  const deleteFormula = async (token) => {
-    try {
-      const res = await axios.delete(`/api/delete/formulas/${formula.id}`, {
-        data: {
-          token
-        }
-      })
-      const data = await res.data
-      if (data.message) {
-        setMessage(array => [...array, { type: 'info', input: 'message', message: data.message }])
-      }
-      setTimeout(() => {
-        window.location.reload(true)
-      }, 1000)
-    } catch (error) {
-      if (error.response.data.violations) {
-        const violation = error.response.data.violations
-        violation.forEach(element => {
-          setMessage(array => [...array, { type: 'error', input: element.propertyPath, message: element.title }])
-          console.log(element.propertyPath);
-          console.log(element.title);
-        });
-      } else {
-        console.log(error.response.data.message);
-        setMessage(array => [...array, { type: 'info', input: 'message', message: error.response.data.message }])
-      }
-      console.log(error);
-    }
-  }
   return (
     <tr>
       <td>{formula.name}</td>
@@ -48,7 +19,7 @@ const FormulasRow = ({ formula, menuId, token }) => {
         <div className='button_delete' onClick={() => { setConfirmDelete(prev => !prev) }}> <img src="../img/Trash.png" alt="delete" /></div>
       </div>
       {showModalFormula ?
-      <ModalFormula formula={formula}  menuId={menuId} showEdit={() => {setShowModalFormula(prev => !prev) }} token={token} />
+      <ModalFormula formula={formula}  menuId={menuId} showEdit={() => {setShowModalFormula(prev => !prev) }} token={token} getData={getData} />
       :null}
       {confirmDelete ?
               <div className='confirm_delete_window'>
@@ -59,7 +30,7 @@ const FormulasRow = ({ formula, menuId, token }) => {
                     <button className='cancel_delete' onClick={() => setConfirmDelete(prev => !prev)}>Annuler</button>
                     <button className='delete' onClick={() => {
                       // Manage deletion
-                      deleteFormula(token)
+                      deleteItem(token, '/api/delete/formulas/', formula.id, setMessage, getData)
                     }
                     }>Supprimer</button>
                   </div>

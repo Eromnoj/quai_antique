@@ -1,5 +1,5 @@
 import React, {useState} from 'react'
-import axios from 'axios'
+import { deleteItem } from '../../utils/functions'
 
 import ModalMenu from './modals/ModalMenu'
 import ModalFormula from './modals/ModalFormula'
@@ -7,11 +7,11 @@ import ModalFormula from './modals/ModalFormula'
 import ShowApiResponse from './ShowApiResponse'
 import FormulasRow from './FormulasRow'
 
-const MenuTables = ({ menu, tokenMenu, tokenFormula}) => {
+const MenuTables = ({ menu, tokenMenu, tokenFormula, getData}) => {
 
   const showFormulas = menu.formulas.map(formula => {
     return (
-      <FormulasRow formula={formula} key={formula.id}  menuId={menu.id} token={tokenFormula} />
+      <FormulasRow formula={formula} key={formula.id}  menuId={menu.id} token={tokenFormula} getData={getData} />
     )
   })
 
@@ -20,35 +20,6 @@ const MenuTables = ({ menu, tokenMenu, tokenFormula}) => {
   const [message, setMessage] = useState([])
   const [showModalFormula, setShowModalFormula] = useState(false)
 
-  const deleteMenu = async (token) => {
-    try {
-      const res = await axios.delete(`/api/delete/menus/${menu.id}`, {
-        data: {
-          token
-        }
-      })
-      const data = await res.data
-      if (data.message) {
-        setMessage(array => [...array, { type: 'info', input: 'message', message: data.message }])
-      }
-      setTimeout(() => {
-        window.location.reload(true)
-      }, 1000)
-    } catch (error) {
-      if (error.response.data.violations) {
-        const violation = error.response.data.violations
-        violation.forEach(element => {
-          setMessage(array => [...array, { type: 'error', input: element.propertyPath, message: element.title }])
-          console.log(element.propertyPath);
-          console.log(element.title);
-        });
-      } else {
-        console.log(error.response.data.message);
-        setMessage(array => [...array, { type: 'info', input: 'message', message: error.response.data.message }])
-      }
-      console.log(error);
-    }
-  }
   return (
     <div className='div_table'>
     <table>
@@ -68,7 +39,7 @@ const MenuTables = ({ menu, tokenMenu, tokenFormula}) => {
               <div className='button_delete' onClick={() => { setConfirmDelete(prev => !prev) }}> <img src="../img/Trash.png" alt="delete" /></div>
             </div>
             {showModalMenu ?
-              <ModalMenu menu={menu} showEdit={() => { setShowModalMenu(prev => !prev) }} token={tokenMenu} />
+              <ModalMenu menu={menu} showEdit={() => { setShowModalMenu(prev => !prev) }} token={tokenMenu} getData={getData} />
               : null}
             {confirmDelete ?
               <div className='confirm_delete_window'>
@@ -79,7 +50,7 @@ const MenuTables = ({ menu, tokenMenu, tokenFormula}) => {
                     <button className='cancel_delete' onClick={() => setConfirmDelete(prev => !prev)}>Annuler</button>
                     <button className='delete' onClick={() => {
                       // Manage deletion
-                      deleteMenu(tokenMenu)
+                      deleteItem(tokenMenu, '/api/delete/menus/',menu.id, setMessage, getData)
                     }
                     }>Supprimer</button>
                   </div>
@@ -92,7 +63,7 @@ const MenuTables = ({ menu, tokenMenu, tokenFormula}) => {
           <th colSpan={3}>
             <button className='add_formula_button' onClick={() => {setShowModalFormula(prev=> !prev) }}>Ajouter une formule</button>
             {showModalFormula ? 
-            <ModalFormula menuId={menu.id} showEdit={() => {setShowModalFormula(prev=> !prev) }} token={tokenFormula}/>
+            <ModalFormula menuId={menu.id} showEdit={() => {setShowModalFormula(prev=> !prev) }} token={tokenFormula}  getData={getData}/>
           :null}
           </th>
         </tr>

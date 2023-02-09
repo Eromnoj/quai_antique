@@ -68,15 +68,27 @@ class BookingRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
-    public function findWithPagination(int $page, int $maxResult): array
+    public function findWithPagination(int $page, int $maxResult, string $name): array
     {
         
         $firstResult = $page * $maxResult;
         return $this->createQueryBuilder('b')
             ->addOrderBy('b.date', 'ASC')
             ->addOrderBy('b.time', 'ASC')
+            ->andWhere('b.lastname LIKE :name')
             ->setFirstResult($firstResult)
             ->setMaxResults($maxResult)
+            ->setParameter('name', '%'.$name.'%')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findByName(string $name): array
+    {
+        
+        return $this->createQueryBuilder('b')
+            ->andWhere('b.lastname LIKE :name')
+            ->setParameter('name', '%'.$name.'%')
             ->getQuery()
             ->getResult();
     }

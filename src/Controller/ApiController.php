@@ -241,7 +241,10 @@ class ApiController extends AbstractController
                 } catch (FileException $e) {
                     // ... handle exception if something happens during file upload
                     $message = [
-                        'message' => $e
+                        'message' => 'Un problème est servenu lors du chargement de l\'image, veuillez recommencer',
+                        'original' => $originalFilename,
+                        'safe' => $safeFilename,
+                        'new' => $newFilename
                     ];
 
                     $messageJson = $serializer->serialize($message, 'json', []);

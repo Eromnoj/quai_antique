@@ -32,6 +32,7 @@ const ModalImage = ({ image, showEdit, token, getData }) => {
         showEdit()
       }, 2000)
     } catch (error) {
+      console.log(error);
       if (error.response.data.violations) {
         const violation = error.response.data.violations
         violation.forEach(element => {
@@ -41,7 +42,7 @@ const ModalImage = ({ image, showEdit, token, getData }) => {
         });
       } else {
         console.log(error.response.data.message);
-        setMessage(array => [...array, { type: 'info', input: 'message', message: error.response.data.message }])
+        setMessage(array => [...array, { type: 'error', input: 'message', message: error.response.data.message }])
       }
     }
   }
@@ -64,6 +65,7 @@ const ModalImage = ({ image, showEdit, token, getData }) => {
               <label htmlFor="image">Changer l'image</label>
               <input type="file" name="image" id="image" {...register('image')} />
               <ShowApiResponse array={message} input={'url'} />
+              <ShowApiResponse array={message} input={''} />
 
             </div>
             <div className='description_div'>

@@ -35,12 +35,16 @@ const ModalImage = ({ image, showEdit, token, getData }) => {
       if (error.response.data.violations) {
         const violation = error.response.data.violations
         violation.forEach(element => {
-          setMessage(array => [...array, { type: 'error', input: element.propertyPath, message: element.title }])
+          if (element.propertyPath ===''){
+            setMessage(array => [...array, { type: 'error', input: element.propertyPath, message: "Le fichier est trop volumineux. 2Mo max" }])
+          } else {
+            setMessage(array => [...array, { type: 'error', input: element.propertyPath, message: element.title }])
+          }
         });
       } else if(error.response.data.message) {
         setMessage(array => [...array, { type: 'error', input: 'message', message: error.response.data.message }])
       } else {
-        setMessage(array => [...array, { type: 'error', input: 'message', message: "Une erreur serveur est survenue" }])
+        setMessage(array => [...array, { type: 'error', input: 'message', message: "Une erreur serveur est survenue: le fichier est trop volumineux" }])
       }
     }
   }
@@ -63,6 +67,7 @@ const ModalImage = ({ image, showEdit, token, getData }) => {
               <label htmlFor="image">Changer l'image</label>
               <input type="file" name="image" id="image" {...register('image')} />
               <ShowApiResponse array={message} input={'url'} />
+              <ShowApiResponse array={message} input={''} />
 
             </div>
             <div className='description_div'>

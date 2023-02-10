@@ -218,7 +218,8 @@ class ApiController extends AbstractController
                         'image/*'
                     ],
                     'maxSizeMessage' => 'Le fichier doit faire moins de 2Mo',
-                    'mimeTypesMessage' => 'Le fichier doit être une image'
+                    'mimeTypesMessage' => 'Le fichier doit être une image',
+                    
                 ])
             );
 

@@ -118,7 +118,7 @@ class ApiController extends AbstractController
                         'message' => 'Un problème est servenu lors du chargement de l\'image, veuillez recommencer'
                     ];
 
-                    $messageJson = $serializer->serialize($e, 'json', []);
+                    $messageJson = $serializer->serialize($message, 'json', []);
 
                     return new JsonResponse($messageJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
                 }
@@ -207,11 +207,11 @@ class ApiController extends AbstractController
         if ($this->isCsrfTokenValid('image', $submittedToken)) {
             $image = new Gallery();
 
-            $updateImage = $request->files->get('image');
+            $addImage = $request->files->get('image');
             $description = $request->get('description');
             // Check if file is an image with a max size 2Mo
             $violations = $validator->validate(
-                $updateImage,
+                $addImage,
                 new File([
                     'maxSize' => '2000K',
                     'mimeTypes' => [
@@ -227,13 +227,13 @@ class ApiController extends AbstractController
                 return new JsonResponse($serializer->serialize($violations, 'json', []), Response::HTTP_BAD_REQUEST, [], true);
             }
 
-            if ($updateImage) {
+            if ($addImage) {
 
-                $originalFilename = pathinfo($updateImage->getClientOriginalName(), PATHINFO_FILENAME);
+                $originalFilename = pathinfo($addImage->getClientOriginalName(), PATHINFO_FILENAME);
                 $safeFilename = $slugger->slug($originalFilename);
-                $newFilename = $safeFilename . '-' . uniqid() . '.' . $updateImage->guessExtension();
+                $newFilename = $safeFilename . '-' . uniqid() . '.' . $addImage->guessExtension();
                 try {
-                    $updateImage->move(
+                    $addImage->move(
                         $this->getParameter('image_upload_directory'),
                         $newFilename
                     );

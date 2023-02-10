@@ -24,7 +24,7 @@ const ImageCard = ({ image, token, getData }) => {
         </div>
       </div>
       {showEdit ?
-        <ModalImage image={image} token={token} showEdit={() => setShowEdit(prev => !prev)} />
+        <ModalImage image={image} token={token} showEdit={() => setShowEdit(prev => !prev)} getData={getData} />
         : null}
       {confirmDelete ?
         

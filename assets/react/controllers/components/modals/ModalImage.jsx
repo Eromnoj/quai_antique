@@ -37,11 +37,12 @@ const ModalImage = ({ image, showEdit, token, getData }) => {
         const violation = error.response.data.violations
         violation.forEach(element => {
           setMessage(array => [...array, { type: 'error', input: element.propertyPath, message: element.title }])
+          console.log(element.propertyPath);
+          console.log(element.title);
         });
-      } else if (error.response.data.message){
-        setMessage(array => [...array, { type: 'error', input: 'message', message: error.response.data.message }])
       } else {
-        setMessage(array => [...array, { type: 'error', input: 'message', message: 'Le fichier ne dois pas dépasser 2Mo'} ])
+        console.log(error.response.data.message);
+        setMessage(array => [...array, { type: 'info', input: 'message', message: error.response.data.message }])
       }
     }
   }
@@ -64,7 +65,6 @@ const ModalImage = ({ image, showEdit, token, getData }) => {
               <label htmlFor="image">Changer l'image</label>
               <input type="file" name="image" id="image" {...register('image')} />
               <ShowApiResponse array={message} input={'url'} />
-              <ShowApiResponse array={message} input={''} />
 
             </div>
             <div className='description_div'>

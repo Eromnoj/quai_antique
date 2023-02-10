@@ -118,7 +118,7 @@ class ApiController extends AbstractController
                         'message' => 'Un problème est servenu lors du chargement de l\'image, veuillez recommencer'
                     ];
 
-                    $messageJson = $serializer->serialize($message, 'json', []);
+                    $messageJson = $serializer->serialize($e, 'json', []);
 
                     return new JsonResponse($messageJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
                 }

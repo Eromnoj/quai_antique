@@ -1,7 +1,7 @@
 import React, {useState} from 'react'
-import { deleteItem } from '../../utils/functions'
-import ShowApiResponse from './ShowApiResponse'
+
 import ModalImage from './modals/ModalImage'
+import ModalDelete from './modals/ModalDelete'
 
 const ImageCard = ({ image, token, getData }) => {
 
@@ -27,20 +27,16 @@ const ImageCard = ({ image, token, getData }) => {
         <ModalImage image={image} token={token} showEdit={() => setShowEdit(prev => !prev)} />
         : null}
       {confirmDelete ?
-        <div className='confirm_delete_window'>
-          <div className='confirm_delete_container'>
-                <ShowApiResponse array={message} input={'message'} />
-            <p>Voulez-vous vraiment supprimer l'image {image.description} ?</p>
-            <div className='delete_buttons'>
-              <button className='cancel_delete' onClick={() => setConfirmDelete(prev => !prev)}>Annuler</button>
-              <button className='delete' onClick={() => {
-                // Manage deletion
-                deleteItem(token, '/api/delete/image/', image.id, setMessage, getData)
-              }
-              }>Supprimer</button>
-            </div>
-          </div>
-        </div> : null}
+        
+        <ModalDelete message={message}
+        setMessage={setMessage}
+        token={token}
+        item={image}
+        setConfirmDelete={setConfirmDelete}
+        getData={getData}
+        url={'/api/delete/image/'} />
+        
+        : null}
     </>
   )
 

@@ -1,4 +1,5 @@
 import axios from 'axios'
+import moment from 'moment'
 
 
 /**
@@ -21,6 +22,7 @@ export const deleteItem = async (token, url, id, setMessage, getData) => {
     }
     setTimeout(() => {
       getData()
+      setMessage([])
     }, 2000)
   } catch (error) {
     if (error.response.data.violations) {
@@ -65,7 +67,7 @@ export const submitItem = async (item, dataToSend, setMessage, getData, showEdit
 
 export const bookingSubmit = async (bookingState, setConfirmBooking, setMessage, setIsBookingSent) => {
   try {
-    const res = await axios.put('/api/add/booking', bookingState)
+    const res = await axios.post('/api/add/booking', bookingState)
     const data = await res.data
     if (data.message) {
       setConfirmBooking(true)
@@ -73,7 +75,6 @@ export const bookingSubmit = async (bookingState, setConfirmBooking, setMessage,
     }
   } catch (error) {
     setIsBookingSent(false)
-
     if (error.response.data.violations) {
       const violation = error.response.data.violations
       violation.forEach(element => {
@@ -305,6 +306,7 @@ export const getAvailableSeatsAndSchedule = async (date, shift, setSeatsLeft, se
 
     dispatch({ type: 'time', value: moment(data.shiftStart).utcOffset(1).format('HH:mm') })
   } catch (error) {
-    setMessage(array => [...array, { type: 'error', input: 'errorMessage', message: error.response.data.message }])
+    console.log(error);
+    // setMessage(array => [...array, { type: 'error', input: 'errorMessage', message: error.response.data.message }])
   }
 }

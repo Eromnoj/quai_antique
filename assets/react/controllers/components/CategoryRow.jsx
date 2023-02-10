@@ -1,10 +1,8 @@
-import React, {useState} from 'react'
-import { deleteItem } from '../../utils/functions'
+import React, { useState } from 'react'
 
 import ModalCategory from './modals/ModalCategory'
-import ShowApiResponse from './ShowApiResponse'
-
-const CategoryRow = ({ category, token, getData}) => {
+import ModalDelete from './modals/ModalDelete'  
+const CategoryRow = ({ category, token, getData }) => {
 
   const [showModalCategory, setShowModalCategory] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
@@ -20,23 +18,19 @@ const CategoryRow = ({ category, token, getData}) => {
           <div className='button_delete' onClick={() => setConfirmDelete(prev => !prev)}> <img src="../img/Trash.png" alt="delete" /></div>
         </div>
         {showModalCategory ?
-          <ModalCategory cat={category} showEdit={() => { setShowModalCategory(prev => !prev) }} token={token} getData={() => {getData()}} />
+          <ModalCategory cat={category} showEdit={() => { setShowModalCategory(prev => !prev) }} token={token} getData={() => { getData() }} />
           : null}
         {confirmDelete ?
-          <div className='confirm_delete_window'>
-            <div className='confirm_delete_container'>
-              <ShowApiResponse array={message} input={'message'} />
-              <p>Voulez-vous vraiment supprimer la catégorie {category.name} ?</p>
-              <div className='delete_buttons'>
-                <button className='cancel_delete' onClick={() => setConfirmDelete(prev => !prev)}>Annuler</button>
-                <button className='delete' onClick={() => {
-                  // Manage deletion
-                  deleteItem(token,'/api/delete/categories/', category.id, setMessage, getData)
-                }
-                }>Supprimer</button>
-              </div>
-            </div>
-          </div> : null}
+
+          <ModalDelete message={message}
+            setMessage={setMessage}
+            token={token}
+            item={category}
+            setConfirmDelete={setConfirmDelete}
+            getData={getData}
+            url={'/api/delete/categories/'} />
+
+          : null}
       </td>
     </tr>
   )

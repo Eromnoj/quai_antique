@@ -24,3 +24,19 @@
   background-color: variables.$deep-chestnut;
   text-align: center;
 }
+
+.booking_container {
+  .message_info {
+    margin: auto;
+    font-family: 'Karma', serif;
+    font-weight: normal;
+    padding: 10px;
+    border: 2px solid variables.$green-crayola;
+    border-radius: 25px;
+    color: variables.$rich-black-fogra-29;
+    background-color: variables.$cultured;
+    text-align: center;
+    width: 90%;
+    max-width: 800px;
+  }
+}

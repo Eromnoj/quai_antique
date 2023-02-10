@@ -1,10 +1,9 @@
-import React, {useState} from 'react'
-import { deleteItem } from '../../utils/functions'
+import React, { useState } from 'react'
 
 import ModalDish from './modals/ModalDish'
-import ShowApiResponse from './ShowApiResponse'
+import ModalDelete from './modals/ModalDelete'
 
-const DishesRow = ({ dish, categories, token, getData}) => {
+const DishesRow = ({ dish, categories, token, getData }) => {
 
   const [showModalDish, setShowModalDish] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
@@ -22,23 +21,19 @@ const DishesRow = ({ dish, categories, token, getData}) => {
           <div className='button_delete' onClick={() => setConfirmDelete(prev => !prev)}> <img src="../img/Trash.png" alt="delete" /></div>
         </div>
         {showModalDish ?
-          <ModalDish dish={dish} categories={categories} showEdit={() => { setShowModalDish(prev => !prev) }} token={token} getData={getData}/>
+          <ModalDish dish={dish} categories={categories} showEdit={() => { setShowModalDish(prev => !prev) }} token={token} getData={getData} />
           : null}
         {confirmDelete ?
-          <div className='confirm_delete_window'>
-            <div className='confirm_delete_container'>
-              <ShowApiResponse array={message} input={'message'} />
-              <p>Voulez-vous vraiment supprimer le plat : {dish.name} ?</p>
-              <div className='delete_buttons'>
-                <button className='cancel_delete' onClick={() => setConfirmDelete(prev => !prev)}>Annuler</button>
-                <button className='delete' onClick={() => {
-                  // Manage deletion
-                  deleteItem(token, '/api/delete/dishes/', dish.id, setMessage, getData)
-                }
-                }>Supprimer</button>
-              </div>
-            </div>
-          </div> : null}
+
+          <ModalDelete message={message}
+            setMessage={setMessage}
+            token={token}
+            item={dish}
+            setConfirmDelete={setConfirmDelete}
+            getData={getData}
+            url={'/api/delete/dishes/'} />
+
+          : null}
       </td>
     </tr>
   )

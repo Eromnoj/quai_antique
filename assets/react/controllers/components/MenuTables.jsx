@@ -1,10 +1,8 @@
 import React, {useState} from 'react'
-import { deleteItem } from '../../utils/functions'
 
 import ModalMenu from './modals/ModalMenu'
 import ModalFormula from './modals/ModalFormula'
-
-import ShowApiResponse from './ShowApiResponse'
+import ModalDelete from './modals/ModalDelete'
 import FormulasRow from './FormulasRow'
 
 const MenuTables = ({ menu, tokenMenu, tokenFormula, getData}) => {
@@ -42,20 +40,16 @@ const MenuTables = ({ menu, tokenMenu, tokenFormula, getData}) => {
               <ModalMenu menu={menu} showEdit={() => { setShowModalMenu(prev => !prev) }} token={tokenMenu} getData={getData} />
               : null}
             {confirmDelete ?
-              <div className='confirm_delete_window'>
-                <div className='confirm_delete_container'>
-                <ShowApiResponse array={message} input={'message'} />
-                  <p>Voulez-vous vraiment supprimer le menu : {menu.name} ?</p>
-                  <div className='delete_buttons'>
-                    <button className='cancel_delete' onClick={() => setConfirmDelete(prev => !prev)}>Annuler</button>
-                    <button className='delete' onClick={() => {
-                      // Manage deletion
-                      deleteItem(tokenMenu, '/api/delete/menus/',menu.id, setMessage, getData)
-                    }
-                    }>Supprimer</button>
-                  </div>
-                </div>
-              </div> : null}
+              
+          <ModalDelete message={message}
+          setMessage={setMessage}
+          token={tokenMenu}
+          item={menu}
+          setConfirmDelete={setConfirmDelete}
+          getData={getData}
+          url={'/api/delete/menus/'} />
+              
+               : null}
           </td>
         </tr>
         <tr>

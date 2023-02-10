@@ -1,6 +1,6 @@
 import React, { useReducer, useState } from 'react'
 import moment from 'moment/moment'
-import {submitItem} from '../../../utils/functions'
+import { submitItem } from '../../../utils/functions'
 
 import ShowApiResponse from '../ShowApiResponse'
 
@@ -10,20 +10,25 @@ const ModalBooking = ({ booking, showEdit, token, getData }) => {
 
   const initialState = {
     lastname: booking ? booking.lastname : '',
+    firstname: booking ? booking.firstname : '',
     date: booking ? booking.date : moment().utcOffset(0).toISOString(),
     time: booking ? booking.time : moment().utcOffset(0).toISOString(),
     allergies: booking ? booking.allergies : '',
     phone: booking ? booking.phone : '',
     shift: booking ? booking.shift : '',
     number: booking ? booking.number : 0,
+    email: booking ? booking.email : '',
     token: token,
-    email: null
   }
 
   const reducer = (state, action) => {
     switch (action.type) {
       case 'lastname':
         return { ...state, lastname: action.value }
+      case 'firstname':
+        return { ...state, firstname: action.value }
+      case 'email':
+        return { ...state, email: action.value }
       case 'date':
         let date = moment(action.value + "T00:00:00.000Z").utcOffset(0).toISOString()
         return { ...state, date: date }
@@ -49,10 +54,10 @@ const ModalBooking = ({ booking, showEdit, token, getData }) => {
   return (
     <div className='modal_window'>
       <div className='modal_container'>
-        <div className='modal_header'><button className='close_button' 
-        onClick={() => {
-          getData()
-          showEdit()
+        <div className='modal_header'><button className='close_button'
+          onClick={() => {
+            getData()
+            showEdit()
           }}>Fermer</button></div>
         <div className='modal_body'>
           <ShowApiResponse array={message} input={'message'} />
@@ -63,13 +68,25 @@ const ModalBooking = ({ booking, showEdit, token, getData }) => {
             submitItem(booking, state, setMessage, getData, showEdit, 'booking')
           }}>
             <p>{booking ? `Modifier la réservation de ${booking.lastname}` : 'Ajouter une réservation'}</p>
+
             <div className='lastname_div'>
               <label htmlFor="lastname">Nom</label>
               <input type="text" name="lastname" id="lastname" value={state.lastname} onChange={(e) => dispatch({ type: 'lastname', value: e.target.value })} />
-
               <ShowApiResponse array={message} input={'lastname'} />
-
             </div>
+
+            <div className='firstname_div'>
+              <label htmlFor="firstname">Prenom</label>
+              <input type="text" name="firstname" id="firstname" value={state.firstname} onChange={(e) => dispatch({ type: 'firstname', value: e.target.value })} />
+              <ShowApiResponse array={message} input={'firstname'} />
+            </div>
+
+            <div className='email_div'>
+              <label htmlFor="email">Email</label>
+              <input type="email" name="email" id="email" value={state.email} onChange={(e) => dispatch({ type: 'email', value: e.target.value })} />
+              <ShowApiResponse array={message} input={'email'} />
+            </div>
+
             <div className='number_div'>
               <label htmlFor="number">Nombre de couverts</label>
               <input type="number" name="number" id="number" value={state.number} onChange={(e) => dispatch({ type: 'number', value: e.target.value })} />

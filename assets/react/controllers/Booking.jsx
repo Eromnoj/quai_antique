@@ -87,8 +87,8 @@ const Booking = ({ userEmail, userLastname, userFirstname, userAllergies, userPh
       <div className='booking_container'>
         <div className='booking_title'>
           <h2>Réserver une table</h2>
-          <ShowApiResponse array={message} input={'message'} />
         </div>
+          <ShowApiResponse array={message} input={'message'} />
       </div>
     )
   }
@@ -120,7 +120,7 @@ const Booking = ({ userEmail, userLastname, userFirstname, userAllergies, userPh
 
           <div className='number_div'>
             <label htmlFor="number">Couverts :</label>
-            <input type="number" name="number" id="number" value={bookingState.number}
+            <input type="number" name="number" id="number" value={bookingState.number} min={1}
               onChange={(e) => dispatch({ type: 'number', value: e.target.value })} />
             <ShowApiResponse array={message} input={'number'} />
           </div>
@@ -183,7 +183,7 @@ const Booking = ({ userEmail, userLastname, userFirstname, userAllergies, userPh
             <label htmlFor="email">Votre email :</label>
             <input type="email" name="email" id="email" value={bookingState.email}
               onChange={(e) => dispatch({ type: 'email', value: e.target.value })} />
-            <ShowApiResponse array={message} input={'firstname'} />
+            <ShowApiResponse array={message} input={'email'} />
           </div>
 
           <div className='phone_div'>

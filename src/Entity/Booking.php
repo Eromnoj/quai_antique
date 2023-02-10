@@ -16,8 +16,16 @@ class Booking
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Assert\NotBlank(message: "Votre nom est obligatoire")]
+    #[Assert\NotBlank(message: "Un nom est obligatoire")]
     private ?string $lastname = null;
+    
+    #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: "Un prénom est obligatoire")]
+    private ?string $firstname = null;
+    
+    #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: "Une adresse email est obligatoire")]
+    private ?string $email = null;
 
     #[ORM\Column]
     #[Assert\NotBlank(message:"Vous devez indiquer un nombre de couverts")]
@@ -43,6 +51,8 @@ class Booking
     #[ORM\Column(length: 255)]
     #[Assert\Choice(options:['midi', 'soir'], message: "Veuillez choisir un service")]
     private ?string $shift = null;
+
+
 
     public function getId(): ?int
     {
@@ -129,6 +139,30 @@ class Booking
     public function setShift(string $shift): self
     {
         $this->shift = $shift;
+
+        return $this;
+    }
+
+    public function getFirstname(): ?string
+    {
+        return $this->firstname;
+    }
+
+    public function setFirstname(string $firstname): self
+    {
+        $this->firstname = $firstname;
+
+        return $this;
+    }
+
+    public function getEmail(): ?string
+    {
+        return $this->email;
+    }
+
+    public function setEmail(string $email): self
+    {
+        $this->email = $email;
 
         return $this;
     }

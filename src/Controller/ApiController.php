@@ -1012,7 +1012,7 @@ class ApiController extends AbstractController
             $em->remove($formula);
             $em->flush();
             $content = [
-                'message' => 'Catégorie supprimée. '
+                'message' => 'Formule supprimée. '
             ];
             $responseJson = $serializer->serialize($content, 'json', []);
             return new JsonResponse($responseJson, Response::HTTP_OK, [], true);
@@ -1141,6 +1141,8 @@ class ApiController extends AbstractController
 
             $booking = new Booking();
             $booking->setLastName($updateBooking->getLastName());
+            $booking->setFirstName($updateBooking->getFirstName());
+            $booking->setEmail($updateBooking->getEmail());
             $booking->setAllergies($updateBooking->getAllergies());
             $booking->setPhone($updateBooking->getPhone());
             $booking->setShift($updateBooking->getShift());

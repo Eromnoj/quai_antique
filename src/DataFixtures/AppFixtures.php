@@ -87,7 +87,9 @@ class AppFixtures extends Fixture
             $booking[$i] = new Booking();
 
             $booking[$i]->setLastname($faker->lastName);
+            $booking[$i]->setFirstname($faker->firstName);
             $booking[$i]->setNumber($faker->randomDigitNotNull);
+            $booking[$i]->setEmail($faker->email);
             $booking[$i]->setPhone($faker->phoneNumber);
             $booking[$i]->setDate($faker->dateTimeBetween('now', '+ 10 days'));
             $booking[$i]->setTime($faker->dateTime());

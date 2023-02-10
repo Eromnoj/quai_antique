@@ -5,8 +5,6 @@ namespace App\Repository;
 use App\Entity\Restaurant;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
-use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
-use Symfony\Component\Serializer\Serializer;
 
 /**
  * @extends ServiceEntityRepository<Restaurant>
@@ -43,15 +41,12 @@ class RestaurantRepository extends ServiceEntityRepository
 
     public function getMaxCapacity(): int
     {
+        $queryRestaurant = $this->createQueryBuilder('r')
+            ->select('r.max_capacity')
+            ->getQuery()
+            ->getOneOrNullResult();
 
-        $queryRestaurant = $this->findAll();
-
-        $normalizers = [new ObjectNormalizer()];
-        $serializers = new Serializer($normalizers, []);
-
-        $restaurantInfo = $serializers->normalize($queryRestaurant[0]);
-
-        return $restaurantInfo['maxCapacity'];
+        return $queryRestaurant['max_capacity'];
     }
 
     //    /**

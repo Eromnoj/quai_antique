@@ -307,6 +307,6 @@ export const getAvailableSeatsAndSchedule = async (date, shift, setSeatsLeft, se
     dispatch({ type: 'time', value: moment(data.shiftStart).utcOffset(1).format('HH:mm') })
   } catch (error) {
     console.log(error);
-    // setMessage(array => [...array, { type: 'error', input: 'errorMessage', message: error.response.data.message }])
+    setMessage(array => [...array, { type: 'error', input: 'errorMessage', message: error.response.data.message }])
   }
 }

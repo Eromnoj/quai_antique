@@ -85,32 +85,40 @@ class ApiController extends AbstractController
                     'mimeTypes' => [
                         'image/*'
                     ],
-                    'maxSizeMessage' => 'Le fichier doit faire moins de 2Mo',
+                    'maxSizeMessage' => 'Le fichier doit faire moins de {{limit}} {{suffix}}',
+                    'uploadIniSizeErrorMessage' => 'Le serveur n\'accepte aucun fichier de plus de {{limit}} {{suffix}}',
                     'mimeTypesMessage' => 'Le fichier doit être une image'
                 ])
             );
 
             if ($violations->count() > 0) {
-
+                // sending validation errors
                 return new JsonResponse($serializer->serialize($violations, 'json', []), Response::HTTP_BAD_REQUEST, [], true);
             }
 
             if ($updateImage) {
-
+                // if there is no errors, and a file was send, first proceeding with giving it an unique namespace
+                // getting the original file name first without the extension
                 $originalFilename = pathinfo($updateImage->getClientOriginalName(), PATHINFO_FILENAME);
+                // slugging the name to prevent unauthorized characters in http request
                 $safeFilename = $slugger->slug($originalFilename);
+                // creating the new name using the slugged name, adding a unique ID to prevent replace an existing file, then putting back to extension
                 $newFilename = $safeFilename . '-' . uniqid() . '.' . $updateImage->guessExtension();
                 try {
+                    // using symfony method to copy the file from /tmp to the directory defined in /config/services.yaml
                     $updateImage->move(
                         $this->getParameter('image_upload_directory'),
                         $newFilename
                     );
 
+                    // to allow the deletion of the old file first create a symfony Filesystem() instance to access the filesystem and use methods 
+                    // proposed by symfony
                     $filesystem = new Filesystem();
-
+                    // getting the filename
                     $oldImage = $image->getUrl();
+                    // removing the old file
                     $filesystem->remove([$this->getParameter('image_upload_directory') . '/' . $oldImage]);
-
+                    // setting the new filename to the selected image
                     $image->setUrl($newFilename);
                 } catch (FileException $e) {
                     // ... handle exception if something happens during file upload
@@ -123,13 +131,14 @@ class ApiController extends AbstractController
                     return new JsonResponse($messageJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
                 }
             }
+            // setting the description
             $image->setDescription($description);
-
+            // running validation for the database constraints
             $errors = $validator->validate($image);
             if ($errors->count() > 0) {
                 return new JsonResponse($serializer->serialize($errors, 'json'), JsonResponse::HTTP_BAD_REQUEST, [], true);
             }
-
+            //persisting to the database and sending back a message
             $em->persist($image);
             $em->flush();
             $content = [
@@ -155,11 +164,11 @@ class ApiController extends AbstractController
         EntityManagerInterface $em,
     ): JsonResponse {
         $requestArray = $request->toArray();
-
         $submittedToken = $requestArray['token'];
 
         if ($this->isCsrfTokenValid('image', $submittedToken)) {
             $imageUrl = $image->getUrl();
+            // first try to delete the image from the server
             try {
                 $filesystem = new Filesystem();
 
@@ -175,7 +184,7 @@ class ApiController extends AbstractController
                 return new JsonResponse($messageJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
             }
 
-
+            //if it succeeds, then we remove its reference from the database
             $em->remove($image);
             $em->flush();
             $content = [
@@ -192,6 +201,7 @@ class ApiController extends AbstractController
         }
     }
 
+    // the logic of this method is similar to the update_image() method. See comments there for reference
     #[Route('/add/image', name: 'app_add_image', methods: ['POST'])]
     #[IsGranted('ROLE_ADMIN', message: 'Vous n\'avez pas les droits suffisants pour effectuer cette action')]
     public function add_image(
@@ -209,6 +219,7 @@ class ApiController extends AbstractController
 
             $addImage = $request->files->get('image');
             $description = $request->get('description');
+
             // Check if file is an image with a max size 2Mo
             $violations = $validator->validate(
                 $addImage,
@@ -217,10 +228,10 @@ class ApiController extends AbstractController
                     'mimeTypes' => [
                         'image/*'
                     ],
-                    'maxSizeMessage' => 'Le fichier doit faire moins de 2Mo',
+                    'maxSizeMessage' => 'Le fichier doit faire moins de {{limit}} {{suffix}}',
+                    'uploadIniSizeErrorMessage' => 'Le serveur n\'accepte aucun fichier de plus de {{limit}} {{suffix}}',
                     'mimeTypesMessage' => 'Le fichier doit être une image',
-                    
-                ])
+                ]),
             );
 
             if ($violations->count() > 0) {
@@ -241,7 +252,7 @@ class ApiController extends AbstractController
 
                     $image->setUrl($newFilename);
                 } catch (FileException $e) {
-                    // ... handle exception if something happens during file upload
+                    
                     $message = [
                         'message' => 'Un problème est servenu lors du chargement de l\'image, veuillez recommencer'
                     ];
@@ -265,7 +276,7 @@ class ApiController extends AbstractController
                 'message' => 'Changement sauvegardé. '
             ];
             $responseJson = $serializer->serialize($content, 'json', []);
-            return new JsonResponse($responseJson, Response::HTTP_OK, [], true);
+            return new JsonResponse($responseJson, Response::HTTP_CREATED, [], true);
         } else {
             $content = [
                 'message' => 'Une erreur est survenue'
@@ -282,10 +293,13 @@ class ApiController extends AbstractController
         RestaurantRepository $restaurantRepository,
         SerializerInterface $serializer
     ): JsonResponse {
+        // getting the restaurant infos
         $restaurant = $restaurantRepository->findAll();
         $context = (new ObjectNormalizerContextBuilder())
+            // adding group context, sets in the Entities, to prevent cycling request which would cause an error.
             ->withGroups('get_restaurant')
             ->toArray();
+            //serialize the response and send it in json
         $restaurantJson = $serializer->serialize($restaurant, 'json', $context);
         return new JsonResponse($restaurantJson, Response::HTTP_OK, [], true);
     }
@@ -301,26 +315,30 @@ class ApiController extends AbstractController
     ): JsonResponse {
 
         $requestArray = $request->toArray();
-
         $submittedToken = $requestArray['token'];
 
         if ($this->isCsrfTokenValid('restaurant', $submittedToken)) {
 
+            // converting the JSON request into a restaurant class, this allows to use the methods availables in the entity
             $updateRestaurant = $serializer->deserialize(
-                $request->getContent(),
-                Restaurant::class,
-                'json'
+                $request->getContent(), //getting content from request
+                Restaurant::class, // setting in what class it should be deserialized,
+                'json' //what type of request it's deserializing from
             );
+
+            // replacing the data
             $restaurant->setAddress($updateRestaurant->getAddress());
             $restaurant->setCity($updateRestaurant->getCity());
             $restaurant->setPhone($updateRestaurant->getPhone());
             $restaurant->setPostCode($updateRestaurant->getPostCode());
             $restaurant->setMaxCapacity($updateRestaurant->getMaxCapacity());
 
+            // validation from constraints of the entity
             $errors = $validator->validate($restaurant);
             if ($errors->count() > 0) {
                 return new JsonResponse($serializer->serialize($errors, 'json'), JsonResponse::HTTP_BAD_REQUEST, [], true);
             }
+            // Persisting and sending back the response
             $em->persist($restaurant);
             $em->flush();
             $content = [
@@ -570,7 +588,7 @@ class ApiController extends AbstractController
 
             $contentJson = $serializer->serialize($content, 'json', []);
 
-            return new JsonResponse($contentJson, Response::HTTP_OK, [], true);
+            return new JsonResponse($contentJson, Response::HTTP_CREATED, [], true);
         } else {
             $content = [
                 'message' => 'Une erreur est survenue'
@@ -589,23 +607,28 @@ class ApiController extends AbstractController
         CategoryRepository $categoryRepository
     ): JsonResponse {
 
+        // request for pagination
         $page = intval($request->query->get('page'));
         $maxResults = intval($request->query->get('max'));
         $categoryId = intval($request->query->get('category'));
 
         if ($categoryId) {
+            // if the filter by category is requested first getting the category to count the dishes from this category
             $category = $categoryRepository->find($categoryId);
             $count = count($dishRepository->findBy(['category' => $category]));
+            // then using custom method to find by category with pagination
             $dishList = $dishRepository->findByCategoryWithPagination($page, $maxResults, $categoryId);
         } else {
+            // else just count all the entries, and use custom method to find with pagination
             $count = count($dishRepository->findAll());
             $dishList = $dishRepository->findWithPagination($page, $maxResults);
         }
-
+        // preparing the response
         $dish = [
             'count' => $count,
             'dish' => $dishList
         ];
+        // setting context to prevent cycling request
         $context = (new ObjectNormalizerContextBuilder())
             ->withGroups('get_dishes')
             ->toArray();
@@ -613,6 +636,7 @@ class ApiController extends AbstractController
 
         return new JsonResponse($dishJson, Response::HTTP_OK, [], true);
     }
+
 
     #[Route('/update/dishes/{id}', name: 'app_update_dishes', methods: ['PUT'])]
     #[IsGranted('ROLE_ADMIN', message: 'Vous n\'avez pas les droits suffisants pour effectuer cette action')]
@@ -639,10 +663,10 @@ class ApiController extends AbstractController
             $dish->setDescription($updateDish->getDescription());
             $dish->setPrice($updateDish->getPrice());
 
-
+            // getting category id from the request
             $content = $request->toArray();
             $idCategory = $content['category'];
-
+            // this allow to set the category relation
             $dish->setCategory($categoryRepository->find($idCategory));
 
             $errors = $validator->validate($dish);
@@ -714,7 +738,7 @@ class ApiController extends AbstractController
 
             $contentJson = $serializer->serialize($content, 'json', []);
 
-            return new JsonResponse($contentJson, Response::HTTP_OK, [], true);
+            return new JsonResponse($contentJson, Response::HTTP_CREATED, [], true);
         } else {
             $content = [
                 'message' => 'Une erreur est survenue'
@@ -791,7 +815,6 @@ class ApiController extends AbstractController
                 Category::class,
                 'json'
             );
-
 
             $menu->setName($updateMenu->getName());
 
@@ -882,7 +905,7 @@ class ApiController extends AbstractController
 
             $contentJson = $serializer->serialize($content, 'json', []);
 
-            return new JsonResponse($contentJson, Response::HTTP_OK, [], true);
+            return new JsonResponse($contentJson, Response::HTTP_CREATED, [], true);
         } else {
             $content = [
                 'message' => 'Une erreur est survenue'
@@ -892,7 +915,7 @@ class ApiController extends AbstractController
         }
     }
 
-
+    // formulas
     #[Route('/update/formulas/{id}', name: 'app_update_formulas', methods: ['PUT'])]
     #[IsGranted('ROLE_ADMIN', message: 'Vous n\'avez pas les droits suffisants pour effectuer cette action')]
     public function update_formulas(
@@ -987,7 +1010,7 @@ class ApiController extends AbstractController
 
             $contentJson = $serializer->serialize($content, 'json', []);
 
-            return new JsonResponse($contentJson, Response::HTTP_OK, [], true);
+            return new JsonResponse($contentJson, Response::HTTP_CREATED, [], true);
         } else {
             $content = [
                 'message' => 'Une erreur est survenue'
@@ -1072,6 +1095,8 @@ class ApiController extends AbstractController
             );
 
             $booking->setLastName($updateBooking->getLastName());
+            $booking->setFirstName($updateBooking->getFirstName());
+            $booking->setEmail($updateBooking->getEmail());
             $booking->setAllergies($updateBooking->getAllergies());
             $booking->setPhone($updateBooking->getPhone());
             $booking->setShift($updateBooking->getShift());
@@ -1128,7 +1153,7 @@ class ApiController extends AbstractController
 
             $maxCapacity = $restaurantRepository->getMaxCapacity();
 
-            $seatsTaken = $bookingRepository->getAvailable($date, $shift)[0]['seats'] === null ? 0 : intval($bookingRepository->getAvailable($date, $shift)[0]['seats']);
+            $seatsTaken = $bookingRepository->getTaken($date, $shift);
 
             $seatsLeft = $maxCapacity - $seatsTaken;
 
@@ -1161,16 +1186,16 @@ class ApiController extends AbstractController
 
             // Send confirmation email
             if ($requestArray['email'] !== null) {
-
+                // getting restaurant infos to send them with the email
                 $restaurantInfos = $restaurantRepository->findAll();
 
-
+                //Prepare email to send. Email is edited in a twig template 
                 $email = (new TemplatedEmail())
-                    ->from(new Address('j.moreschi@outlook.fr', 'Le Quai Antique'))
+                    ->from(new Address($this->getParameter('app.email_addr'), 'Le Quai Antique'))
                     ->to($requestArray['email'])
                     ->subject('Confirmation de réservation')
                     ->htmlTemplate('mail_templates/confirmbooking.html.twig')
-                    ->context([
+                    ->context([ //sending data to use in the twig template
                         'name' => $updateBooking->getLastname(),
                         'date' => date_format($updateBooking->getDate(), 'c'),
                         'time' => date_format($updateBooking->getTime(), 'c'),
@@ -1186,7 +1211,7 @@ class ApiController extends AbstractController
 
             $contentJson = $serializer->serialize($content, 'json', []);
 
-            return new JsonResponse($contentJson, Response::HTTP_OK, [], true);
+            return new JsonResponse($contentJson, Response::HTTP_CREATED, [], true);
         } else {
             $content = [
                 'message' => 'Une erreur est survenue'
@@ -1238,14 +1263,18 @@ class ApiController extends AbstractController
 
         $date = $request->query->get('date');
         $shift = $request->query->get('shift');
-
+        // call custom method to get the schedule depending on the date, see method to more details
         $day = $scheduleRepository->getScheduleByDate($date, $shift);
 
+        // call custom method to get the max capacity of the restaurant.
         $maxCapacity = $restaurantRepository->getMaxCapacity();
 
-        $seatsTaken = $bookingRepository->getAvailable($date, $shift)[0]['seats'] === null ? 0 : intval($bookingRepository->getAvailable($date, $shift)[0]['seats']);
+        // call custom method to get the seats taken depending on the day and the shift.
+        $seatsTaken = $bookingRepository->getTaken($date, $shift);
 
         $seatsLeft = $maxCapacity - $seatsTaken;
+
+        // sending back the seats left depend on the service, the start and end times of the service, or if the service is closed
         $response = [
             'seatsLeft' => $seatsLeft,
             'shiftStart' => $day['start'],

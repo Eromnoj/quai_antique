@@ -89,8 +89,9 @@ class ApiController extends AbstractController
                     'mimeTypesMessage' => 'Le fichier doit être une image'
                 ])
             );
-            // if there is an error during validation, send back the error
+
             if ($violations->count() > 0) {
+
                 return new JsonResponse($serializer->serialize($violations, 'json', []), Response::HTTP_BAD_REQUEST, [], true);
             }
 
@@ -164,7 +165,7 @@ class ApiController extends AbstractController
 
                 $filesystem->remove([$this->getParameter('image_upload_directory') . '/' . $imageUrl]);
             } catch (FileException $e) {
-                // ... handle exception if something happens during file deletion
+                // ... handle exception if something happens during file upload
                 $message = [
                     'message' => 'Un problème est servenu lors de la suppression de l\'image, veuillez recommencer'
                 ];
@@ -206,11 +207,11 @@ class ApiController extends AbstractController
         if ($this->isCsrfTokenValid('image', $submittedToken)) {
             $image = new Gallery();
 
-            $addImage = $request->files->get('image');
+            $updateImage = $request->files->get('image');
             $description = $request->get('description');
             // Check if file is an image with a max size 2Mo
             $violations = $validator->validate(
-                $addImage,
+                $updateImage,
                 new File([
                     'maxSize' => '2000K',
                     'mimeTypes' => [
@@ -226,13 +227,13 @@ class ApiController extends AbstractController
                 return new JsonResponse($serializer->serialize($violations, 'json', []), Response::HTTP_BAD_REQUEST, [], true);
             }
 
-            if ($addImage) {
+            if ($updateImage) {
 
-                $originalFilename = pathinfo($addImage->getClientOriginalName(), PATHINFO_FILENAME);
+                $originalFilename = pathinfo($updateImage->getClientOriginalName(), PATHINFO_FILENAME);
                 $safeFilename = $slugger->slug($originalFilename);
-                $newFilename = $safeFilename . '-' . uniqid() . '.' . $addImage->guessExtension();
+                $newFilename = $safeFilename . '-' . uniqid() . '.' . $updateImage->guessExtension();
                 try {
-                    $addImage->move(
+                    $updateImage->move(
                         $this->getParameter('image_upload_directory'),
                         $newFilename
                     );
@@ -241,10 +242,7 @@ class ApiController extends AbstractController
                 } catch (FileException $e) {
                     // ... handle exception if something happens during file upload
                     $message = [
-                        'message' => 'Un problème est servenu lors du chargement de l\'image, veuillez recommencer',
-                        'original' => $originalFilename,
-                        'safe' => $safeFilename,
-                        'new' => $newFilename
+                        'message' => 'Un problème est servenu lors du chargement de l\'image, veuillez recommencer'
                     ];
 
                     $messageJson = $serializer->serialize($message, 'json', []);

@@ -32,18 +32,15 @@ const ModalImage = ({ image, showEdit, token, getData }) => {
         showEdit()
       }, 2000)
     } catch (error) {
-      console.log(error);
-      
       if (error.response.data.violations) {
         const violation = error.response.data.violations
         violation.forEach(element => {
           setMessage(array => [...array, { type: 'error', input: element.propertyPath, message: element.title }])
-          console.log(element.propertyPath);
-          console.log(element.title);
         });
-      } else {
-        console.log(error.response.data.message);
+      } else if (error.response.data.message){
         setMessage(array => [...array, { type: 'error', input: 'message', message: error.response.data.message }])
+      } else {
+        setMessage(array => [...array, { type: 'error', input: 'message', message: 'Le fichier ne dois pas dépasser 2Mo'} ])
       }
     }
   }

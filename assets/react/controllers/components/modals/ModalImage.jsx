@@ -33,6 +33,7 @@ const ModalImage = ({ image, showEdit, token, getData }) => {
       }, 2000)
     } catch (error) {
       console.log(error);
+      
       if (error.response.data.violations) {
         const violation = error.response.data.violations
         violation.forEach(element => {

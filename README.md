@@ -162,8 +162,8 @@ APP_ENV=dev php bin/console doctrine:fixtures:load
 ```
 
 L'alimentation de la base de donnée avec les fixtures n'est pas obligatoires. Les vérifications nécessaires pour avoir une base de données avec les informations minimales sont faites au niveau des controllers de l'application :
-- Méthode permettant d'avoir des horaires sur 7 jours : [get_schedule](https://github.com/Eromnoj/quai_antique/blob/cb831352ed70f8380bf5c51afd46275793dca300/src/Controller/ApiController.php#L369-L396). la suppression des horaires n'est pas possible, mais en case mauvaises manipulations de la base de donnée, ceci permet d'avoir une réinitialisation.
-- Premier utilisateur inscrit toujours administrateur ([register](https://github.com/Eromnoj/quai_antique/blob/cb831352ed70f8380bf5c51afd46275793dca300/src/Controller/RegistrationController.php#L37-L50)) ([isUserFirstSuscriber](https://github.com/Eromnoj/quai_antique/blob/cb831352ed70f8380bf5c51afd46275793dca300/src/Repository/UserRepository.php#L64-L73)), et le compte administrateur ne peut pas être supprimé ([delete_client](https://github.com/Eromnoj/quai_antique/blob/cb831352ed70f8380bf5c51afd46275793dca300/src/Controller/ApiController.php#L1404-L1416))
+- Méthode permettant d'avoir des horaires sur 7 jours : [populatechedule](https://github.com/Eromnoj/quai_antique/blob/d49319d6cdcb0364d2467b154b4fb6bcde08a4e9/src/Repository/ScheduleRepository.php#L91-L117). la suppression des horaires n'est pas possible, mais en case mauvaises manipulations de la base de donnée, ceci permet d'avoir une réinitialisation.
+- Premier utilisateur inscrit toujours administrateur ([register](https://github.com/Eromnoj/quai_antique/blob/cb831352ed70f8380bf5c51afd46275793dca300/src/Controller/RegistrationController.php#L37-L57)) ([isUserFirstSuscriber](https://github.com/Eromnoj/quai_antique/blob/cb831352ed70f8380bf5c51afd46275793dca300/src/Repository/UserRepository.php#L64-L73)), et le compte administrateur ne peut pas être supprimé ([delete_client](https://github.com/Eromnoj/quai_antique/blob/cb831352ed70f8380bf5c51afd46275793dca300/src/Controller/ApiController.php#L1404-L1416))
 
 Cependant, pour un test plus agréable, l'alimentation de la base est recommandée.
 
@@ -186,7 +186,7 @@ symfony:serve
 ```
 Le projet est alors accessible via l'adresse suivante : localhost:8000
 ### Accéder au compte adminstrateur
-Si vous avez alimenté la base de donnée avec les fixtures, un compte administrateur a été avec les informations de connexions suivante : 
+Si vous avez alimenté la base de donnée avec les fixtures, un compte administrateur a été avec les informations de connexions suivantes : 
 ```
 login : admin@lequaiantique.fr
 mdp : mySupErS3cr3tP4s5w0rd

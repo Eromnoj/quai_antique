@@ -104,8 +104,8 @@ symfony check:requirements
 ```
 Veuillez corriger les éventuelles erreurs en installant les dépendances manquantes signalées par l'outils.
 
-### Récupération du projet en utlisant Git
-Placez vous dans le dossier devant receptionner le projet et taper la commande suivante :
+### Récupération du projet en utilisant Git
+Placez vous dans le dossier devant receptionner le projet et tapez la commande suivante :
 ```
 git clone https://github.com/Eromnoj/quai_antique.git
 ```
@@ -141,7 +141,7 @@ DATABASE_URL="mysql://<user>:<password>@<address>:<port>/<nomBDD>?serverVersion=
 - ##### Information pour l'envoie de mail
 
 Le projet envoie des mails à deux occasions : pour la récupération du mot de passe ainsi que pour confirmer une réservation.
-Pour cela, le service d'envoi de mail de [Sendgrid](https://sendgrid.com/) a été utilisé. Mais le mailer par défaut de symfony peut être utilisé en utilisant un serveur SMTP ([Dcumentation symfony](https://symfony.com/doc/current/mailer.html)). Dans le cas où aucune adresse mail n'aurait été fournit, les envois de mail sont désactivés en intégrant un bloc trycatch. Si vous ne l'intégrer pas lors du test en local, l'envoi de mail est fonctionnelle sur le site déployé, et peut y être testée.
+Pour cela, le service d'envoi de mail de [Sendgrid](https://sendgrid.com/) a été utilisé. Mais le mailer par défaut de symfony peut être utilisé en utilisant un serveur SMTP ([Dcumentation symfony](https://symfony.com/doc/current/mailer.html)). Dans le cas où aucune adresse mail n'aurait été fournit, les envois de mail sont désactivés en intégrant un bloc trycatch. Si vous ne l'intégrez pas lors du test en local, l'envoi de mail est fonctionnelle sur le site déployé, et peut y être testée.
 ```
 MAILER_DSN=smtp://user:pass@smtp.example.com:25
 EMAIL_ADDR="votre@email.fr"
@@ -162,7 +162,7 @@ APP_ENV=dev php bin/console doctrine:fixtures:load
 ```
 
 L'alimentation de la base de donnée avec les fixtures n'est pas obligatoires. Les vérifications nécessaires pour avoir une base de données avec les informations minimales sont faites au niveau des controllers de l'application :
-- Contrôle permettant d'avoir des horaires pertinents sur 7 jours : [get_schedule](https://github.com/Eromnoj/quai_antique/blob/cb831352ed70f8380bf5c51afd46275793dca300/src/Controller/ApiController.php#L369-L396). la suppression des horaires n'est pas possible, mais en case mauvaises manipulations de la base de donnée, ceci permet d'avoir une réinitialisation.
+- Méthode permettant d'avoir des horaires sur 7 jours : [get_schedule](https://github.com/Eromnoj/quai_antique/blob/cb831352ed70f8380bf5c51afd46275793dca300/src/Controller/ApiController.php#L369-L396). la suppression des horaires n'est pas possible, mais en case mauvaises manipulations de la base de donnée, ceci permet d'avoir une réinitialisation.
 - Premier utilisateur inscrit toujours administrateur ([register](https://github.com/Eromnoj/quai_antique/blob/cb831352ed70f8380bf5c51afd46275793dca300/src/Controller/RegistrationController.php#L37-L50)) ([isUserFirstSuscriber](https://github.com/Eromnoj/quai_antique/blob/cb831352ed70f8380bf5c51afd46275793dca300/src/Repository/UserRepository.php#L64-L73)), et le compte administrateur ne peut pas être supprimé ([delete_client](https://github.com/Eromnoj/quai_antique/blob/cb831352ed70f8380bf5c51afd46275793dca300/src/Controller/ApiController.php#L1404-L1416))
 
 Cependant, pour un test plus agréable, l'alimentation de la base est recommandée.
@@ -191,4 +191,4 @@ Si vous avez alimenté la base de donnée avec les fixtures, un compte administr
 login : admin@lequaiantique.fr
 mdp : mySupErS3cr3tP4s5w0rd
 ```
-Dans le cas où vous n'auriez pas déployé les fixtures, le premier compte créé sur le site est celui de l'administrateur. Pour cela, il vous suffit alors de vous rendre sur la page "Mon Compte", puis de cliquez sur le lien vers la page de création de compte.
+Dans le cas où vous n'auriez pas déployé les fixtures, le premier compte créé sur le site est celui de l'administrateur. Pour cela, il vous suffit alors de vous rendre sur la page "Mon Compte", puis de cliquez sur le lien vers la page de création de compte. Vous pourrez alors entrer toutes les informations nécessaires pour la création du compte administrateur.

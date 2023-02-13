@@ -40,12 +40,19 @@ class RegistrationController extends AbstractController
                 
                 $restaurant = new Restaurant();
                 $restaurant->setUserId($user);
-
+                $restaurant->setAddress($form->get('address')->getData());
+                $restaurant->setPostCode($form->get('post_code')->getData());
+                $restaurant->setCity($form->get('city')->getData());
+                $restaurant->setPhone($form->get('phone')->getData());
                 $entityManager->persist($restaurant);
+
+                // populated schedule with dummy data
+                $scheduleRepository->populateSchedule();
             } else {
                 $client = new Client();
                 $client->setUserId($user);
-
+                $client->setAllergies($form->get('allergies')->getData());
+                $client->setNumber($form->get('number')->getData());
                 $entityManager->persist($client);
             }
 
@@ -67,12 +74,17 @@ class RegistrationController extends AbstractController
                 return $this->redirectToRoute('app_user_profil');
             }
         }
-        $info = $restaurantRepository->findAll();
+        $info = $restaurantRepository->findAll();if(count($info) === 0){
+            $restaurantInfo = false;
+        } else {
+            $restaurantInfo = $info[0];
+        }
         $schedule = $scheduleRepository->findAll();
         return $this->render('registration/register.html.twig', [
             'registrationForm' => $form->createView(),
             'schedule' => $schedule,
-            'info' => $info[0]
+            'info' => $restaurantInfo,
+            'first_suscriber' => $allUser->isUserFirstSuscriber()
         ]);
     }
 }

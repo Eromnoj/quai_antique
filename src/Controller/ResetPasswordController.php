@@ -52,11 +52,16 @@ class ResetPasswordController extends AbstractController
         }
 
         $info = $restaurantRepository->findAll();
+        if(count($info) === 0){
+            $restaurantInfo = false;
+        } else {
+            $restaurantInfo = $info[0];
+        }
         $schedule = $scheduleRepository->findAll();
         return $this->render('reset_password/request.html.twig', [
             'requestForm' => $form->createView(),
             'schedule' => $schedule,
-            'info' => $info[0]
+            'info' => $restaurantInfo
         ]);
     }
 
@@ -74,11 +79,16 @@ class ResetPasswordController extends AbstractController
         }
 
         $info = $restaurantRepository->findAll();
+        if(count($info) === 0){
+            $restaurantInfo = false;
+        } else {
+            $restaurantInfo = $info[0];
+        }
         $schedule = $scheduleRepository->findAll();
         return $this->render('reset_password/check_email.html.twig', [
             'resetToken' => $resetToken,
             'schedule' => $schedule,
-            'info' => $info[0]
+            'info' => $restaurantInfo
         ]);
     }
 
@@ -138,11 +148,16 @@ class ResetPasswordController extends AbstractController
         }
 
         $info = $restaurantRepository->findAll();
+        if(count($info) === 0){
+            $restaurantInfo = false;
+        } else {
+            $restaurantInfo = $info[0];
+        }
         $schedule = $scheduleRepository->findAll();
         return $this->render('reset_password/reset.html.twig', [
             'resetForm' => $form->createView(),
             'schedule' => $schedule,
-            'info' => $info[0]
+            'info' => $restaurantInfo
         ]);
     }
 

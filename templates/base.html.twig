@@ -134,13 +134,15 @@
 					</div>
 				</div>
 				<div class="address">
-
+					{% if info %}
+				{# {{ dump(info) }} #}
 					<p>Le Quai Antique</p>
 					<p>{{info.address}}</p>
 					<p>{{info.postCode}}
 						{{info.city}}</p>
 					<p>tél :
 						{{info.phone}}</p>
+					{% endif %}
 				</div>
 			</footer>
 		{% endblock %}

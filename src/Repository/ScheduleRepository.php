@@ -88,6 +88,34 @@ class ScheduleRepository extends ServiceEntityRepository
         return $response;
     }
 
+    // if schedule get emptied, or not containing 7 days, this method can initialised it
+    public function populateSchedule()
+    {
+        $connection = $this->getEntityManager()->getConnection();
+            $plateform = $connection->getDatabasePlatform();
+            $connection->executeQuery($plateform->getTruncateTableSQL('schedule', true));
+
+            //... Then filled with dummy values. Those values are the same of the AppFixtures
+            $days = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
+
+            $schedule = array();
+
+            for ($i = 0; $i < count($days); $i++) {
+                $schedule[$i] = new Schedule();
+
+                $schedule[$i]->setDay($days[$i]);
+                $i <= 4 ? $schedule[$i]->setNoonClosed(false) : $schedule[$i]->setNoonClosed(true);
+                $schedule[$i]->setNoonStart(new DateTime('11:00'));
+                $schedule[$i]->setNoonEnd(new DateTime('14:00'));
+                $i >= 4 && $i < 6 ? $schedule[$i]->setEveningClosed(false) : $schedule[$i]->setEveningClosed(true);
+                $schedule[$i]->setEveningStart(new DateTime('17:00'));
+                $schedule[$i]->setEveningEnd(new DateTime('21:00'));
+
+                $this->getEntityManager()->persist($schedule[$i]);
+                $this->getEntityManager()->flush();
+            }
+    }
+
     //    /**
     //     * @return Schedule[] Returns an array of Schedule objects
     //     */

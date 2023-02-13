@@ -370,30 +370,8 @@ class ApiController extends AbstractController
         // If the schedule was not created with the fixtures...
         if (count($schedule) < 7) {
             // If the schedule table has less than 7 entries, it gets truncated... 
-            $connection = $em->getConnection();
-            $plateform = $connection->getDatabasePlatform();
-            $connection->executeQuery($plateform->getTruncateTableSQL('schedule', true));
-
-            //... Then filled with dummy values. Those values are the same of the AppFixtures
-            $days = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
-
-            $schedule = array();
-
-            for ($i = 0; $i < count($days); $i++) {
-                $schedule[$i] = new Schedule();
-
-                $schedule[$i]->setDay($days[$i]);
-                $i <= 4 ? $schedule[$i]->setNoonClosed(false) : $schedule[$i]->setNoonClosed(true);
-                $schedule[$i]->setNoonStart(new DateTime('11:00'));
-                $schedule[$i]->setNoonEnd(new DateTime('14:00'));
-                $i >= 4 && $i < 6 ? $schedule[$i]->setEveningClosed(false) : $schedule[$i]->setEveningClosed(true);
-                $schedule[$i]->setEveningStart(new DateTime('17:00'));
-                $schedule[$i]->setEveningEnd(new DateTime('21:00'));
-
-                $em->persist($schedule[$i]);
-                $em->flush();
-
-            }
+            $scheduleRepository->populateSchedule();
+ 
             $schedule = $scheduleRepository->findAll();
         }
         $scheduleJson = $serializer->serialize($schedule, 'json', []);

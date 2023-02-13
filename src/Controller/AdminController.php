@@ -15,10 +15,15 @@ class AdminController extends AbstractController
     public function index(ScheduleRepository $scheduleRepository, RestaurantRepository $restaurantRepository): Response
     {
         $info = $restaurantRepository->findAll();
+        if(count($info) === 0){
+            $restaurantInfo = false;
+        } else {
+            $restaurantInfo = $info[0];
+        }
         $schedule = $scheduleRepository->findAll();
         return $this->render('admin/restaurant.html.twig', [
             'schedule' => $schedule,
-            'info' => $info[0]
+            'info' => $restaurantInfo
         ]);
     }
 
@@ -26,10 +31,15 @@ class AdminController extends AbstractController
     public function dishes(ScheduleRepository $scheduleRepository, RestaurantRepository $restaurantRepository): Response
     {
         $info = $restaurantRepository->findAll();
+        if(count($info) === 0){
+            $restaurantInfo = false;
+        } else {
+            $restaurantInfo = $info[0];
+        }
         $schedule = $scheduleRepository->findAll();
         return $this->render('admin/dishes.html.twig', [
             'schedule' => $schedule,
-            'info' => $info[0]
+            'info' => $restaurantInfo
         ]);
     }
 
@@ -37,10 +47,15 @@ class AdminController extends AbstractController
     public function menus(ScheduleRepository $scheduleRepository, RestaurantRepository $restaurantRepository): Response
     {
         $info = $restaurantRepository->findAll();
+        if(count($info) === 0){
+            $restaurantInfo = false;
+        } else {
+            $restaurantInfo = $info[0];
+        }
         $schedule = $scheduleRepository->findAll();
         return $this->render('admin/menus.html.twig', [
             'schedule' => $schedule,
-            'info' => $info[0]
+            'info' => $restaurantInfo
         ]);
     }
 
@@ -48,10 +63,15 @@ class AdminController extends AbstractController
     public function adminBooking(ScheduleRepository $scheduleRepository, RestaurantRepository $restaurantRepository): Response
     {
         $info = $restaurantRepository->findAll();
+        if(count($info) === 0){
+            $restaurantInfo = false;
+        } else {
+            $restaurantInfo = $info[0];
+        }
         $schedule = $scheduleRepository->findAll();
         return $this->render('admin/booking.html.twig', [
             'schedule' => $schedule,
-            'info' => $info[0]
+            'info' => $restaurantInfo
         ]);
     }
 }

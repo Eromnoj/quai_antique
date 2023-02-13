@@ -23,12 +23,17 @@ class LoginController extends AbstractController
         $lastUsername = $authenticationUtils->getLastUsername();
 
         $info = $restaurantRepository->findAll();
+        if(count($info) === 0){
+            $restaurantInfo = false;
+        } else {
+            $restaurantInfo = $info[0];
+        }
         $schedule = $scheduleRepository->findAll();
         return $this->render('login/index.html.twig', [
             'last_username' => $lastUsername,
             'error' => $error,
             'schedule' => $schedule,
-            'info' => $info[0]
+            'info' => $restaurantInfo
         ]);
     }
 

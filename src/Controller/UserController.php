@@ -15,10 +15,15 @@ class UserController extends AbstractController
     public function profil(ScheduleRepository $scheduleRepository, RestaurantRepository $restaurantRepository): Response
     {
         $info = $restaurantRepository->findAll();
+        if(count($info) === 0){
+            $restaurantInfo = false;
+        } else {
+            $restaurantInfo = $info[0];
+        }
         $schedule = $scheduleRepository->findAll();
         return $this->render('user/profil.html.twig', [
             'schedule' => $schedule,
-            'info' => $info[0]
+            'info' => $restaurantInfo
         ]);
     }
 
@@ -26,10 +31,15 @@ class UserController extends AbstractController
     public function account(ScheduleRepository $scheduleRepository, RestaurantRepository $restaurantRepository): Response
     {
         $info = $restaurantRepository->findAll();
+        if(count($info) === 0){
+            $restaurantInfo = false;
+        } else {
+            $restaurantInfo = $info[0];
+        }
         $schedule = $scheduleRepository->findAll();
         return $this->render('user/account.html.twig', [
             'schedule' => $schedule,
-            'info' => $info[0]
+            'info' => $restaurantInfo
         ]);
     }
 }

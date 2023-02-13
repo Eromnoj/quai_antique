@@ -19,10 +19,15 @@ class PagesController extends AbstractController
         $gallery = $galleryRepository->findAll();
 
         $info = $restaurantRepository->findAll();
+        if(count($info) === 0){
+            $restaurantInfo = false;
+        } else {
+            $restaurantInfo = $info[0];
+        }
         $schedule = $scheduleRepository->findAll();
         return $this->render('pages/index.html.twig',[
             'schedule' => $schedule,
-            'info' => $info[0],
+            'info' => $restaurantInfo,
             'gallery' => $gallery
         ]);
     }
@@ -32,10 +37,15 @@ class PagesController extends AbstractController
     {
         $category = $categoryRepository->findAll();
         $info = $restaurantRepository->findAll();
+        if(count($info) === 0){
+            $restaurantInfo = false;
+        } else {
+            $restaurantInfo = $info[0];
+        }
         $schedule = $scheduleRepository->findAll();
         return $this->render('pages/dishes.html.twig',[
             'schedule' => $schedule,
-            'info' => $info[0],
+            'info' => $restaurantInfo,
             'categories' => $category
         ]);
     }
@@ -45,10 +55,15 @@ class PagesController extends AbstractController
     {
         $menus = $menuRepository->findAll();
         $info = $restaurantRepository->findAll();
+        if(count($info) === 0){
+            $restaurantInfo = false;
+        } else {
+            $restaurantInfo = $info[0];
+        }
         $schedule = $scheduleRepository->findAll();
         return $this->render('pages/menus.html.twig',[
             'schedule' => $schedule,
-            'info' => $info[0],
+            'info' => $restaurantInfo,
             'menus' => $menus
         ]);
     }
@@ -56,11 +71,15 @@ class PagesController extends AbstractController
     #[Route('/reservation', name: 'app_booking')]
     public function booking(ScheduleRepository $scheduleRepository, RestaurantRepository $restaurantRepository): Response
     {
-        $info = $restaurantRepository->findAll();
+        $info = $restaurantRepository->findAll();if(count($info) === 0){
+            $restaurantInfo = false;
+        } else {
+            $restaurantInfo = $info[0];
+        }
         $schedule = $scheduleRepository->findAll();
         return $this->render('pages/booking.html.twig',[
             'schedule' => $schedule,
-            'info' => $info[0]
+            'info' => $restaurantInfo
         ]);
     }
 

@@ -1153,7 +1153,7 @@ class ApiController extends AbstractController
 
             $maxCapacity = $restaurantRepository->getMaxCapacity();
 
-            $seatsTaken = $bookingRepository->getTaken($date, $shift);
+            $seatsTaken = $bookingRepository->getSeatTakenByShift($date, $shift);
 
             $seatsLeft = $maxCapacity - $seatsTaken;
 
@@ -1270,7 +1270,7 @@ class ApiController extends AbstractController
         $maxCapacity = $restaurantRepository->getMaxCapacity();
 
         // call custom method to get the seats taken depending on the day and the shift.
-        $seatsTaken = $bookingRepository->getTaken($date, $shift);
+        $seatsTaken = $bookingRepository->getSeatTakenByShift($date, $shift);
 
         $seatsLeft = $maxCapacity - $seatsTaken;
 

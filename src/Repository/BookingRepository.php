@@ -45,16 +45,7 @@ class BookingRepository extends ServiceEntityRepository
         }
     }
 
-    public function findOrderByDate(): array
-    {
-        return $this->createQueryBuilder('b')
-            ->addOrderBy('b.date', 'ASC')
-            ->addOrderBy('b.time', 'ASC')
-            ->getQuery()
-            ->getResult();
-    }
-
-    public function getTaken(string $date, string $shift): int
+    public function getSeatTakenByShift(string $date, string $shift): int
     {
          $seatsLeft = $this->createQueryBuilder('r')
             ->andWhere('r.date = :date')

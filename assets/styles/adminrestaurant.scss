@@ -57,7 +57,7 @@
       }
     }
 
-    .info_form {
+    .info_form, .user_form {
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -209,7 +209,7 @@
     }
 
     section {
-      .info_form {
+      .info_form, .user_form {
         align-items: flex-start;
 
         .form_inputs {

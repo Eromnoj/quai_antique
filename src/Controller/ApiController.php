@@ -1185,29 +1185,39 @@ class ApiController extends AbstractController
             $em->flush();
 
             // Send confirmation email
-            if ($requestArray['email'] !== null) {
-                // getting restaurant infos to send them with the email
-                $restaurantInfos = $restaurantRepository->findAll();
-
-                //Prepare email to send. Email is edited in a twig template 
-                $email = (new TemplatedEmail())
+           
+            try { //trycatch block only for testing purpose, in case no email address was defined in Environnement variables
+                if ($requestArray['email'] !== null) {
+                    // getting restaurant infos to send them with the email
+                    $restaurantInfos = $restaurantRepository->findAll();
+                    
+                    //Prepare email to send. Email is edited in a twig template 
+                    $email = (new TemplatedEmail())
                     ->from(new Address($this->getParameter('app.email_addr'), 'Le Quai Antique'))
                     ->to($requestArray['email'])
                     ->subject('Confirmation de réservation')
                     ->htmlTemplate('mail_templates/confirmbooking.html.twig')
                     ->context([ //sending data to use in the twig template
                         'name' => $updateBooking->getLastname(),
-                        'date' => date_format($updateBooking->getDate(), 'c'),
+                        'date' => date_format($updateBooking->getDate(), 'c'), // the 'c' converts the date to ISO 8601, readable by TWIG
                         'time' => date_format($updateBooking->getTime(), 'c'),
                         'tel' => $restaurantInfos[0]->getPhone(),
                     ]);
-
-                $mailer->send($email);
+                    
+                    $mailer->send($email);
+                }
+                //code...
+                $content = [
+                    "message" => "Votre réservation a bien été enregistrée. Vous recevrez sous peu un mail de confirmation"
+                ];
+            } catch (\Throwable $th) {
+                $content = [
+                    "message" => "Votre réservation a bien été enregistrée. Pas d'email de configurer"
+                ];
             }
+           
 
-            $content = [
-                "message" => "Votre réservation a bien été enregistrée. Vous recevrez sous peu un mail de confirmation"
-            ];
+            
 
             $contentJson = $serializer->serialize($content, 'json', []);
 
@@ -1409,7 +1419,7 @@ class ApiController extends AbstractController
 
         if ($this->isCsrfTokenValid('profil', $submittedToken)) {
 
-            if ($isAdmin) {
+            if ($isAdmin) {//prevent admin account to be deleted
                 $content = [
                     'message' => 'Le compte administrateur ne peut pas être supprimé'
                 ];

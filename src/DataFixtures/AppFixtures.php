@@ -73,7 +73,7 @@ class AppFixtures extends Fixture
                 $manager->persist($client);
             }
 
-            $user[$i]->setPassword($this->userPasswordHasher->hashPassword($user[$i], 'azerty'));
+            $user[$i]->setPassword($this->userPasswordHasher->hashPassword($user[$i], 'mySupErS3cr3tP4s5w0rd'));
 
             $manager->persist($user[$i]);
         }

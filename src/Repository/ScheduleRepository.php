@@ -42,6 +42,7 @@ class ScheduleRepository extends ServiceEntityRepository
 
     public function getScheduleByDate($date, $shift): array
     {
+        // Array to translate day from english to french
         $daysEnToFr = [
             'Monday' => 'Lundi',
             'Tuesday' => 'Mardi',
@@ -52,12 +53,16 @@ class ScheduleRepository extends ServiceEntityRepository
             'Sunday' => 'Dimanche',
     ];
 
+        // getting the day corresponding to date chosen by the customer
         $dayFromDate = date_format(new DateTime($date), 'l');  
 
+        // translating the day in french to query the databas
         $dayFr = $daysEnToFr[$dayFromDate];
 
+        // preparing a container for the response
         $response = array();
 
+        // depending if it's noon or evening shift, querying the infos needed
         if($shift === 'midi'){
             $qb = $this->createQueryBuilder('s')
             ->select('s.noonStart')
@@ -89,7 +94,7 @@ class ScheduleRepository extends ServiceEntityRepository
     }
 
     // if schedule get emptied, or not containing 7 days, this method can initialised it
-    public function populateSchedule()
+    public function populateSchedule(bool $flush)
     {
         $connection = $this->getEntityManager()->getConnection();
             $plateform = $connection->getDatabasePlatform();
@@ -112,7 +117,9 @@ class ScheduleRepository extends ServiceEntityRepository
                 $schedule[$i]->setEveningEnd(new DateTime('21:00'));
 
                 $this->getEntityManager()->persist($schedule[$i]);
-                $this->getEntityManager()->flush();
+                if($flush) {
+                    $this->getEntityManager()->flush();
+                }
             }
     }
 

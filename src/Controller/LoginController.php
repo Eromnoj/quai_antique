@@ -41,8 +41,8 @@ class LoginController extends AbstractController
     public function loginRedirect(Security $security)
     {
         $user = $security->getUser();
-
         if ($user) {
+            // depending on the user is ADMIN or not, redirect to the right panel
 
             if (in_array("ROLE_ADMIN", $user->getRoles())) {
                 return $this->redirectToRoute('app_admin_restaurant');

@@ -361,8 +361,7 @@ class ApiController extends AbstractController
     #[Route('/schedule', name: 'app_get_schedule', methods: ['GET'])]
     public function get_schedule(
         ScheduleRepository $scheduleRepository,
-        SerializerInterface $serializer,
-        EntityManagerInterface $em
+        SerializerInterface $serializer
     ): JsonResponse {
         $schedule = $scheduleRepository->findAll();
 
@@ -370,7 +369,7 @@ class ApiController extends AbstractController
         // If the schedule was not created with the fixtures...
         if (count($schedule) < 7) {
             // If the schedule table has less than 7 entries, it gets truncated... 
-            $scheduleRepository->populateSchedule();
+            $scheduleRepository->populateSchedule(true);
  
             $schedule = $scheduleRepository->findAll();
         }

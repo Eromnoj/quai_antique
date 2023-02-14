@@ -32,8 +32,6 @@ class RegistrationController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // encode the plain password
-
             //Make sure the first suscriber is the Admin if they are Admin, relation to the restaurant table, otherwise relation to the client DB
             if ($allUser->isUserFirstSuscriber()){
                 $user->setRoles(['ROLE_ADMIN']);
@@ -45,9 +43,9 @@ class RegistrationController extends AbstractController
                 $restaurant->setCity($form->get('city')->getData());
                 $restaurant->setPhone($form->get('phone')->getData());
                 $entityManager->persist($restaurant);
-
+                
                 // populated schedule with dummy data
-                $scheduleRepository->populateSchedule();
+                $scheduleRepository->populateSchedule(false);
             } else {
                 $client = new Client();
                 $client->setUserId($user);
@@ -55,7 +53,8 @@ class RegistrationController extends AbstractController
                 $client->setNumber($form->get('number')->getData());
                 $entityManager->persist($client);
             }
-
+            
+            // encode the plain password
             $user->setPassword(
                 $userPasswordHasher->hashPassword(
                     $user,

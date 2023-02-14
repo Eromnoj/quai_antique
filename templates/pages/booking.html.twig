@@ -1,5 +1,8 @@
 {% extends 'base.html.twig' %}
 
+{% block description %}Réservez vite votre table en ligne, le restaurant vous accueille sur les horaires suivantes :
+  {% for day in schedule %}  {{day.day}} Midi - {% if day.noonClosed %}Fermé{% else %}{{day.noonStart|date("H:i", "Europe/Paris")}} - {{day.noonEnd|date("H:i", "Europe/Paris")}}{% endif %} / Soir -{% if day.eveningClosed %}Fermé{% else %}{{day.eveningStart|date("H:i", "Europe/Paris")}} - {{day.eveningEnd|date("H:i", "Europe/Paris")}}{% endif %}{% endfor %}{% endblock %}
+
 {% block title %}Le Quai Antique - Réserver une table
 {% endblock %}
 

@@ -162,10 +162,10 @@ APP_ENV=dev php bin/console doctrine:fixtures:load
 ```
 
 L'alimentation de la base de donnée avec les fixtures n'est pas obligatoires. Les vérifications nécessaires pour avoir une base de données avec les informations minimales sont faites au niveau des controllers de l'application :
-- Méthode permettant d'avoir des horaires sur 7 jours : [populateSchedule](https://github.com/Eromnoj/quai_antique/blob/d49319d6cdcb0364d2467b154b4fb6bcde08a4e9/src/Repository/ScheduleRepository.php#L91-L117). la suppression des horaires n'est pas possible, mais en case mauvaises manipulations de la base de donnée, ceci permet d'avoir une réinitialisation.
+- Méthode permettant d'avoir des horaires sur 7 jours : [populateSchedule](https://github.com/Eromnoj/quai_antique/blob/d49319d6cdcb0364d2467b154b4fb6bcde08a4e9/src/Repository/ScheduleRepository.php#L91-L117). la suppression des horaires n'est pas possible, mais en cas de mauvaises manipulations de la base de donnée, ceci permet d'avoir une réinitialisation.
 - Premier utilisateur inscrit toujours administrateur ([register](https://github.com/Eromnoj/quai_antique/blob/cb831352ed70f8380bf5c51afd46275793dca300/src/Controller/RegistrationController.php#L37-L57)) ([isUserFirstSuscriber](https://github.com/Eromnoj/quai_antique/blob/cb831352ed70f8380bf5c51afd46275793dca300/src/Repository/UserRepository.php#L64-L73)), et le compte administrateur ne peut pas être supprimé ([delete_client](https://github.com/Eromnoj/quai_antique/blob/cb831352ed70f8380bf5c51afd46275793dca300/src/Controller/ApiController.php#L1404-L1416))
 
-Cependant, pour un test plus agréable, l'alimentation de la base est recommandée.
+Cependant, sans les fixtures, les tables concernant la gallerie d'image, les plats, les menus et les réservations ne seront pas alimentées, et devront être fournies pendant les tests.
 
 ### Build du front-end React
 Toutes les pages d'administration (restaurant, client), ont été construites grâce aux composants React. l'utilisation du bundle webpack encore de symfony permet de transpiler les composants pour pouvoir être déployer. Pour se faire, tapez la commande suivante, à la racine du projet :
@@ -185,10 +185,16 @@ Pour lancer le projet via le serveur web proposé par symfony, tapez la commande
 symfony serve
 ```
 Le projet est alors accessible via l'adresse suivante : localhost:8000
+
+- ##### Lancer le projet depuis XAMPP
+Si vous avez choisi de lancer le projet via XAMPP, assurez vous que le serveur pointe vers le sous-dossier /public à l'intérieur du projet
+
 ### Accéder au compte adminstrateur
 Si vous avez alimenté la base de donnée avec les fixtures, un compte administrateur a été créé avec les informations de connexions suivantes : 
 ```
 login : admin@lequaiantique.fr
 mdp : mySupErS3cr3tP4s5w0rd
 ```
-Dans le cas où vous n'auriez pas déployé les fixtures, le premier compte créé sur le site est celui de l'administrateur. Pour cela, il vous suffit alors de vous rendre sur la page "Mon Compte", puis de cliquez sur le lien vers la page de création de compte. Vous pourrez alors entrer toutes les informations nécessaires pour la création du compte administrateur.
+Le mot de passe ainsi que l'adresse de connexion pourront ensuite être modifiés dans l'espace d'administration.
+
+Dans le cas où vous n'auriez pas déployé les fixtures, le premier compte créé sur le site est celui de l'administrateur. Pour cela, il vous suffit alors de vous rendre sur la page "Mon Compte", puis de cliquer sur le lien vers la page de création de compte. Vous pourrez alors entrer toutes les informations nécessaires pour la création du compte administrateur.

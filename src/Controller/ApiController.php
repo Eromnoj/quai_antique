@@ -369,6 +369,7 @@ class ApiController extends AbstractController
         // If the schedule was not created with the fixtures...
         if (count($schedule) < 7) {
             // If the schedule table has less than 7 entries, it gets truncated... 
+            // setting flush to true as there isn't any another persistence required
             $scheduleRepository->populateSchedule(true);
  
             $schedule = $scheduleRepository->findAll();

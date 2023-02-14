@@ -33,6 +33,7 @@ class RegistrationFormType extends AbstractType
             ->add('email')
             ->add('agreeTerms', CheckboxType::class, [
                 'mapped' => false,
+                'label' => 'Accepter les CGU',
                 'constraints' => [
                     new IsTrue([
                         'message' => 'Vous devez accepter les CGU.',
@@ -60,6 +61,7 @@ class RegistrationFormType extends AbstractType
                 ],
             ]);
 
+            // If it's the first suscriber, propose the administrator form
         if ($this->userRepository->isUserFirstSuscriber()) {
             $builder
             ->add('address', TextType::class, [
@@ -107,7 +109,7 @@ class RegistrationFormType extends AbstractType
                     ])
                 ]
             ]);
-
+            // else propose the customer form
         } else {
 
             $builder

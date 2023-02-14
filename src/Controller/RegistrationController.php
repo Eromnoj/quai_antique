@@ -45,6 +45,7 @@ class RegistrationController extends AbstractController
                 $entityManager->persist($restaurant);
                 
                 // populated schedule with dummy data
+                // setting flush to false as there is also the password to persist
                 $scheduleRepository->populateSchedule(false);
             } else {
                 $client = new Client();

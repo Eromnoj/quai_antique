@@ -74,4 +74,20 @@ class AdminController extends AbstractController
             'info' => $restaurantInfo
         ]);
     }
+
+    #[Route('/account', name: 'app_admin_account')]
+    public function adminAccount(ScheduleRepository $scheduleRepository, RestaurantRepository $restaurantRepository): Response
+    {
+        $info = $restaurantRepository->findAll();
+        if(count($info) === 0){
+            $restaurantInfo = false;
+        } else {
+            $restaurantInfo = $info[0];
+        }
+        $schedule = $scheduleRepository->findAll();
+        return $this->render('admin/account.html.twig', [
+            'schedule' => $schedule,
+            'info' => $restaurantInfo
+        ]);
+    }
 }

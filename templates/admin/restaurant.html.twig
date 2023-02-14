@@ -5,10 +5,7 @@
 {% set RestaurantCSRFToken = csrf_token('restaurant') %}
 {% set ScheduleCSRFToken = csrf_token('schedule') %}
 {% set ImageCSRFToken = csrf_token('image') %}
-{% set ProfilCSRFToken = csrf_token('profil') %}
-{% if app.user %}
-		{% set userId = app.user.id %}
-	{% endif %}
+
 {% block content %}
-<div {{ react_component('AdminRestaurant', {userId, ProfilCSRFToken, RestaurantCSRFToken, ScheduleCSRFToken, ImageCSRFToken } )}}></div>
+<div {{ react_component('AdminRestaurant', {RestaurantCSRFToken, ScheduleCSRFToken, ImageCSRFToken } )}}></div>
 {% endblock %}

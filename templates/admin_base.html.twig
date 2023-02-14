@@ -33,6 +33,13 @@
           {% else %}
           class="sidebar_item"
         {% endif %}>Les Réservations</li></a>
+        
+        <a href="{{path('app_admin_account')}}"><li
+        {% if currentPath == 'app_admin_account' %}
+          class="sidebar_item sidebar_active"
+          {% else %}
+          class="sidebar_item"
+        {% endif %}>Compte</li></a>
         <a href="{{path('app_logout')}}"><li class="sidebar_item disconnect">Déconnexion</li></a>
       </ul>
   </div>

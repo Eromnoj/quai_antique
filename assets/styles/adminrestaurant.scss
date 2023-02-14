@@ -56,8 +56,35 @@
         text-align: center;
       }
     }
-
-    .info_form, .user_form {
+    .admin_form {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      div {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-left: 5%;
+        margin-right: 5%;
+        width: 90%;
+        input {
+          width: 100%;
+          height: 45px;
+          border: solid 1px variables.$rich-black-fogra-29;
+          border-radius: 10px;
+          font-size: 20px;
+          text-align: center;
+        }
+      }
+      .submit_button {
+        margin: auto;
+        margin-top: 45px;
+        @include variables.button(50px, 260px, variables.$green-crayola, 7px, 20px);
+      }
+    }
+    .info_form {
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -89,6 +116,7 @@
       }
 
     }
+
 
     .image_showcase {
       margin-top: 35px;

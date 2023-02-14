@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useReducer } from 'react'
 
-import { getRestaurant, updateRestaurant, getGallery, getSchedule, getEmail, updateClient } from '../utils/functions'
+import { getRestaurant, updateRestaurant, getGallery, getSchedule } from '../utils/functions'
 import ModalImage from './components/modals/ModalImage'
 import ShowApiResponse from './components/ShowApiResponse'
 import ScheduleRow from './components/ScheduleRow'
 import ImageCard from './components/ImageCard'
 
 
-const AdminRestaurant = ({ userId, ProfilCSRFToken, RestaurantCSRFToken, ScheduleCSRFToken, ImageCSRFToken }) => {
+const AdminRestaurant = ({ RestaurantCSRFToken, ScheduleCSRFToken, ImageCSRFToken }) => {
 
   //const to store response from API
   const [message, setMessage] = useState([])
@@ -56,41 +56,6 @@ const AdminRestaurant = ({ userId, ProfilCSRFToken, RestaurantCSRFToken, Schedul
       getGallery(setGallery, setMessage)
       getRestaurant(dispatchRestaurant, setMessage)
       getSchedule(setSchedule, setMessage)
-    }
-    return () => {
-      ignore = true
-    }
-  }, [])
-
-  // update login info
-  const [deletePassword, setDeletePassword] = useState('')
-  const initialUser = {
-    email: '',
-    password: '',
-    verifPwd: '',
-    token: ProfilCSRFToken
-  }
-
-  const userReducer = (state, action) => {
-    switch (action.type) {
-      case 'email':
-        return { ...state, email: action.value }
-      case 'password':
-        return { ...state, password: action.value }
-      case 'verifPwd':
-        return { ...state, verifPwd: action.value }
-      default:
-        return
-    }
-  }
-
-  const [user, dispatchUser] = useReducer(userReducer, initialUser)
-
-
-  useEffect(() => {
-    let ignore = false
-    if (!ignore) {
-      getEmail(userId, dispatchUser)
     }
     return () => {
       ignore = true
@@ -212,34 +177,7 @@ const AdminRestaurant = ({ userId, ProfilCSRFToken, RestaurantCSRFToken, Schedul
           }}
         />
         : null}
-      <section>
-        <h3>Gérer mon compte</h3>
-        <form className='user_form' onSubmit={(e) => {
-          e.preventDefault()
-          setMessage([])
-          updateClient(userId, user, setMessage, dispatchUser, setDeletePassword)
-        }}>
-          <div className='form_inputs'>
-
-          <ShowApiResponse array={message} input={'message1'} />
-          <div className='email_div'>
-            <label htmlFor="email">Modifier mon E-mail :</label>
-            <input type="email" name="email" id="email" value={user.email} onChange={(e) => dispatchUser({ type: 'email', value: e.target.value })} />
-            <ShowApiResponse array={message} input={'email'} />
-          </div>
-          <div className='password_div'>
-            <label htmlFor="password">Modifier mon mot de passe :</label>
-            <input type="password" name="password" id="password" value={user.password} onChange={(e) => dispatchUser({ type: 'password', value: e.target.value })} />
-            <ShowApiResponse array={message} input={'password'} />
-          </div>
-          <div className='password_verif_div'>
-            <label htmlFor="password_verif">Entrez votre mot de passe actuel pour confirmer les changements :</label>
-            <input type="password" name="password_verif" id="password_verif" value={user.verifPwd} onChange={(e) => dispatchUser({ type: 'verifPwd', value: e.target.value })} />
-          </div>
-          </div>
-          <input type="submit" value="Sauvergarder mes données" className='submit_button' />
-        </form>
-      </section>
+      
     </div>
   )
 }

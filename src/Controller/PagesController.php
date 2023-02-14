@@ -83,4 +83,19 @@ class PagesController extends AbstractController
         ]);
     }
 
+    #[Route('/cgu', name: 'app_cgu')]
+    public function cgu(ScheduleRepository $scheduleRepository, RestaurantRepository $restaurantRepository): Response
+    {
+        $info = $restaurantRepository->findAll();if(count($info) === 0){
+            $restaurantInfo = false;
+        } else {
+            $restaurantInfo = $info[0];
+        }
+        $schedule = $scheduleRepository->findAll();
+        return $this->render('pages/cgu.html.twig',[
+            'schedule' => $schedule,
+            'info' => $restaurantInfo
+        ]);
+    }
+
 }

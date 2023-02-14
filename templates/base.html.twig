@@ -1,12 +1,20 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 	<head>
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<title>
-			{% block title %}Welcome!
+			{% block title %}Bienvenue
 			{% endblock %}
 		</title>
+		{% if info %}
+			<meta name="description" content="{% block description %}Le quai antique - Restaurant situé à {{info.address}} {{info.postCode}} {{info.city}}tél :{{info.phone}}{% endblock %}">
+		{% endif %}
+		<meta property="og:type" content="website"/>
+		<meta property="og:url" content="{{ app.request.uri }}"/>
+		<meta property="og:locale" content="fr_FR"/>
+		<meta name="geo.placename" content="{{ info.city }}"/>
+
 		<link
 		rel="icon" href="/img/logo_clear.svg">
 		{# Run `composer require symfony/webpack-encore-bundle` to start using Symfony UX #}
@@ -130,18 +138,17 @@
 						</p>
 					</div>
 					<div class="cgu">
-						<a href="#">CGU</a>
+						<a href="{{path('app_cgu')}}">CGU</a>
 					</div>
 				</div>
 				<div class="address">
 					{% if info %}
-				{# {{ dump(info) }} #}
-					<p>Le Quai Antique</p>
-					<p>{{info.address}}</p>
-					<p>{{info.postCode}}
-						{{info.city}}</p>
-					<p>tél :
-						{{info.phone}}</p>
+						<p>Le Quai Antique</p>
+						<p>{{info.address}}</p>
+						<p>{{info.postCode}}
+							{{info.city}}</p>
+						<p>tél :
+							{{info.phone}}</p>
 					{% endif %}
 				</div>
 			</footer>

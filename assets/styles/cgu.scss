@@ -1,0 +1,33 @@
+@use 'variables.scss';
+@import url('https://fonts.googleapis.com/css2?family=Average+Sans&family=Karma:wght@300;400;500;600;700&family=Titillium+Web:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,200;1,300;1,400;1,600;1,700&display=swap');
+
+.CGU_container {
+  display: grid;
+  width: 80%;
+  margin: auto;
+  font-family: 'Karma', serif;
+  margin-bottom: 140px;
+  .page_title {
+    justify-self: center;
+    font-family: "Titillium web", sans-serif;
+    font-weight: bold;
+    color: variables.$green-crayola;
+    font-size: 50px;
+    margin-bottom: 50px;
+  }
+  h4 {
+    font-family: "Average Sans", sans-serif;
+    font-size: 1.2em;
+    margin-bottom: 20px;
+    margin-top: 20px;
+  }
+
+  p {
+    margin: 5px;
+  }
+  ul{
+    list-style: none;
+    padding-left: 10px;
+
+  }
+}

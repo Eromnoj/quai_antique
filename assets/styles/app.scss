@@ -36,7 +36,19 @@ body {
     grid-template-rows: 100px 1fr 700px;
     font-family: "Karma", serif;
 }
+.button_responsive {
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    z-index: 80;
+    a {
+        text-decoration: none;
 
+        .booking_button {
+            @include variables.button(30px, 100px, variables.$rich-black-fogra-29, 5px, 16px)
+        }
+    }
+}
 
 header {
     background-color: variables.$rich-black-fogra-29;
@@ -51,6 +63,7 @@ header {
         display: flex;
         align-items: center;
         justify-self: start;
+        z-index: 50;
         align-self: center;
 
         .logo {
@@ -61,33 +74,44 @@ header {
         }
 
         .site_title {
-            font-family: 'Titillium Web', sans-serif;
-            font-weight: bold;
-            font-size: 20px;
-            color: variables.$ocean-green;
-            margin-left: 10px;
-            text-decoration: none;
+            text-align: center;
+            a{
+
+                font-family: 'Titillium Web', sans-serif;
+                font-weight: bold;
+                font-size: 20px;
+                color: variables.$ocean-green;
+                margin-left: 10px;
+                text-decoration: none;
+            }
         }
     }
 
     .top_menu {
         justify-self: end;
         align-self: center;
-        z-index: 40;
+        z-index: 30;
+
         .burger {
             width: 50px;
             height: 50px;
             position: absolute;
             top: 25px;
             right: 10px;
+            transition: transform 0.5s;
 
             .burgerInput {
                 display: none;
             }
         }
 
+        .rotate {
+            transform: rotate(-90deg);
+            transition: transform 0.5s;
+        }
+
         .link_list {
-            display: none;
+            display: flex;
             flex-direction: column;
             list-style: none;
             text-align: right;
@@ -96,6 +120,8 @@ header {
             right: 0px;
             width: 100vw;
             background-color: variables.$rich-black-fogra-29;
+            transform: translateY(-400px);
+            transition: transform 0.2s;
 
             a {
                 font-family: 'Average Sans', sans-serif;
@@ -108,9 +134,10 @@ header {
                     margin-top: 40px;
                     margin-bottom: 40px;
                 }
-                .link_active{
+
+                .link_active {
                     filter: drop-shadow(0px 0px 1px variables.$green-crayola);
-                    color : variables.$green-crayola;
+                    color: variables.$green-crayola;
                 }
 
                 :hover {
@@ -156,6 +183,7 @@ footer {
             thead,
             tbody {
                 width: 100%;
+
                 td {
                     width: 150px;
                 }
@@ -190,17 +218,19 @@ footer {
     body {
         grid-template-rows: 100px 1fr 380px;
     }
-
+    .button_responsive {
+        display: none;
+    }
     header {
         grid-template-columns: repeat(3, 1fr);
 
         .logo_container {
-    
+
             .logo {
                 width: 90px;
                 height: 90px;
             }
-    
+
             .site_title {
                 font-size: 25px;
             }
@@ -218,7 +248,7 @@ footer {
                 display: flex;
                 flex-direction: row;
                 text-align: center;
-
+                transform: translateY(0);
                 position: relative;
                 top: 0px;
                 right: 0px;
@@ -243,8 +273,10 @@ footer {
             justify-self: end;
             align-self: center;
             margin-right: 10px;
+
             a {
                 text-decoration: none;
+
                 .booking_button {
                     @include variables.button(50px, 250px, variables.$green-crayola, 12px, 20px)
                 }

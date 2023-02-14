@@ -36,8 +36,11 @@
 						</div>
 					</a>
 					<div class="site_title">
-						Le Quai<br/>
-						Antique
+					<a href="{{path('app_index')}}">
+						Le Quai </a><br/>
+						<a href="{{path('app_index')}}">
+						Antique</a>
+						
 					</div>
 				</div>
 				<div class="top_menu">
@@ -55,7 +58,7 @@
 					</ul>
 
 					<div class="burger">
-						<label for="show_menu">
+						<label for="show_menu" class="burger_label">
 							<svg viewbox="0 0 32 32" fill="#ededed">
 								<rect x="0" y="4" rx="3" ry="3" width="32" height="3"/>
 								<rect x="0" y="14" rx="3" ry="3" width="32" height="3"/>
@@ -74,6 +77,13 @@
 					</a>
 				</div>
 			</header>
+			<div class="button_responsive">
+					<a href="{{path('app_booking')}}">
+						<div class="booking_button">
+							<p>Réserver</p>
+						</div>
+					</a>
+				</div>
 		{% endblock %}
 		<main>
 			{% block body %}{% endblock %}

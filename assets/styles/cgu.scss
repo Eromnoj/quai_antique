@@ -8,12 +8,7 @@
   font-family: 'Karma', serif;
   margin-bottom: 140px;
   .page_title {
-    justify-self: center;
-    font-family: "Titillium web", sans-serif;
-    font-weight: bold;
-    color: variables.$green-crayola;
-    font-size: 50px;
-    margin-bottom: 50px;
+    @include variables.pageTitle();
   }
   h4 {
     font-family: "Average Sans", sans-serif;

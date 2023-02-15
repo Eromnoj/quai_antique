@@ -37,3 +37,27 @@ $gradient-top-right: linear-gradient(45deg, #edededff, #a7d8c6ff, #62c4a0ff, #1d
     cursor: pointer;
   }
 }
+
+@mixin pageTitle() {
+  justify-self: center;
+  font-family: "Titillium web", sans-serif;
+  font-weight: bold;
+  color: $green-crayola;
+  font-size: 50px;
+  margin-bottom: 50px;
+  text-align: center;
+  @media screen and (min-width: 875px) {
+    font-size: 80px;
+    margin-bottom: 50px;
+  }
+}
+
+@mixin input($width, $height) {
+  width: $width;
+  height: $height;
+  border-radius: 10px;
+  border: solid 1px $rich-black-fogra-29;
+  text-align: center;
+  font-size: 20px;
+  background-color: white;
+}

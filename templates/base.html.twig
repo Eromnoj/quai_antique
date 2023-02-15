@@ -8,7 +8,7 @@
 			{% endblock %}
 		</title>
 		{% if info %}
-			<meta name="description" content="{% block description %}Le quai antique - Restaurant situé à {{info.address}} {{info.postCode}} {{info.city}}tél :{{info.phone}}{% endblock %}">
+			<meta name="description" content="{% block description %}Le quai antique - Restaurant situé à {{info.address}} {{info.postCode}} {{info.city}} tél : {{info.phone}}{% endblock %}">
 		{% endif %}
 		<meta property="og:type" content="website"/>
 		<meta property="og:url" content="{{ app.request.uri }}"/>

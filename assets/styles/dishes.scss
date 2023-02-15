@@ -4,14 +4,9 @@
 .dishes_container {
   display: grid;
   margin-bottom: 40px;
-
+  margin-top: 75px;
   .page_title {
-    justify-self: center;
-    font-family: "Titillium web", sans-serif;
-    font-weight: bold;
-    color: variables.$green-crayola;
-    font-size: 50px;
-    margin-bottom: 50px;
+    @include variables.pageTitle();
   }
 
   .category_container {
@@ -66,14 +61,10 @@
 }
 
 
-@media screen and (min-width: 875px){
+@media screen and (min-width: 875px) {
 
   .dishes_container {
-    .page_title {
-      font-size: 80px;
-      margin-bottom: 50px;
-    }
-    
+
     .category_container {
 
       .category_items {

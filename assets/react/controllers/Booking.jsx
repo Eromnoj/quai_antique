@@ -85,9 +85,7 @@ const Booking = ({ userEmail, userLastname, userFirstname, userAllergies, userPh
   if (confirmBooking) {
     return (
       <div className='booking_container'>
-        <div className='booking_title'>
-          <h2>Réserver une table</h2>
-        </div>
+          <h2 className='booking_title'>Réserver une table</h2>
           <ShowApiResponse array={message} input={'message'} />
       </div>
     )
@@ -95,9 +93,8 @@ const Booking = ({ userEmail, userLastname, userFirstname, userAllergies, userPh
 
   return (
     <div className='booking_container'>
-      <div className='booking_title'>
-        <h2>Réserver une table</h2>
-      </div>
+        <h2 className='booking_title'>Réserver une table</h2>
+
 
       <form className='form' onSubmit={(e) => {
         e.preventDefault()

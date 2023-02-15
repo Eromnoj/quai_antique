@@ -2,9 +2,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Average+Sans&family=Karma:wght@300;400;500;600;700&family=Titillium+Web:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,200;1,300;1,400;1,600;1,700&display=swap');
 
 
-.user_body {
+.admin_body, .user_body {
   display: grid;
-  grid-template-rows: 270px 1fr;
   height: 100%;
   .sidebar {
     background-color: variables.$rich-black-fogra-29;
@@ -42,21 +41,24 @@
       }
     }
   }
-  .user_content {
+  .content {
     margin-top: 50px;
-    .user_title {
-      font-family: "Titillium web", sans-serif;
-      font-weight: bold;
-      color: variables.$green-crayola;
-      font-size: 50px;
-      margin-bottom: 50px;
-      text-align: center;
+    .title {
+      @include variables.pageTitle();
     }
   }
 }
 
+.admin_body {
+  grid-template-rows: 430px 1fr;
+}
+
+.user_body {
+  grid-template-rows: 270px 1fr;
+}
+
 @media screen and (min-width: 875px) {
-  .user_body {
+  .admin_body {
     grid-template-rows: unset;
     grid-template-columns: 260px 1fr;
     .sidebar {
@@ -67,11 +69,6 @@
           font-size: 20px;
           text-align: right;
         }
-      }
-    }
-    .user_content {
-      .user_title {
-        font-size: 80px;
       }
     }
   }

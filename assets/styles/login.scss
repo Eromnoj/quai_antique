@@ -14,13 +14,9 @@
     font-weight: bold;
     color: variables.$green-crayola;
   }
+
   .login_title {
-    justify-self: center;
-    font-family: "Titillium web", sans-serif;
-    font-weight: bold;
-    color: variables.$green-crayola;
-    font-size: 50px;
-    margin-bottom: 50px;
+    @include variables.pageTitle();
   }
 
   .disclaimer {
@@ -56,18 +52,10 @@
       input[type=text],
       input[type=password],
       input[type=number] {
-        height: 50px;
-        border-radius: 10px;
-        border: 1px solid variables.$rich-black-fogra-29;
-        text-align: center;
-        font-size: 20px;
+        @include variables.input(100%, 45px); 
       }
       textarea {
-        height: 150px;
-        border-radius: 10px;
-        border: 1px solid variables.$rich-black-fogra-29;
-        text-align: center;
-        font-size: 20px;
+        @include variables.input(100%, 145px); 
       }
       a {
         font-size: 16px;
@@ -79,15 +67,4 @@
     }
   }
   
-}
-
-
-@media screen and (min-width: 875px) {
-  .login_container {
-  
-    .login_title {
-      font-size: 80px;
-    }
-    
-}
 }

@@ -1,5 +1,5 @@
 # Le Quai Antique
-## _Projet réaliser dans le cadre de l'évaluation en cours de formation au sein de l'organisme STUDI_
+## _Projet réalisé dans le cadre de l'évaluation en cours de formation au sein de l'organisme STUDI_
 
 ## Présentation du projet
 Dans le cadre de ma formation avec STUDI, j'ai dû réaliser un site vitrine pour un restaurant, pouvant gérer des comptes clients, un compte d'administrateur qui a la main sur une gallerie d'image, une présentation des plats et des menus, ainsi qu'une interface de réservation en ligne.
@@ -7,8 +7,11 @@ Dans le cadre de ma formation avec STUDI, j'ai dû réaliser un site vitrine pou
 Je vais ici présenter les différentes étapes de déploiement pour pouvoir tester le projet localement. 
 
 Le projet final a été deployé en ligne et est accessible en cliquant sur le lien suivant : [Le Quai Antique](ecf.jomoreschi.fr)
+
 La Charte Graphique du sujet peut être téléchargée ici : [Charte Graphique](https://github.com/Eromnoj/quai_antique/raw/main/charte_graphique.pdf)
+
 La documentation technique du sujet peut être téléchargée ici : [Documentation Technique](https://github.com/Eromnoj/quai_antique/raw/main/documentation_technique.pdf)
+
 Lien vers le logiciel de gestion de projet Trello : [Trello](https://trello.com/invite/b/7kdIA0wP/ATTIaeed5af8c0ed411f3f0eb709e4faee505DE91DBD/le-quai-antique)
 
 # Deploiement du projet

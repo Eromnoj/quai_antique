@@ -66,8 +66,8 @@ const UserAccount = ({userId, ProfilCSRFToken}) => {
       </div>
       <input type="submit" value="Sauvergarder mes données" className='submit_button'/>
     </form>
-    <h3>Supprimer mon compte :</h3>
-    <form className='user_form margin_password' onSubmit={(e)=> {
+    <h3 className=' margin_password'>Supprimer mon compte :</h3>
+    <form className='user_form' onSubmit={(e)=> {
       e.preventDefault()
       setMessage([])
       deleteClient(deletePassword, ProfilCSRFToken, userId, setMessage)

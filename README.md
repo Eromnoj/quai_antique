@@ -52,7 +52,7 @@ sudo apt install git
 
 ```
 sudo apt install software-properties-common
-sudo apt-repository ppa:ondrej/php
+sudo apt-add-repository ppa:ondrej/php
 sudo apt update 
 sudo apt install php php-fpm php-mbstring php-xml php-curl php-zip
 ```

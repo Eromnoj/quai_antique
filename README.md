@@ -20,7 +20,7 @@ Le projet a été développé en utilisant le framework Symfony, en version 6.2,
 Mon environnement de développement se trouve sur WSL2 (Windows Subsystem for Linux) avec un système Ubuntu 20.04LTS. Les étapes d'installations des prérequis seront donc valides pour n'importe quel système linux de type Debian. 
 Cependant une installation de type XAMPP est tout à fait utilisable, assurez-vous cependant de respecter les prérequis de version de PHP, 8.1 étant la version minimale à utiliser pour la version 6.2 de Symfony.
 Pour créer une interface d'administration dynamique, les composants React proposé par Symfony ont été utilisé, l'installation de la dernière version LTS de nodejs devra aussi être effectué. 
-
+On regarde
 #### Prérequis
 - Git
 - PHP 8.1

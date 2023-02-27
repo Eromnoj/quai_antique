@@ -6,7 +6,7 @@ Dans le cadre de ma formation avec STUDI, j'ai dû réaliser un site vitrine pou
 
 Je vais ici présenter les différentes étapes de déploiement pour pouvoir tester le projet localement. 
 
-Le projet final a été deployé en ligne et est accessible en cliquant sur le lien suivant : [Le Quai Antique](ecf.jomoreschi.fr)
+Le projet final a été deployé en ligne et est accessible en cliquant sur le lien suivant : [Le Quai Antique](https://ecf.jomoreschi.fr)
 
 La Charte Graphique du sujet peut être téléchargée ici : [Charte Graphique](https://github.com/Eromnoj/quai_antique/raw/main/charte_graphique.pdf)
 

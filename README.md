@@ -135,7 +135,9 @@ Créez un fichier .env.local avec les variables d'environnement sous cette forme
 ```
 APP_ENV=prod
 ```
-- ##### Définir un SECRET (doit être une chaîne de 32 caractères aléatoire. Avec openssl, une chaine de caratères peut être générée en tapant la commande : openssl rand -hex 32)
+- ##### Définir un SECRET 
+
+Doit être une chaîne de 32 caractères aléatoire. Avec openssl, une chaine de caratères peut être générée en tapant la commande : ```openssl rand -hex 32``` 
 ```
 APP_SECRET=***chaineUltraSecreteEtUnique***
 ```
@@ -147,7 +149,7 @@ DATABASE_URL="mysql://<user>:<password>@<address>:<port>/<nomBDD>?serverVersion=
 - ##### Information pour l'envoie de mail
 
 Le projet envoie des mails à deux occasions : pour la récupération du mot de passe ainsi que pour confirmer une réservation.
-Pour cela, le service d'envoi de mail de [Sendgrid](https://sendgrid.com/) a été utilisé. Mais le mailer par défaut de symfony peut être utilisé en utilisant un serveur SMTP ([Documentation symfony](https://symfony.com/doc/current/mailer.html)). Dans le cas où aucune adresse mail n'aurait pas été fournie, les envois de mail sont désactivés en intégrant un bloc trycatch. Si vous n'intégrez pas d'adresse mail lors du test en local, l'envoi de mail est fonctionnelle sur le site déployé, et peut y être testée.
+Pour cela, le service d'envoi de mail de [Sendgrid](https://sendgrid.com/) a été utilisé. Mais le mailer par défaut de symfony peut être utilisé en utilisant un serveur SMTP ([Documentation symfony](https://symfony.com/doc/current/mailer.html)). Dans le cas où aucune adresse mail n'aurait pas été fournie, les envois de mail sont désactivés en intégrant un bloc trycatch. Si vous n'intégrez pas d'adresse mail lors du test en local, l'envoi de mail est fonctionnelle sur le site déployé en exemple, et peut y être testée.
 ```
 MAILER_DSN=smtp://user:pass@smtp.example.com:25
 EMAIL_ADDR="votre@email.fr"

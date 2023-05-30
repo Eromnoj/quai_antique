@@ -121,14 +121,17 @@ cd quai_antique
 ```
 ### Installation des dépendances
 Pour installer les dépendances nécessaires au fonctionnement du site, tapez les commandes suivantes :
-- Installation des dépendances node
-```
-npm install
-```
+
 - Installation des dépendances symfony
 ```
 composer install
 ```
+
+- Installation des dépendances node
+```
+npm install
+```
+
 ### Modifiez les variables d'environnement
 Créez un fichier .env.local avec les variables d'environnement sous cette forme :
 - ##### Définir l'environnement sous prod (pour desactiver le debogage)

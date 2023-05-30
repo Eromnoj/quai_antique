@@ -19,13 +19,13 @@ class PagesController extends AbstractController
         $gallery = $galleryRepository->findAll();
 
         $info = $restaurantRepository->findAll();
-        if(count($info) === 0){
+        if (count($info) === 0) {
             $restaurantInfo = false;
         } else {
             $restaurantInfo = $info[0];
         }
         $schedule = $scheduleRepository->findAll();
-        return $this->render('pages/index.html.twig',[
+        return $this->render('pages/index.html.twig', [
             'schedule' => $schedule,
             'info' => $restaurantInfo,
             'gallery' => $gallery
@@ -33,17 +33,20 @@ class PagesController extends AbstractController
     }
 
     #[Route('/carte', name: 'app_dishes')]
-    public function dishes(ScheduleRepository $scheduleRepository, RestaurantRepository $restaurantRepository, CategoryRepository $categoryRepository): Response
-    {
+    public function dishes(
+        ScheduleRepository $scheduleRepository,
+        RestaurantRepository $restaurantRepository,
+        CategoryRepository $categoryRepository
+    ): Response {
         $category = $categoryRepository->findAll();
         $info = $restaurantRepository->findAll();
-        if(count($info) === 0){
+        if (count($info) === 0) {
             $restaurantInfo = false;
         } else {
             $restaurantInfo = $info[0];
         }
         $schedule = $scheduleRepository->findAll();
-        return $this->render('pages/dishes.html.twig',[
+        return $this->render('pages/dishes.html.twig', [
             'schedule' => $schedule,
             'info' => $restaurantInfo,
             'categories' => $category
@@ -55,13 +58,13 @@ class PagesController extends AbstractController
     {
         $menus = $menuRepository->findAll();
         $info = $restaurantRepository->findAll();
-        if(count($info) === 0){
+        if (count($info) === 0) {
             $restaurantInfo = false;
         } else {
             $restaurantInfo = $info[0];
         }
         $schedule = $scheduleRepository->findAll();
-        return $this->render('pages/menus.html.twig',[
+        return $this->render('pages/menus.html.twig', [
             'schedule' => $schedule,
             'info' => $restaurantInfo,
             'menus' => $menus
@@ -71,13 +74,14 @@ class PagesController extends AbstractController
     #[Route('/reservation', name: 'app_booking')]
     public function booking(ScheduleRepository $scheduleRepository, RestaurantRepository $restaurantRepository): Response
     {
-        $info = $restaurantRepository->findAll();if(count($info) === 0){
+        $info = $restaurantRepository->findAll();
+        if (count($info) === 0) {
             $restaurantInfo = false;
         } else {
             $restaurantInfo = $info[0];
         }
         $schedule = $scheduleRepository->findAll();
-        return $this->render('pages/booking.html.twig',[
+        return $this->render('pages/booking.html.twig', [
             'schedule' => $schedule,
             'info' => $restaurantInfo
         ]);
@@ -86,16 +90,16 @@ class PagesController extends AbstractController
     #[Route('/cgu', name: 'app_cgu')]
     public function cgu(ScheduleRepository $scheduleRepository, RestaurantRepository $restaurantRepository): Response
     {
-        $info = $restaurantRepository->findAll();if(count($info) === 0){
+        $info = $restaurantRepository->findAll();
+        if (count($info) === 0) {
             $restaurantInfo = false;
         } else {
             $restaurantInfo = $info[0];
         }
         $schedule = $scheduleRepository->findAll();
-        return $this->render('pages/cgu.html.twig',[
+        return $this->render('pages/cgu.html.twig', [
             'schedule' => $schedule,
             'info' => $restaurantInfo
         ]);
     }
-
 }

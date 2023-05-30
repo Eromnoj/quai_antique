@@ -5,7 +5,6 @@ import ShowApiResponse from './components/ShowApiResponse'
 
 const AdminAccount = ({ userId, ProfilCSRFToken }) => {
   //const to store response from API
-  console.log(userId);
   const [message, setMessage] = useState([])
 
   // update login info

@@ -34,6 +34,7 @@ class Booking
 
     #[ORM\Column]
     #[Assert\NotBlank(message:"Vous devez indiquer un numéro de téléphone")]
+    #[Assert\Regex('/^(?:(?:\+|00)33|0)\s*[1-9](?:[\s.-]*\d{2}){4}$/', message: "Veuillez indiquer un numéro de téléphone valide")]
     private ?string $phone = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]

@@ -685,7 +685,7 @@ class ApiController extends AbstractController
         $submittedToken = $requestArray['token'];
 
         if ($this->isCsrfTokenValid('dishes', $submittedToken)) {
-            $updateDish = $serializer->deserialize(
+            $addDish = $serializer->deserialize(
                 $request->getContent(),
                 Dish::class,
                 'json'
@@ -693,9 +693,9 @@ class ApiController extends AbstractController
 
             $dish = new Dish();
 
-            $dish->setName($updateDish->getName());
-            $dish->setDescription($updateDish->getDescription());
-            $dish->setPrice($updateDish->getPrice());
+            $dish->setName($addDish->getName());
+            $dish->setDescription($addDish->getDescription());
+            $dish->setPrice($addDish->getPrice());
 
             $content = $request->toArray();
             $idCategory = $content['category'];

@@ -47,7 +47,7 @@ class BookingRepository extends ServiceEntityRepository
 
     public function getSeatTakenByShift(string $date, string $shift): int
     {
-         $seatsLeft = $this->createQueryBuilder('r')
+         $seatsTaken = $this->createQueryBuilder('r')
             ->andWhere('r.date = :date')
             ->andWhere('r.shift = :shift')
             ->select('SUM(r.number) as seats')
@@ -56,7 +56,7 @@ class BookingRepository extends ServiceEntityRepository
                 new Parameter('shift', $shift)
             ]))->getQuery()->getOneOrNullResult();
 
-            return  intval($seatsLeft['seats']);
+            return  intval($seatsTaken['seats']);
     }
 
     public function findWithPagination(int $page, int $maxResult, string $name): array

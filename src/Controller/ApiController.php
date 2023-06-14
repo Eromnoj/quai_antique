@@ -267,7 +267,7 @@ class ApiController extends AbstractController
 
             $errors = $validator->validate($image);
             if ($errors->count() > 0) {
-                return new JsonResponse($serializer->serialize($errors, 'json'), JsonResponse::HTTP_BAD_REQUEST, [], true);
+                return new JsonResponse($serializer->serialize($errors, 'json'), Response::HTTP_BAD_REQUEST, [], true);
             }
 
             $em->persist($image);
@@ -1114,6 +1114,7 @@ class ApiController extends AbstractController
         ValidatorInterface $validator,
         RestaurantRepository $restaurantRepository,
         BookingRepository $bookingRepository,
+        ScheduleRepository $scheduleRepository,
         MailerInterface $mailer
     ): JsonResponse {
         $requestArray = $request->toArray();
@@ -1135,9 +1136,13 @@ class ApiController extends AbstractController
 
             $seatsLeft = $maxCapacity - $seatsTaken;
 
-            if ($seatsLeft - $number < 0) {
+            $shiftInfo = $scheduleRepository->getScheduleByDate($date, $shift);
+
+
+
+            if ($seatsLeft - $number < 0 || $shiftInfo['closed']) {
                 $content = [
-                    'message' => 'Il \'a plus assez de place pour valider cette réservation'
+                    'message' => 'Il \'a plus assez de place pour valider cette réservation',
                 ];
                 $responseJson = $serializer->serialize($content, 'json', []);
                 return new JsonResponse($responseJson, Response::HTTP_BAD_REQUEST, [], true);
@@ -1186,11 +1191,11 @@ class ApiController extends AbstractController
                 }
                 //code...
                 $content = [
-                    "message" => "Votre réservation a bien été enregistrée. Vous recevrez sous peu un mail de confirmation"
+                    "message" => "Votre réservation a bien été enregistrée. Vous recevrez sous peu un mail de confirmation",
                 ];
             } catch (\Throwable $th) {
                 $content = [
-                    "message" => "Votre réservation a bien été enregistrée. Pas d'email de configurer"
+                    "message" => "Votre réservation a bien été enregistrée. Pas d'email de configurer",
                 ];
             }
            

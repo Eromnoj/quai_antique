@@ -138,7 +138,11 @@ const Booking = ({ userEmail, userLastname, userFirstname, userAllergies, userPh
         {seatsLeft <= 0 || isShiftClosed ?
           <div>
             <p>Le restaurant est fermé sur ce service, ou il n'y a plus de places disponibles</p>
-          </div> :
+          </div> : seatsLeft - bookingState.number < 0 ?
+          <div>
+          <p>Il n'y pas suffisament de places restantes sur ce service</p>
+        </div>
+          :
           <>
             <div className='available'>
               {seatsLeft !== 0 ?

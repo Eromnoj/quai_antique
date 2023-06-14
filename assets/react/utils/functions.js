@@ -31,7 +31,6 @@ export const deleteItem = async (token, url, id, setMessage, getData) => {
         setMessage(array => [...array, { type: 'error', input: element.propertyPath, message: element.title }])
       });
     } else {
-      console.log(error.response.data.message);
       setMessage(array => [...array, { type: 'info', input: 'message', message: error.response.data.message }])
     }
 
@@ -53,7 +52,6 @@ export const submitItem = async (item, dataToSend, setMessage, getData, showEdit
       showEdit()
     }, 2000)
   } catch (error) {
-    console.log(error);
     if (error.response.data.violations) {
       const violation = error.response.data.violations
       violation.forEach(element => {
@@ -118,7 +116,6 @@ export const getBookings = async (page, max, setCount, setBookings, name) => {
     setCount(data.count)
     setBookings(data.booking)
   } catch (error) {
-    console.log(error);
   }
 }
 
@@ -183,11 +180,10 @@ export const getGallery = async (setGallery, setMessage) => {
     if (error.response.data.violations) {
       const violation = error.response.data.violations
       violation.forEach(element => {
-        console.log(element.propertyPath);
-        console.log(element.title);
+      setMessage(array => [...array, { type: 'error', input: element.propertyPath, message: element.title }])
+
       });
     } else {
-      console.log(error.response.data.message);
       setMessage(array => [...array, { type: 'error', input: 'message', message: error.response.data.message }])
     }
   }
@@ -216,7 +212,6 @@ export const getEmail = async (userId, dispatch) => {
     const data = await res.data
     dispatch({type: 'email', value: data.email })
   } catch (error) {
-    console.log(error)
   }
 }
 
@@ -306,7 +301,6 @@ export const getAvailableSeatsAndSchedule = async (date, shift, setSeatsLeft, se
 
     dispatch({ type: 'time', value: moment(data.shiftStart).utcOffset(1).format('HH:mm') })
   } catch (error) {
-    console.log(error);
     setMessage(array => [...array, { type: 'error', input: 'errorMessage', message: error.response.data.message }])
   }
 }

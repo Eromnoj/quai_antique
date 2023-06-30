@@ -47,7 +47,7 @@ class BookingRepository extends ServiceEntityRepository
 
     public function getSeatTakenByShift(string $date, string $shift): int
     {
-         $seatsTaken = $this->createQueryBuilder('r')
+        $seatsTaken = $this->createQueryBuilder('r')
             ->andWhere('r.date = :date')
             ->andWhere('r.shift = :shift')
             ->select('SUM(r.number) as seats')
@@ -56,30 +56,30 @@ class BookingRepository extends ServiceEntityRepository
                 new Parameter('shift', $shift)
             ]))->getQuery()->getOneOrNullResult();
 
-            return  intval($seatsTaken['seats']);
+        return  intval($seatsTaken['seats']);
     }
 
     public function findWithPagination(int $page, int $maxResult, string $name): array
     {
-        
+
         $firstResult = $page * $maxResult;
         return $this->createQueryBuilder('b')
-            ->addOrderBy('b.date', 'ASC')
-            ->addOrderBy('b.time', 'ASC')
+            ->addOrderBy('b.date', 'DESC')
+            ->addOrderBy('b.time', 'DESC')
             ->andWhere('b.lastname LIKE :name')
             ->setFirstResult($firstResult)
             ->setMaxResults($maxResult)
-            ->setParameter('name', '%'.$name.'%')
+            ->setParameter('name', '%' . $name . '%')
             ->getQuery()
             ->getResult();
     }
 
     public function findByName(string $name): array
     {
-        
+
         return $this->createQueryBuilder('b')
             ->andWhere('b.lastname LIKE :name')
-            ->setParameter('name', '%'.$name.'%')
+            ->setParameter('name', '%' . $name . '%')
             ->getQuery()
             ->getResult();
     }

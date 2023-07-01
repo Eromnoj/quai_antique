@@ -136,7 +136,7 @@ class ApiController extends AbstractController
             // running validation for the database constraints
             $errors = $validator->validate($image);
             if ($errors->count() > 0) {
-                return new JsonResponse($serializer->serialize($errors, 'json'), JsonResponse::HTTP_BAD_REQUEST, [], true);
+                return new JsonResponse($serializer->serialize($errors, 'json'), Response::HTTP_BAD_REQUEST, [], true);
             }
             //persisting to the database and sending back a message
             $em->persist($image);
@@ -336,7 +336,7 @@ class ApiController extends AbstractController
             // validation from constraints of the entity
             $errors = $validator->validate($restaurant);
             if ($errors->count() > 0) {
-                return new JsonResponse($serializer->serialize($errors, 'json'), JsonResponse::HTTP_BAD_REQUEST, [], true);
+                return new JsonResponse($serializer->serialize($errors, 'json'), Response::HTTP_BAD_REQUEST, [], true);
             }
             // Persisting and sending back the response
             $em->persist($restaurant);
@@ -478,7 +478,7 @@ class ApiController extends AbstractController
             $errors = $validator->validate($category);
 
             if ($errors->count() > 0) {
-                return new JsonResponse($serializer->serialize($errors, 'json'), JsonResponse::HTTP_BAD_REQUEST, [], true);
+                return new JsonResponse($serializer->serialize($errors, 'json'), Response::HTTP_BAD_REQUEST, [], true);
             }
 
             $em->persist($category);
@@ -555,7 +555,7 @@ class ApiController extends AbstractController
             $errors = $validator->validate($category);
 
             if ($errors->count() > 0) {
-                return new JsonResponse($serializer->serialize($errors, 'json'), JsonResponse::HTTP_BAD_REQUEST, [], true);
+                return new JsonResponse($serializer->serialize($errors, 'json'), Response::HTTP_BAD_REQUEST, [], true);
             }
 
             $em->persist($category);
@@ -650,7 +650,7 @@ class ApiController extends AbstractController
             $errors = $validator->validate($dish);
 
             if ($errors->count() > 0) {
-                return new JsonResponse($serializer->serialize($errors, 'json'), JsonResponse::HTTP_BAD_REQUEST, [], true);
+                return new JsonResponse($serializer->serialize($errors, 'json'), Response::HTTP_BAD_REQUEST, [], true);
             }
             $em->persist($dish);
             $em->flush();
@@ -705,7 +705,7 @@ class ApiController extends AbstractController
             $errors = $validator->validate($dish);
 
             if ($errors->count() > 0) {
-                return new JsonResponse($serializer->serialize($errors, 'json'), JsonResponse::HTTP_BAD_REQUEST, [], true);
+                return new JsonResponse($serializer->serialize($errors, 'json'), Response::HTTP_BAD_REQUEST, [], true);
             }
             $em->persist($dish);
             $em->flush();
@@ -799,7 +799,7 @@ class ApiController extends AbstractController
             $errors = $validator->validate($menu);
 
             if ($errors->count() > 0) {
-                return new JsonResponse($serializer->serialize($errors, 'json'), JsonResponse::HTTP_BAD_REQUEST, [], true);
+                return new JsonResponse($serializer->serialize($errors, 'json'), Response::HTTP_BAD_REQUEST, [], true);
             }
             $em->persist($menu);
             $em->flush();
@@ -873,12 +873,12 @@ class ApiController extends AbstractController
             $errors = $validator->validate($menu);
 
             if ($errors->count() > 0) {
-                return new JsonResponse($serializer->serialize($errors, 'json'), JsonResponse::HTTP_BAD_REQUEST, [], true);
+                return new JsonResponse($serializer->serialize($errors, 'json'), Response::HTTP_BAD_REQUEST, [], true);
             }
             $em->persist($menu);
             $em->flush();
             $content = [
-                "message" => "Catégorie ajoutée. "
+                "message" => "Menu ajouté. "
             ];
 
             $contentJson = $serializer->serialize($content, 'json', []);
@@ -921,7 +921,7 @@ class ApiController extends AbstractController
             $errors = $validator->validate($formula);
 
             if ($errors->count() > 0) {
-                return new JsonResponse($serializer->serialize($errors, 'json'), JsonResponse::HTTP_BAD_REQUEST, [], true);
+                return new JsonResponse($serializer->serialize($errors, 'json'), Response::HTTP_BAD_REQUEST, [], true);
             }
             $em->persist($formula);
             $em->flush();
@@ -977,7 +977,7 @@ class ApiController extends AbstractController
             $errors = $validator->validate($formula);
 
             if ($errors->count() > 0) {
-                return new JsonResponse($serializer->serialize($errors, 'json'), JsonResponse::HTTP_BAD_REQUEST, [], true);
+                return new JsonResponse($serializer->serialize($errors, 'json'), Response::HTTP_BAD_REQUEST, [], true);
             }
             $em->persist($formula);
             $em->flush();
@@ -1085,7 +1085,7 @@ class ApiController extends AbstractController
             $errors = $validator->validate($booking);
 
             if ($errors->count() > 0) {
-                return new JsonResponse($serializer->serialize($errors, 'json'), JsonResponse::HTTP_BAD_REQUEST, [], true);
+                return new JsonResponse($serializer->serialize($errors, 'json'), Response::HTTP_BAD_REQUEST, [], true);
             }
             $em->persist($booking);
             $em->flush();
@@ -1162,7 +1162,7 @@ class ApiController extends AbstractController
             $errors = $validator->validate($booking);
 
             if ($errors->count() > 0) {
-                return new JsonResponse($serializer->serialize($errors, 'json'), JsonResponse::HTTP_BAD_REQUEST, [], true);
+                return new JsonResponse($serializer->serialize($errors, 'json'), Response::HTTP_BAD_REQUEST, [], true);
             }
             $em->persist($booking);
             $em->flush();
@@ -1351,7 +1351,7 @@ class ApiController extends AbstractController
                 $errors = $validator->validate($user);
 
                 if ($errors->count() > 0) {
-                    return new JsonResponse($serializer->serialize($errors, 'json'), JsonResponse::HTTP_BAD_REQUEST, [], true);
+                    return new JsonResponse($serializer->serialize($errors, 'json'), Response::HTTP_BAD_REQUEST, [], true);
                 }
 
                 $em->persist($user);
@@ -1492,7 +1492,7 @@ class ApiController extends AbstractController
             $errors = $validator->validate($client);
 
             if ($errors->count() > 0) {
-                return new JsonResponse($serializer->serialize($errors, 'json'), JsonResponse::HTTP_BAD_REQUEST, [], true);
+                return new JsonResponse($serializer->serialize($errors, 'json'), Response::HTTP_BAD_REQUEST, [], true);
             }
             $em->persist($client);
             $em->flush();

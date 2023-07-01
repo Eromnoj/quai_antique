@@ -19,104 +19,103 @@
 
 
 		{{ form_start(registrationForm) }}
-
-		{{ form_row(registrationForm.email, {
-                    label: 'Votre e-mail :'
-                }) }}
+		<div>
+		{{ form_label(registrationForm.email, 'Votre e-mail :') }}
+		{{ form_widget(registrationForm.email, {'attr' : {'class' : 'input_form'}}) }}
 		{% if form_errors(registrationForm.email) %}
-
 			<div class="message_error">
 				{{ form_errors(registrationForm.email) }}
 			</div>
 		{% endif %}
-
-		{{ form_row(registrationForm.plainPassword.first, {
-            label: 'Votre mot de passe :'
-        }) }}
+		</div>
+		<div>
+		{{ form_label(registrationForm.plainPassword.first, 'Votre mot de passe :') }}
+		{{ form_widget(registrationForm.plainPassword.first, {'attr' : {'class' : 'input_form'}}) }}
 		{% if form_errors(registrationForm.plainPassword.first) %}
-
 			<div class="message_error">
 				{{ form_errors(registrationForm.plainPassword.first) }}
 			</div>
 		{% endif %}
-		{{ form_row(registrationForm.plainPassword.second, {
-            label: 'Confirmez le mot de passe :'
-        }) }}
+		</div>
+		<div>
+		{{ form_label(registrationForm.plainPassword.second, 'Confirmez le mot de passe :') }}
+		{{ form_widget(registrationForm.plainPassword.second, {'attr' : {'class' : 'input_form'}}) }}
 		{% if form_errors(registrationForm.plainPassword.second) %}
-
 			<div class="message_error">
 				{{ form_errors(registrationForm.plainPassword.second) }}
 			</div>
 		{% endif %}
+		</div>
 
+{# Show form for the administrator #}
 		{% if first_suscriber %}
 			<h3>Informations du restaurant</h3>
-			{{ form_row(registrationForm.address, {
-            label: 'Adresse :'
-        }) }}
-			{% if form_errors(registrationForm.address) %}
-
-				<div class="message_error">
-					{{ form_errors(registrationForm.address) }}
-				</div>
-			{% endif %}
-
-			{{ form_row(registrationForm.post_code, {
-            label: 'Code Postal :'
-        }) }}
-			{% if form_errors(registrationForm.post_code) %}
-
-				<div class="message_error">
-					{{ form_errors(registrationForm.post_code) }}
-				</div>
-			{% endif %}
-
-			{{ form_row(registrationForm.city, {
-            label: 'Ville :'
-        }) }}
-			{% if form_errors(registrationForm.city) %}
-
-				<div class="message_error">
-					{{ form_errors(registrationForm.city) }}
-				{% endif %}
+				<div>
+					{{ form_label(registrationForm.address, 'Adresse :') }}
+		{{ form_widget(registrationForm.address, {'attr' : {'class' : 'input_form'}}) }}
+		{% if form_errors(registrationForm.address) %}
+			<div class="message_error">
+				{{ form_errors(registrationForm.address) }}
 			</div>
-
-			{{ form_row(registrationForm.phone, {
-            label: 'Numéro de téléphone :'
-        }) }}
-			{% if form_errors(registrationForm.phone) %}
-				<div class="message_error">
-					{{ form_errors(registrationForm.phone) }}
+		{% endif %}
 				</div>
-			{% endif %}
-
-			{{ form_row(registrationForm.max_capacity, {
-            label: 'Capacité maximale :'
-        }) }}
-			{% if form_errors(registrationForm.max_capacity) %}
-				<div class="message_error">
-					{{ form_errors(registrationForm.max_capacity) }}
+				<div>
+					{{ form_label(registrationForm.post_code, 'Code Postal :') }}
+		{{ form_widget(registrationForm.post_code, {'attr' : {'class' : 'input_form'}}) }}
+		{% if form_errors(registrationForm.post_code) %}
+			<div class="message_error">
+				{{ form_errors(registrationForm.post_code) }}
+			</div>
+		{% endif %}
 				</div>
-			{% endif %}
-
+				<div>
+					{{ form_label(registrationForm.city, 'Ville :') }}
+		{{ form_widget(registrationForm.city, {'attr' : {'class' : 'input_form'}}) }}
+		{% if form_errors(registrationForm.city) %}
+			<div class="message_error">
+				{{ form_errors(registrationForm.city) }}
+			</div>
+		{% endif %}
+				</div>
+				<div>
+				{{ form_label(registrationForm.phone, 'Numéro de téléphone :') }}
+		{{ form_widget(registrationForm.phone, {'attr' : {'class' : 'input_form'}}) }}
+		{% if form_errors(registrationForm.phone) %}
+			<div class="message_error">
+				{{ form_errors(registrationForm.phone) }}
+			</div>
+		{% endif %}
+				</div>
+				<div>
+				{{ form_label(registrationForm.max_capacity, 'Capacity maximale :') }}
+		{{ form_widget(registrationForm.max_capacity, {'attr' : {'class' : 'input_form'}}) }}
+		{% if form_errors(registrationForm.max_capacity) %}
+			<div class="message_error">
+				{{ form_errors(registrationForm.max_capacity) }}
+			</div>
+		{% endif %}
+				</div>
+{# Showw form for user #}
 		{% else %}
-			{{ form_row(registrationForm.number, {
-            label: 'Convives par défaut :'
-        }) }}
-			{% if form_errors(registrationForm.number) %}
-				<div class="message_error">
-					{{ form_errors(registrationForm.number) }}
-				</div>
-			{% endif %}
+		<div>
+		{{ form_label(registrationForm.number, 'Convives par défault:') }}
+		{{ form_widget(registrationForm.number, {'attr' : {'class' : 'input_form'}}) }}
+		{% if form_errors(registrationForm.number) %}
+			<div class="message_error">
+				{{ form_errors(registrationForm.number) }}
+			</div>
+		{% endif %}
+		</div>
+		<div>
+		{{ form_label(registrationForm.allergies, 'Vos allergies :') }}
+		{{ form_widget(registrationForm.allergies) }}
+		{% if form_errors(registrationForm.allergies) %}
+			<div class="message_error">
+				{{ form_errors(registrationForm.allergies) }}
+			</div>
+		{% endif %}
+		</div>	
 
-			{{ form_row(registrationForm.allergies, {
-            label: 'Vos allergies :'
-        }) }}
-			{% if form_errors(registrationForm.allergies) %}
-				<div class="message_error">
-					{{ form_errors(registrationForm.allergies) }}
-				</div>
-			{% endif %}
 		{% endif %}
 
 		<div class='cgu_input'>

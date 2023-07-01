@@ -11,7 +11,7 @@ import moment from 'moment'
 // function to delete Items
 export const deleteItem = async (token, url, id, setMessage, getData) => {
   try {
-    const res = await axios.delete(url+id, {
+    const res = await axios.delete(url + id, {
       data: {
         token
       }
@@ -41,7 +41,7 @@ export const deleteItem = async (token, url, id, setMessage, getData) => {
 
 export const submitItem = async (item, dataToSend, setMessage, getData, showEdit, path) => {
   let url = item ? `/api/update/${path}/${item.id}` : `/api/add/${path}`
-    try {
+  try {
     const res = item ? await axios.put(url, dataToSend) : await axios.post(url, dataToSend)
     const data = await res.data
     if (data.message) {
@@ -180,7 +180,7 @@ export const getGallery = async (setGallery, setMessage) => {
     if (error.response.data.violations) {
       const violation = error.response.data.violations
       violation.forEach(element => {
-      setMessage(array => [...array, { type: 'error', input: element.propertyPath, message: element.title }])
+        setMessage(array => [...array, { type: 'error', input: element.propertyPath, message: element.title }])
 
       });
     } else {
@@ -210,7 +210,7 @@ export const getEmail = async (userId, dispatch) => {
   try {
     const res = await axios.get(`/api/get/client/${userId}`)
     const data = await res.data
-    dispatch({type: 'email', value: data.email })
+    dispatch({ type: 'email', value: data.email })
   } catch (error) {
   }
 }
@@ -240,7 +240,7 @@ export const updateClient = async (userId, user, setMessage, dispatch) => {
     }
     setTimeout(() => {
       setMessage([])
-      dispatch({type: 'verifPwd', value: ''})
+      dispatch({ type: 'verifPwd', value: '' })
       getEmail(userId, dispatch)
     }, 2000)
   } catch (error) {
@@ -278,10 +278,10 @@ export const submitUserInfo = async (userId, userProfil, setMessage) => {
 }
 
 /**
- * 
+ *
  * function to get available seats and booking hours by shift
- * 
- *  */ 
+ *
+ **/
 
 export const getAvailableSeatsAndSchedule = async (date, shift, setSeatsLeft, setIsShiftClosed, setHourArray, setMessage, dispatch) => {
   try {

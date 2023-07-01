@@ -5,6 +5,7 @@ $middle-blue-green: hsla(158, 39%, 75%, 1);
 $ocean-green: hsla(158, 45%, 58%, 1);
 $green-crayola: hsla(158, 72%, 40%, 1);
 $deep-chestnut: hsla(0, 47%, 51%, 1);
+$disabled : hsla(0, 2%, 66%, 1);
 $gradient-top-right: linear-gradient(45deg, #edededff, #a7d8c6ff, #62c4a0ff, #1db07aff);
 
 
@@ -24,10 +25,10 @@ $gradient-top-right: linear-gradient(45deg, #edededff, #a7d8c6ff, #62c4a0ff, #1d
   cursor: pointer;
 
   &:disabled {
-    background: rgb(171, 168, 168);
+    background: $disabled ;
 
     &:hover {
-      background: rgb(171, 168, 168);
+      background: $disabled;
       cursor: default;
     }
   }

@@ -44,11 +44,11 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 #[Route('/api')]
 class ApiController extends AbstractController
 {
-    
+
     ///////////////////////
     // ADMIN CONTROLLERS //
     ///////////////////////
-    
+
     // Gallery
     ////////////
     #[Route('/gallery', name: 'app_get_gallery', methods: ['GET'])]
@@ -252,7 +252,7 @@ class ApiController extends AbstractController
 
                     $image->setUrl($newFilename);
                 } catch (FileException $e) {
-                    
+
                     $message = [
                         'message' => 'Un problème est servenu lors du chargement de l\'image, veuillez recommencer'
                     ];
@@ -299,7 +299,7 @@ class ApiController extends AbstractController
             // adding group context, sets in the Entities, to prevent cycling request which would cause an error.
             ->withGroups('get_restaurant')
             ->toArray();
-            //serialize the response and send it in json
+        //serialize the response and send it in json
         $restaurantJson = $serializer->serialize($restaurant, 'json', $context);
         return new JsonResponse($restaurantJson, Response::HTTP_OK, [], true);
     }
@@ -371,7 +371,7 @@ class ApiController extends AbstractController
             // If the schedule table has less than 7 entries, it gets truncated... 
             // setting flush to true as there isn't any another persistence required
             $scheduleRepository->populateSchedule(true);
- 
+
             $schedule = $scheduleRepository->findAll();
         }
         $scheduleJson = $serializer->serialize($schedule, 'json', []);
@@ -1037,7 +1037,7 @@ class ApiController extends AbstractController
         Request $request
     ): JsonResponse {
 
-        
+
         $page = intval($request->query->get('page'));
         $maxResults = intval($request->query->get('max'));
         $name = $request->query->get('name');
@@ -1120,15 +1120,15 @@ class ApiController extends AbstractController
         $requestArray = $request->toArray();
         $submittedToken = $requestArray['token'];
         if ($this->isCsrfTokenValid('booking', $submittedToken)) {
-            $updateBooking = $serializer->deserialize(
+            $addBooking = $serializer->deserialize(
                 $request->getContent(),
                 Booking::class,
                 'json'
             );
 
-            $date = date_format($updateBooking->getDate(), 'c');
-            $shift = $updateBooking->getShift();
-            $number = $updateBooking->getNumber();
+            $date = date_format($addBooking->getDate(), 'c');
+            $shift = $addBooking->getShift();
+            $number = $addBooking->getNumber();
 
             $maxCapacity = $restaurantRepository->getMaxCapacity();
 
@@ -1148,45 +1148,34 @@ class ApiController extends AbstractController
                 return new JsonResponse($responseJson, Response::HTTP_BAD_REQUEST, [], true);
             }
 
-            $booking = new Booking();
-            $booking->setLastName($updateBooking->getLastName());
-            $booking->setFirstName($updateBooking->getFirstName());
-            $booking->setEmail($updateBooking->getEmail());
-            $booking->setAllergies($updateBooking->getAllergies());
-            $booking->setPhone($updateBooking->getPhone());
-            $booking->setShift($updateBooking->getShift());
-            $booking->setDate($updateBooking->getDate());
-            $booking->setTime($updateBooking->getTime());
-            $booking->setNumber($updateBooking->getNumber());
-
-            $errors = $validator->validate($booking);
+            $errors = $validator->validate($addBooking);
 
             if ($errors->count() > 0) {
                 return new JsonResponse($serializer->serialize($errors, 'json'), Response::HTTP_BAD_REQUEST, [], true);
             }
-            $em->persist($booking);
+            $em->persist($addBooking);
             $em->flush();
 
             // Send confirmation email
-           
+
             try { //trycatch block only for testing purpose, in case no email address was defined in Environnement variables
                 if ($requestArray['email'] !== null) {
                     // getting restaurant infos to send them with the email
                     $restaurantInfos = $restaurantRepository->findAll();
-                    
+
                     //Prepare email to send. Email is edited in a twig template 
                     $email = (new TemplatedEmail())
-                    ->from(new Address($this->getParameter('app.email_addr'), 'Le Quai Antique'))
-                    ->to($requestArray['email'])
-                    ->subject('Confirmation de réservation')
-                    ->htmlTemplate('mail_templates/confirmbooking.html.twig')
-                    ->context([ //sending data to use in the twig template
-                        'name' => $updateBooking->getLastname(),
-                        'date' => date_format($updateBooking->getDate(), 'c'), // the 'c' converts the date to ISO 8601, readable by TWIG
-                        'time' => date_format($updateBooking->getTime(), 'c'),
-                        'tel' => $restaurantInfos[0]->getPhone(),
-                    ]);
-                    
+                        ->from(new Address($this->getParameter('app.email_addr'), 'Le Quai Antique'))
+                        ->to($requestArray['email'])
+                        ->subject('Confirmation de réservation')
+                        ->htmlTemplate('mail_templates/confirmbooking.html.twig')
+                        ->context([ //sending data to use in the twig template
+                            'name' => $addBooking->getLastname(),
+                            'date' => date_format($addBooking->getDate(), 'c'), // the 'c' converts the date to ISO 8601, readable by TWIG
+                            'time' => date_format($addBooking->getTime(), 'c'),
+                            'tel' => $restaurantInfos[0]->getPhone(),
+                        ]);
+
                     $mailer->send($email);
                 }
                 //code...
@@ -1198,9 +1187,9 @@ class ApiController extends AbstractController
                     "message" => "Votre réservation a bien été enregistrée. Pas d'email de configurer",
                 ];
             }
-           
 
-            
+
+
 
             $contentJson = $serializer->serialize($content, 'json', []);
 
@@ -1402,7 +1391,7 @@ class ApiController extends AbstractController
 
         if ($this->isCsrfTokenValid('profil', $submittedToken)) {
 
-            if ($isAdmin) {//prevent admin account to be deleted
+            if ($isAdmin) { //prevent admin account to be deleted
                 $content = [
                     'message' => 'Le compte administrateur ne peut pas être supprimé'
                 ];

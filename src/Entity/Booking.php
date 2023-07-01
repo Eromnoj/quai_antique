@@ -18,39 +18,40 @@ class Booking
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(message: "Un nom est obligatoire")]
     private ?string $lastname = null;
-    
+
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(message: "Un prénom est obligatoire")]
     private ?string $firstname = null;
-    
+
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(message: "Une adresse email est obligatoire")]
+    #[Assert\Email(message: "Veuillez entrer une adresse email valide")]
     private ?string $email = null;
 
     #[ORM\Column]
-    #[Assert\NotBlank(message:"Vous devez indiquer un nombre de couverts")]
-    #[Assert\GreaterThan(value:0, message: "veuillez indiquer un nombre supérieur à {{ value }}")]
+    #[Assert\NotBlank(message: "Vous devez indiquer un nombre de couverts")]
+    #[Assert\GreaterThan(value: 0, message: "veuillez indiquer un nombre supérieur à {{ value }}")]
     private ?int $number = null;
 
     #[ORM\Column]
-    #[Assert\NotBlank(message:"Vous devez indiquer un numéro de téléphone")]
+    #[Assert\NotBlank(message: "Vous devez indiquer un numéro de téléphone")]
     #[Assert\Regex('/^(?:(?:\+|00)33|0)\s*[1-9](?:[\s.-]*\d{2}){4}$/', message: "Veuillez indiquer un numéro de téléphone valide")]
     private ?string $phone = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
-    #[Assert\NotBlank(message:"Veuillez choisir une date de réservation")]
-    #[Assert\GreaterThan(value:'yesterday', message: "Veuillez choisir une date à partir d'aujourd'hui")]
+    #[Assert\NotBlank(message: "Veuillez choisir une date de réservation")]
+    #[Assert\GreaterThan(value: 'yesterday', message: "Veuillez choisir une date à partir d'aujourd'hui")]
     private ?\DateTimeInterface $date = null;
 
     #[ORM\Column(type: Types::TIME_MUTABLE)]
-    #[Assert\NotBlank(message:"Veuillez choisir une heure d'arrivée")]
+    #[Assert\NotBlank(message: "Veuillez choisir une heure d'arrivée")]
     private ?\DateTimeInterface $time = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $allergies = null;
 
     #[ORM\Column(length: 255)]
-    #[Assert\Choice(options:['midi', 'soir'], message: "Veuillez choisir un service")]
+    #[Assert\Choice(options: ['midi', 'soir'], message: "Veuillez choisir un service")]
     private ?string $shift = null;
 
 

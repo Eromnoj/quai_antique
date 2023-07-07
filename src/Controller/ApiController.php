@@ -151,7 +151,7 @@ class ApiController extends AbstractController
                 'message' => 'Une erreur est survenue'
             ];
             $responseJson = $serializer->serialize($content, 'json', []);
-            return new JsonResponse($responseJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
+            return new JsonResponse($responseJson, Response::HTTP_FORBIDDEN, [], true);
         }
     }
 
@@ -197,7 +197,7 @@ class ApiController extends AbstractController
                 'message' => 'Une erreur est survenue'
             ];
             $responseJson = $serializer->serialize($content, 'json', []);
-            return new JsonResponse($responseJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
+            return new JsonResponse($responseJson, Response::HTTP_FORBIDDEN, [], true);
         }
     }
 
@@ -282,7 +282,7 @@ class ApiController extends AbstractController
                 'message' => 'Une erreur est survenue'
             ];
             $responseJson = $serializer->serialize($content, 'json', []);
-            return new JsonResponse($responseJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
+            return new JsonResponse($responseJson, Response::HTTP_FORBIDDEN, [], true);
         }
     }
 
@@ -352,7 +352,7 @@ class ApiController extends AbstractController
                 'message' => 'Une erreur est survenue'
             ];
             $responseJson = $serializer->serialize($content, 'json', []);
-            return new JsonResponse($responseJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
+            return new JsonResponse($responseJson, Response::HTTP_FORBIDDEN, [], true);
         }
     }
 
@@ -428,7 +428,7 @@ class ApiController extends AbstractController
                 'message' => 'Une erreur est survenue'
             ];
             $responseJson = $serializer->serialize($content, 'json', []);
-            return new JsonResponse($responseJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
+            return new JsonResponse($responseJson, Response::HTTP_FORBIDDEN, [], true);
         }
     }
 
@@ -495,7 +495,7 @@ class ApiController extends AbstractController
                 'message' => 'Une erreur est survenue'
             ];
             $responseJson = $serializer->serialize($content, 'json', []);
-            return new JsonResponse($responseJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
+            return new JsonResponse($responseJson, Response::HTTP_FORBIDDEN, [], true);
         }
     }
 
@@ -524,7 +524,7 @@ class ApiController extends AbstractController
                 'message' => 'Une erreur est survenue'
             ];
             $responseJson = $serializer->serialize($content, 'json', []);
-            return new JsonResponse($responseJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
+            return new JsonResponse($responseJson, Response::HTTP_FORBIDDEN, [], true);
         }
     }
 
@@ -572,7 +572,7 @@ class ApiController extends AbstractController
                 'message' => 'Une erreur est survenue'
             ];
             $responseJson = $serializer->serialize($content, 'json', []);
-            return new JsonResponse($responseJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
+            return new JsonResponse($responseJson, Response::HTTP_FORBIDDEN, [], true);
         }
     }
 
@@ -667,7 +667,7 @@ class ApiController extends AbstractController
                 'message' => 'Une erreur est survenue'
             ];
             $responseJson = $serializer->serialize($content, 'json', []);
-            return new JsonResponse($responseJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
+            return new JsonResponse($responseJson, Response::HTTP_FORBIDDEN, [], true);
         }
     }
 
@@ -722,7 +722,7 @@ class ApiController extends AbstractController
                 'message' => 'Une erreur est survenue'
             ];
             $responseJson = $serializer->serialize($content, 'json', []);
-            return new JsonResponse($responseJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
+            return new JsonResponse($responseJson, Response::HTTP_FORBIDDEN, [], true);
         }
     }
 
@@ -751,7 +751,7 @@ class ApiController extends AbstractController
                 'message' => 'Une erreur est survenue'
             ];
             $responseJson = $serializer->serialize($content, 'json', []);
-            return new JsonResponse($responseJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
+            return new JsonResponse($responseJson, Response::HTTP_FORBIDDEN, [], true);
         }
     }
 
@@ -815,7 +815,7 @@ class ApiController extends AbstractController
                 'message' => 'Une erreur est survenue'
             ];
             $responseJson = $serializer->serialize($content, 'json', []);
-            return new JsonResponse($responseJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
+            return new JsonResponse($responseJson, Response::HTTP_FORBIDDEN, [], true);
         }
     }
 
@@ -844,7 +844,7 @@ class ApiController extends AbstractController
                 'message' => 'Une erreur est survenue'
             ];
             $responseJson = $serializer->serialize($content, 'json', []);
-            return new JsonResponse($responseJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
+            return new JsonResponse($responseJson, Response::HTTP_FORBIDDEN, [], true);
         }
     }
 
@@ -889,7 +889,7 @@ class ApiController extends AbstractController
                 'message' => 'Une erreur est survenue'
             ];
             $responseJson = $serializer->serialize($content, 'json', []);
-            return new JsonResponse($responseJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
+            return new JsonResponse($responseJson, Response::HTTP_FORBIDDEN, [], true);
         }
     }
 
@@ -938,7 +938,7 @@ class ApiController extends AbstractController
                 'message' => 'Une erreur est survenue'
             ];
             $responseJson = $serializer->serialize($content, 'json', []);
-            return new JsonResponse($responseJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
+            return new JsonResponse($responseJson, Response::HTTP_FORBIDDEN, [], true);
         }
     }
 
@@ -994,7 +994,7 @@ class ApiController extends AbstractController
                 'message' => 'Une erreur est survenue'
             ];
             $responseJson = $serializer->serialize($content, 'json', []);
-            return new JsonResponse($responseJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
+            return new JsonResponse($responseJson, Response::HTTP_FORBIDDEN, [], true);
         }
     }
 
@@ -1023,7 +1023,7 @@ class ApiController extends AbstractController
                 'message' => 'Une erreur est survenue'
             ];
             $responseJson = $serializer->serialize($content, 'json', []);
-            return new JsonResponse($responseJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
+            return new JsonResponse($responseJson, Response::HTTP_FORBIDDEN, [], true);
         }
     }
 
@@ -1102,7 +1102,7 @@ class ApiController extends AbstractController
                 'message' => 'Une erreur est survenue'
             ];
             $responseJson = $serializer->serialize($content, 'json', []);
-            return new JsonResponse($responseJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
+            return new JsonResponse($responseJson, Response::HTTP_FORBIDDEN, [], true);
         }
     }
 
@@ -1199,7 +1199,7 @@ class ApiController extends AbstractController
                 'message' => 'Une erreur est survenue'
             ];
             $responseJson = $serializer->serialize($content, 'json', []);
-            return new JsonResponse($responseJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
+            return new JsonResponse($responseJson, Response::HTTP_FORBIDDEN, [], true);
         }
     }
 
@@ -1228,7 +1228,7 @@ class ApiController extends AbstractController
                 'message' => 'Une erreur est survenue'
             ];
             $responseJson = $serializer->serialize($content, 'json', []);
-            return new JsonResponse($responseJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
+            return new JsonResponse($responseJson, Response::HTTP_FORBIDDEN, [], true);
         }
     }
 
@@ -1367,7 +1367,7 @@ class ApiController extends AbstractController
                 'message' => 'Une erreur est survenue'
             ];
             $responseJson = $serializer->serialize($content, 'json', []);
-            return new JsonResponse($responseJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
+            return new JsonResponse($responseJson, Response::HTTP_FORBIDDEN, [], true);
         }
     }
 
@@ -1435,7 +1435,7 @@ class ApiController extends AbstractController
                 'message' => 'Une erreur est survenue'
             ];
             $responseJson = $serializer->serialize($content, 'json', []);
-            return new JsonResponse($responseJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
+            return new JsonResponse($responseJson, Response::HTTP_FORBIDDEN, [], true);
         }
     }
 
@@ -1498,7 +1498,7 @@ class ApiController extends AbstractController
                 'message' => 'Une erreur est survenue'
             ];
             $responseJson = $serializer->serialize($content, 'json', []);
-            return new JsonResponse($responseJson, Response::HTTP_INTERNAL_SERVER_ERROR, [], true);
+            return new JsonResponse($responseJson, Response::HTTP_FORBIDDEN, [], true);
         }
     }
 }

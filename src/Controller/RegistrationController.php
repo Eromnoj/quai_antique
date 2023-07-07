@@ -42,6 +42,7 @@ class RegistrationController extends AbstractController
                 $restaurant->setPostCode($form->get('post_code')->getData());
                 $restaurant->setCity($form->get('city')->getData());
                 $restaurant->setPhone($form->get('phone')->getData());
+                $restaurant->setMaxCapacity($form->get('max_capacity')->getData());
                 $entityManager->persist($restaurant);
                 
                 // populated schedule with dummy data

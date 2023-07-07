@@ -34,7 +34,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Assert\Length(min:6, minMessage:"Le mot de passe doit faire au minimum {{ limit }}")]
     private ?string $password = null;
 
-    #[ORM\OneToOne(mappedBy: 'user_id', cascade: ['persist', 'remove'])]
+    #[ORM\OneToOne(mappedBy: 'user', cascade: ['persist', 'remove'])]
     #[Groups(['client_info'])]
     private ?Client $client = null;
 

@@ -64,8 +64,8 @@ class BookingRepository extends ServiceEntityRepository
 
         $firstResult = $page * $maxResult;
         return $this->createQueryBuilder('b')
-            ->addOrderBy('b.date', 'DESC')
-            ->addOrderBy('b.time', 'DESC')
+            ->addOrderBy('b.date', 'ASC')
+            ->addOrderBy('b.time', 'ASC')
             ->andWhere('b.lastname LIKE :name')
             ->setFirstResult($firstResult)
             ->setMaxResults($maxResult)

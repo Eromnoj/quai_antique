@@ -19,14 +19,17 @@ class Client
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Groups(['client_info'])]
+    #[Assert\Regex('/<[a-z][\s\S]*>/i', match:false, message: "Les balises HTML sont interdites")]
     private ?string $lastname = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Groups(['client_info'])]
+    #[Assert\Regex('/<[a-z][\s\S]*>/i', match:false, message: "Les balises HTML sont interdites")]
     private ?string $firstname = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     #[Groups(['client_info'])]
+    #[Assert\Regex('/<[a-z][\s\S]*>/i', match:false, message: "Les balises HTML sont interdites")]
     private ?string $allergies = null;
 
     #[ORM\Column(nullable: true)]

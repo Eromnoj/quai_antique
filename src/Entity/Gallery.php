@@ -21,6 +21,7 @@ class Gallery
 
     #[ORM\Column(type: Types::TEXT)]
     #[Assert\NotBlank(message:"Vous devez indiquer une description")]
+    #[Assert\Regex('/<[a-z][\s\S]*>/i', match:false, message: "Les balises HTML sont interdites")]
     private ?string $description = null;
 
     public function getId(): ?int

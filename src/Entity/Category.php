@@ -21,6 +21,7 @@ class Category
     #[ORM\Column(length: 255)]
     #[Groups(['get_category_with_dishes', 'get_category', 'get_dishes'])]
     #[Assert\NotBlank(message:"Veuillez indiquer un nom pour la catégorie")]
+    #[Assert\Regex('/<[a-z][\s\S]*>/i', match:false, message: "Les balises HTML sont interdites")]
     private ?string $name = null;
 
     #[ORM\Column]
@@ -31,6 +32,7 @@ class Category
 
     #[ORM\OneToMany(mappedBy: 'category', targetEntity: Dish::class, orphanRemoval: true)]
     #[Groups(['get_category_with_dishes'])]
+    #[Assert\Regex('/<[a-z][\s\S]*>/i', match:false, message: "Les balises HTML sont interdites")]
     private Collection $dishes;
 
     public function __construct()

@@ -20,11 +20,13 @@ class Dish
     #[ORM\Column(length: 255)]
     #[Groups(['get_category_with_dishes', 'get_dishes'])]
     #[Assert\NotBlank(message:"Veuillez choisir un nom pour le plat")]
+    #[Assert\Regex('/<[a-z][\s\S]*>/i', match:false, message: "Les balises HTML sont interdites")]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::TEXT)]
     #[Groups(['get_category_with_dishes', 'get_dishes'])]
     #[Assert\NotBlank(message:"Vous devez indiquer une description")]
+    #[Assert\Regex('/<[a-z][\s\S]*>/i', match:false, message: "Les balises HTML sont interdites")]
     private ?string $description = null;
 
     #[ORM\Column]

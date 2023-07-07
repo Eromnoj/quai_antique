@@ -20,11 +20,13 @@ class Formula
     #[ORM\Column(length: 255)]
     #[Groups(['get_menu_with_formulas'])]
     #[Assert\NotBlank(message:"Vous devez choisir un nom de formules")]
+    #[Assert\Regex('/<[a-z][\s\S]*>/i', match:false, message: "Les balises HTML sont interdites")]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::TEXT)]
     #[Groups(['get_menu_with_formulas'])]
     #[Assert\NotBlank(message:"Vous devez indiquer une description")]
+    #[Assert\Regex('/<[a-z][\s\S]*>/i', match:false, message: "Les balises HTML sont interdites")]
     private ?string $description = null;
 
     #[ORM\Column]

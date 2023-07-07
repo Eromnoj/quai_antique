@@ -17,10 +17,12 @@ class Booking
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(message: "Un nom est obligatoire")]
+    #[Assert\Regex('/<[a-z][\s\S]*>/i', match:false, message: "Les balises HTML sont interdites")]
     private ?string $lastname = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(message: "Un prénom est obligatoire")]
+    #[Assert\Regex('/<[a-z][\s\S]*>/i', match:false, message: "Les balises HTML sont interdites")]
     private ?string $firstname = null;
 
     #[ORM\Column(length: 255)]
@@ -48,6 +50,7 @@ class Booking
     private ?\DateTimeInterface $time = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Assert\Regex('/<[a-z][\s\S]*>/i', match:false, message: "Les balises HTML sont interdites")]
     private ?string $allergies = null;
 
     #[ORM\Column(length: 255)]

@@ -21,6 +21,7 @@ class Menu
     #[ORM\Column(length: 255)]
     #[Groups(['get_menu_with_formulas'])]
     #[Assert\NotBlank(message:"Vous devez choisir un nom de menu")]
+    #[Assert\Regex('/<[a-z][\s\S]*>/i', match:false, message: "Les balises HTML sont interdites")]
     private ?string $name = null;
 
     #[ORM\OneToMany(mappedBy: 'menu', targetEntity: Formula::class, orphanRemoval: true)]

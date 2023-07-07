@@ -22,16 +22,19 @@ class Restaurant
     #[ORM\Column(length: 255, nullable: true)]
     #[Groups(['get_restaurant'])]
     #[Assert\NotBlank(message:"Vous devez indiquer une adresse pour le restaurant")]
+    #[Assert\Regex('/<[a-z][\s\S]*>/i', match:false, message: "Les balises HTML sont interdites")]
     private ?string $address = null;
 
     #[ORM\Column(length: 5, nullable: true)]
     #[Groups(['get_restaurant'])]
     #[Assert\NotBlank(message:"Vous devez indiquer un code postal")]
+    #[Assert\Regex('/<[a-z][\s\S]*>/i', match:false, message: "Les balises HTML sont interdites")]
     private ?string $post_code = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Groups(['get_restaurant'])]
     #[Assert\NotBlank(message:"Vous devez indiquer la ville du restaurant")]
+    #[Assert\Regex('/<[a-z][\s\S]*>/i', match:false, message: "Les balises HTML sont interdites")]
     private ?string $city = null;
 
     #[ORM\Column(length: 255, nullable: true)]
